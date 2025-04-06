@@ -123,6 +123,15 @@ public class AROnboardingManager : MonoBehaviour
         Animator animator = humanoidPrefab.GetComponent<Animator>();
         if (animator != null)
         {
+            // Check if an animation is already playing.
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (!animator.IsInTransition(0) && stateInfo.normalizedTime < 1.0f)
+            {
+                // Animation still in progress. Do not trigger a new one.
+                return;
+            }
+            
+            // Otherwise, trigger the correct animation based on selection.
             if (armType == "Left Shoulder")
             {
                 if (motionType == "Vertical")
@@ -234,7 +243,8 @@ public class AROnboardingManager : MonoBehaviour
         // Handle state changes based on the current phase.
         HandleStateChange();
 
-        if (humanoidPrefab != null && humanoidPrefab.activeSelf)
+        // Animate the humanoid only if active and after greeting phase.
+        if (humanoidPrefab != null && humanoidPrefab.activeSelf && currentPhase != OnboardingPhase.Greeting)
         {
             animateHumanoid();
         }
