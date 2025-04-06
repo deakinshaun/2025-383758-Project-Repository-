@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.InputSystem;
 
 public class ARObjectSpawner : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class ARObjectSpawner : MonoBehaviour
     private Dictionary<string, GameObject> spawnedObjects = new Dictionary<string, GameObject>();
     private ARTrackedImageManager arTrackedImageManager;
 
+    private GameObject lastSelected;
+    public LayerMask interactableLayer;
     void Awake()
     {
         arTrackedImageManager = GetComponent<ARTrackedImageManager>();
@@ -43,7 +46,7 @@ public class ARObjectSpawner : MonoBehaviour
 
     void SpawnObject(ARTrackedImage trackedImage)
     {
-        if (spawnedObjects.ContainsKey(trackedImage.referenceImage.name)) return; // Avoid duplicate spawns
+        if (spawnedObjects.ContainsKey(trackedImage.referenceImage.name)) return; 
 
         int index = GetIndexFromImageName(trackedImage.referenceImage.name);
         if (index == -1) return;
@@ -80,4 +83,42 @@ public class ARObjectSpawner : MonoBehaviour
         }
         return -1;
     }
+
+    //void Update()
+    //{
+    //    if (Touchscreen.current == null || Touchscreen.current.primaryTouch.press.isPressed == false)
+    //        return;
+
+    //    if (Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+    //    {
+    //        Vector2 touchPos = Touchscreen.current.primaryTouch.position.ReadValue();
+    //        Ray ray = Camera.main.ScreenPointToRay(touchPos);
+
+    //        if (Physics.Raycast(ray, out RaycastHit hit, 100f, interactableLayer))
+    //        {
+    //            GameObject selectedObject = hit.collider.gameObject;
+
+    //            if (lastSelected != null && lastSelected != selectedObject)
+    //            {
+    //                // remove previous highlight
+    //                HighlightObject(lastSelected, false);
+    //            }
+
+    //            HighlightObject(selectedObject, true);
+    //            lastSelected = selectedObject;
+    //        }
+    //    }
+    //}
+
+    //void HighlightObject(GameObject obj, bool highlight)
+    //{
+    //    Renderer rend = obj.GetComponent<Renderer>();
+    //    if (rend)
+    //    {
+    //        if (highlight)
+    //            rend.material.color = Color.yellow; // highlighted
+    //        else
+    //            rend.material.color = Color.white;  // default
+    //    }
+    //}
 }

@@ -64,7 +64,9 @@
         "Assembly-CSharp",
         "Assembly-CSharp-firstpass",
         "Fusion.Addons.Physics",
-        "Fusion.Addons.FSM"
+        "Fusion.Addons.FSM",
+        "PhotonVoice.Fusion",
+        "Meta.XR.MultiplayerBlocks.Fusion"
     ],
     "UseSerializableDictionary": true,
     "NullChecksForNetworkedProperties": true,
