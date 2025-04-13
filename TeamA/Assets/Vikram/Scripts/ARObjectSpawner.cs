@@ -1,16 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.InputSystem;
+using TMPro;
 
 public class ARObjectSpawner : MonoBehaviour
 {
-    public List<GameObject> objectsToSpawn; 
-    private Dictionary<string, GameObject> spawnedObjects = new Dictionary<string, GameObject>();
+    public List<GameObject> objectsToSpawn;
+
+    [SerializeField] public Dictionary<string, GameObject> trackedObjects = new Dictionary<string, GameObject>();
     private ARTrackedImageManager arTrackedImageManager;
+
+    private GameObject lastSelected;
+    public LayerMask interactableLayer;
+
+    public TMP_Text debugText;
 
     void Awake()
     {
         arTrackedImageManager = GetComponent<ARTrackedImageManager>();
+    }
+
+    void Start()
+    {
+        for (int i = 0; i < arTrackedImageManager.referenceLibrary.count; i++)
+        {
+            GameObject gameObject = Instantiate(objectsToSpawn[i]);
+            gameObject.SetActive(false);
+            trackedObjects[arTrackedImageManager.referenceLibrary[i].name] = gameObject;
+        }
     }
 
     private void OnEnable()
@@ -32,52 +50,72 @@ public class ARObjectSpawner : MonoBehaviour
 
         foreach (var updatedImage in args.updated)
         {
-            UpdateObjectPosition(updatedImage);
+            
+            UpdateObjectTransform(updatedImage);
         }
 
         foreach (var removedImage in args.removed)
         {
-            RemoveObject(removedImage);
+           
+            RemovedObjects(removedImage);
         }
     }
 
-    void SpawnObject(ARTrackedImage trackedImage)
+    private void RemovedObjects(ARTrackedImage removedImage)
     {
-        if (spawnedObjects.ContainsKey(trackedImage.referenceImage.name)) return; // Avoid duplicate spawns
-
-        int index = GetIndexFromImageName(trackedImage.referenceImage.name);
-        if (index == -1) return;
-
-        GameObject obj = Instantiate(objectsToSpawn[index], trackedImage.transform.position, trackedImage.transform.rotation);
-       
-        spawnedObjects[trackedImage.referenceImage.name] = obj;
+        trackedObjects[removedImage.referenceImage.name].SetActive(false);
     }
 
-    void UpdateObjectPosition(ARTrackedImage trackedImage)
+    private void UpdateObjectTransform(ARTrackedImage updatedImage)
     {
-        if (spawnedObjects.TryGetValue(trackedImage.referenceImage.name, out GameObject obj))
+        trackedObjects[updatedImage.referenceImage.name].transform.position = updatedImage.transform.position;
+        trackedObjects[updatedImage.referenceImage.name].transform.rotation = updatedImage.transform.rotation;
+    }
+
+    private void SpawnObject(ARTrackedImage trackedImage)
+    {
+       trackedObjects[trackedImage.referenceImage.name].SetActive(true);
+       trackedObjects[trackedImage.referenceImage.name].transform.localScale = new Vector3(1, 1, 1);
+    }
+
+    void Update()
+    {
+        if (Touchscreen.current == null || Touchscreen.current.primaryTouch.press.isPressed == false)
+            return;
+
+        if (Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
         {
-            obj.transform.position = trackedImage.transform.position;
-            obj.transform.rotation = trackedImage.transform.rotation;
+            Vector2 touchPos = Touchscreen.current.primaryTouch.position.ReadValue();
+            Ray ray = Camera.main.ScreenPointToRay(touchPos);
+
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, interactableLayer))
+            {
+                GameObject selectedObject = hit.collider.gameObject;
+
+                if (lastSelected != null && lastSelected != selectedObject)
+                {
+                    // remove previous highlight
+                    HighlightObject(lastSelected, false);
+                    
+                }
+
+                HighlightObject(selectedObject, true);
+                lastSelected = selectedObject;
+
+                debugText.text = lastSelected.name;
+            }
         }
     }
 
-    void RemoveObject(ARTrackedImage trackedImage)
+    void HighlightObject(GameObject obj, bool highlight)
     {
-        if (spawnedObjects.TryGetValue(trackedImage.referenceImage.name, out GameObject obj))
+        Renderer rend = obj.GetComponent<Renderer>();
+        if (rend)
         {
-            Destroy(obj);
-            spawnedObjects.Remove(trackedImage.referenceImage.name);
+            if (highlight)
+                rend.material.color = Color.yellow; // highlighted
+            else
+                rend.material.color = Color.white;  // default
         }
-    }
-
-    int GetIndexFromImageName(string imageName)
-    {
-        for (int i = 0; i < objectsToSpawn.Count; i++)
-        {
-            if (objectsToSpawn[i].name == imageName)
-                return i;
-        }
-        return -1;
     }
 }
