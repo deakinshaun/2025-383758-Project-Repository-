@@ -14,7 +14,7 @@ namespace OrgilFolder.Scripts.UI
         public void Initialize(GameProperty gameProperty)
         {
             gameModeName.SetText(gameProperty.gameModeName);
-            maxPlayers.SetText($"Max Players:{gameProperty.maxPlayerCount}");
+            maxPlayers.SetText($"Max Players:{gameProperty.MaxPlayerCount}");
             gameModeDescription.SetText(gameProperty.description);
             previewImage.sprite =
                 Sprite.Create(gameProperty.previewImage,

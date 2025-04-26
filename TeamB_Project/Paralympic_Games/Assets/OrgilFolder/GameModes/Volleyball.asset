@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameModeName: Volleyball
   sport: 0
-  maxPlayerCount: 10
-  sceneIndex: 1
+  matchDuration: 300
+  teams: 2
+  playersPerTeam: 5
+  scenePath: Assets/OrgilFolder/Scenes/BasketballCourt.unity
   previewImage: {fileID: 2800000, guid: 9f085cfd241a58040b2057e83092d6ba, type: 3}
   description: Volleyball Description

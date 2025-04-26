@@ -11,7 +11,7 @@ namespace OrgilFolder.Scripts.UI
         [SerializeField] private Button prevButton;
         [SerializeField] private RectTransform contentRect;
         public int currentIndex;
-
+        public RectTransform ContentRect => contentRect;
         private int childCount;
         private float childWidth;
 
