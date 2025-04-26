@@ -1,0 +1,2 @@
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

@@ -4,6 +4,10 @@ using UnityEngine;
 using Photon.Voice.Unity;
 using Photon.Realtime;
 using Photon.Pun;
+using Unity.VisualScripting;
+using UnityEngine.UI;
+
+
 #if PLATFORM_ANDROID
 using UnityEngine.Android;
 #endif
@@ -17,7 +21,7 @@ public class VoiceManager : MonoBehaviourPunCallbacks
     public int statusMaxLength = 100;
 
     [Tooltip("Controller input used to toggle microphone")]
-    //public OVRInput.RawButton button = OVRInput.RawButton.LThumbstickUp;
+    public Button button;
 
     public GameObject microphoneIndicator;
     public Material microphoneOn;
@@ -43,7 +47,6 @@ public class VoiceManager : MonoBehaviourPunCallbacks
     {
         status.text = "";
         setStatusText("Application started");
-    
 
         #if PLATFORM_ANDROID
         if (!Permission.HasUserAuthorizedPermission(Permission.Microphone))
@@ -71,7 +74,7 @@ public class VoiceManager : MonoBehaviourPunCallbacks
         VoiceConnection vc = GetComponent<VoiceConnection>();
         setStatusText("Joined room with " + vc.Client.CurrentRoom.PlayerCount + " participants.");
 
-        switchMicrophone();
+        SwitchMicrophone();
     }
 
     public void OnDisconnected(DisconnectCause cause)
@@ -79,7 +82,7 @@ public class VoiceManager : MonoBehaviourPunCallbacks
         setStatusText("Disconnected " + cause);
     }
 
-    public void switchMicrophone()
+    public void SwitchMicrophone()
     {
         VoiceConnection vc = GetComponent<VoiceConnection>();
         vc.PrimaryRecorder.TransmitEnabled = !vc.PrimaryRecorder.TransmitEnabled;
@@ -116,7 +119,7 @@ public class VoiceManager : MonoBehaviourPunCallbacks
         }
         setStatusText(vc.Client.State.ToString() + " server: " + vc.Client.CloudRegion + ":" + vc.Client.CurrentServerAddress +
         " room: " + room + " participants: " + otherParticipants);
-
+        
 
     }
     }

@@ -1,0 +1,17 @@
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\GAToUnityCallbacks.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\MacroEnd.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\MacroHeaderBegin.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\MacroSourceBegin.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAApplication.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAConfiguration.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGADebug.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAEvents.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAInput.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGASoftKeyboard.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGASoftKeyboardCallbacks.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGATypes.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UGAVersion.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGACallbacks.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGAConfigurationCallbacks.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGAKeyEventCallbacks.h
+C:\SIT383\2025-383758-Project-Repository-\TeamC\TeamC_project\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\UnityToGAMotionEventCallbacks.h
