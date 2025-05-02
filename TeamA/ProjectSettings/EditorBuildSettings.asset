@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Vikram/Scenes/Vikram.unity
+    path: Assets/Vikram/Scenes/Vikram_MarkerTracking.unity
     guid: 64392ad04e7c9504f85e6cd5855d7a48
   - enabled: 1
     path: Assets/Aleena/Scenes/Aleena's Scene.unity
