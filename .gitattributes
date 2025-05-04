@@ -1,0 +1,15 @@
+Team[[:space:]]E/**/*.fbx filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.png filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.tga filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.wav filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.psd filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.mb filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.tif filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.cubemap filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.tiff filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.exr filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.mp3 filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.asset filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.unitypackage filter=lfs diff=lfs merge=lfs -text
+Team[[:space:]]E/**/*.bin filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,19 @@
+# ninja log v5
+0	6863	1746015968938810053	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	ebe49d2e3ecf2355
+6863	7137	1746015969215807366	/Users/dream/Desktop/SIT383NewProjectFolder/SIT383Project/TeamB_Project/Paralympic_Games/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/a5yn4h52/obj/arm64-v8a/libgame.so	820e7fcfcc590297
+6	6626	1746015968699576749	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	224ffda535a997f0
+15	6319	1746015968389840750	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	1b0be7e062cf035f
+2	6027	1746015968099226923	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c9251b04bc0037e4
+13	5868	1746015967927787726	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	bee00cebf44845ea
+1	5847	1746015967917555265	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	9e1594892111326a
+4	5772	1746015967832180469	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	d77d7885875c780f
+10	5756	1746015967826463841	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f6d7b582dee1790b
+25	3877	1746071554946523985	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	d77d7885875c780f
+28	3890	1746071554938495541	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	f6d7b582dee1790b
+24	4065	1746071555128981556	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	9e1594892111326a
+30	4071	1746071555141680453	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	bee00cebf44845ea
+24	4266	1746071555334412975	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	c9251b04bc0037e4
+32	4409	1746071555477669114	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	1b0be7e062cf035f
+27	4793	1746071555862048056	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	224ffda535a997f0
+23	5039	1746071556107725916	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	ebe49d2e3ecf2355
+5040	5384	1746071556457431434	/Users/dream/Desktop/SIT383NewProjectFolder/SIT383Project/TeamB_Project/Paralympic_Games/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/a5yn4h52/obj/arm64-v8a/libgame.so	820e7fcfcc590297
