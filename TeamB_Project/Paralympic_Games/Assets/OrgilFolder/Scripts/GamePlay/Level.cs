@@ -35,15 +35,21 @@ namespace OrgilFolder.Scripts.GamePlay
             GameManager.Instance.Rpc_LoadDone();
         }
 
-        public Vector3 GetSpawnPosition(int index, int team)
+        public (Vector3,Quaternion) GetSpawnPositionAndRotation(int index, int team)
         {
-            return team switch
+            Transform spawnTf = team switch
             {
-                1 => team1SpawnPositions[index % team1SpawnPositions.Length].position,
-                2 => team2SpawnPositions[index % team2SpawnPositions.Length].position,
-                -1 => spectatorPositions[index % spectatorPositions.Length].position,
-                _ => Vector3.zero
+                1 => team1SpawnPositions[index % team1SpawnPositions.Length],
+                2 => team2SpawnPositions[index % team2SpawnPositions.Length],
+                -1 => spectatorPositions[index % spectatorPositions.Length],
             };
+
+            if (spawnTf)
+            {
+                return (spawnTf.position, spawnTf.rotation);
+            }
+
+            return (Vector3.zero, Quaternion.identity);
         }
     }
 }

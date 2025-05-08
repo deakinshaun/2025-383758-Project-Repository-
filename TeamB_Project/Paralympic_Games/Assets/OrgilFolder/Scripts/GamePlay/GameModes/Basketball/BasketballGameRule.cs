@@ -9,6 +9,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         [SerializeField] private Transform ballSpawnNeutralTf;
         [SerializeField] private Transform team1BallSpawnTf;
         [SerializeField] private Transform team2BallSpawnTf;
+        
         public static BasketballGameRule Instance { get; private set; }
         [SerializeField] private NetworkPrefabRef ballPrefab;
         [Networked] public int TeamAScore { get; private set; }
@@ -32,7 +33,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         public void SpawnBallNeutral()
         {
-            Runner.Spawn(ballPrefab, transform.position, Quaternion.identity, onBeforeSpawned: (runner, obj) =>
+            Runner.Spawn(ballPrefab, ballSpawnNeutralTf.position, ballSpawnNeutralTf.rotation, onBeforeSpawned: (runner, obj) =>
             {
                 var ball = obj.GetComponent<Ball>();
 
@@ -42,7 +43,13 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         private void SpawnBallForTeam(int team)
         {
-            Runner.Spawn(ballPrefab, transform.position, Quaternion.identity, onBeforeSpawned: (runner, obj) =>
+
+            Transform spawnTf = team switch
+            {
+                1 => team1BallSpawnTf,
+                2 => team2BallSpawnTf,
+            };
+            Runner.Spawn(ballPrefab, spawnTf.position, spawnTf.rotation, onBeforeSpawned: (runner, obj) =>
             {
                 var ball = obj.GetComponent<Ball>();
                 ball.InitializePossession(team);

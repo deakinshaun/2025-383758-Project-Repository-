@@ -1,9 +1,10 @@
 ﻿using System;
+using Fusion;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 {
-    public class WheelchairMovement : MonoBehaviour
+    public class WheelchairMovement : NetworkBehaviour
     {
         [SerializeField] private Transform leftWheel;
         [SerializeField] private Transform rightWheel;
@@ -15,26 +16,49 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         private float leftPrevAngle;
         private float rightPrevAngle;
         private float wheelBase;
-        private Rigidbody _leftRb;
-        private Rigidbody _rightRb;
+
 
         private Vector3 leftWheelUpLocal;
         private Vector3 rightWheelUpLocal;
 
+
+        private Vector3 inputVel;
+        private Quaternion inputRot;
+
         private void Start()
         {
-            _leftRb = leftWheel.GetComponent<Rigidbody>();
-            _rightRb = rightWheel.GetComponent<Rigidbody>();
-
             leftWheelUpLocal = transform.InverseTransformDirection(leftWheel.transform.up);
             rightWheelUpLocal = transform.InverseTransformDirection(rightWheel.transform.up);
-
-
             leftPrevAngle = GetCurrentRotAngle(leftWheel, transform.TransformDirection(leftWheelUpLocal));
             rightPrevAngle = GetCurrentRotAngle(rightWheel, transform.TransformDirection(rightWheelUpLocal));
-
-
             wheelBase = Vector3.Distance(leftWheel.transform.position, rightWheel.transform.position);
+        }
+
+        public override void Spawned()
+        {
+            base.Spawned();
+            
+            if (HasInputAuthority)
+            {
+                PlayerInputBehaviour.GetInput += ProvideInput;
+            }
+        }
+
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            base.Despawned(runner, hasState);
+            
+            PlayerInputBehaviour.GetInput -= ProvideInput;
+
+        }
+        
+        private PlayerInput ProvideInput()
+        {
+            return new PlayerInput
+            {
+                rotation = inputRot,
+                velocity = inputVel
+            };
         }
 
         private void Update()
@@ -84,12 +108,12 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             float forwardSpeed = (leftSpeed + rightSpeed) * 0.5f;
             float rotAngVel = Mathf.Rad2Deg * (leftSpeed - rightSpeed) / wheelBase;
 
-            transform.position += transform.forward * (forwardSpeed * Time.fixedDeltaTime);
+            inputVel = transform.forward * forwardSpeed;
 
             if (Mathf.Abs(rotAngVel) > speedDiffThreshold)
             {
-                transform.rotation = Quaternion.AngleAxis(rotAngVel * Time.fixedDeltaTime, Vector3.up) *
-                                     transform.rotation;
+                inputRot = Quaternion.AngleAxis(rotAngVel * Time.fixedDeltaTime, Vector3.up) *
+                           transform.rotation;
             }
 
             leftPrevAngle = LRotAngle;
