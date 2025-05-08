@@ -22,6 +22,8 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         private Vector3 rightWheelUpLocal;
 
 
+        private InputSystem_Actions _inputSystemActions;
+
         private Vector3 inputVel;
         private Quaternion inputRot;
 
@@ -37,7 +39,8 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         public override void Spawned()
         {
             base.Spawned();
-            
+            _inputSystemActions = new InputSystem_Actions();
+            _inputSystemActions.Enable();
             if (HasInputAuthority)
             {
                 PlayerInputBehaviour.GetInput += ProvideInput;
@@ -47,11 +50,10 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             base.Despawned(runner, hasState);
-            
-            PlayerInputBehaviour.GetInput -= ProvideInput;
 
+            PlayerInputBehaviour.GetInput -= ProvideInput;
         }
-        
+
         private PlayerInput ProvideInput()
         {
             return new PlayerInput
@@ -63,31 +65,23 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         private void Update()
         {
-            if (Input.GetMouseButton(0))
-            {
-                float x = Input.mousePositionDelta.x;
-                leftWheel.transform.rotation = Quaternion.AngleAxis(x * Time.deltaTime, leftWheel.right) *
-                                               leftWheel.transform.rotation;
-            }
-
-            if (Input.GetKey(KeyCode.A))
+            if (_inputSystemActions.Player.LeftWheelUp.IsPressed())
             {
                 leftWheel.transform.rotation = Quaternion.AngleAxis(-rotSpeed * Time.deltaTime, leftWheel.right) *
                                                leftWheel.transform.rotation;
             }
-            else if (Input.GetKey(KeyCode.Q))
+            else if (_inputSystemActions.Player.LeftWheelDown.IsPressed())
             {
                 leftWheel.transform.rotation = Quaternion.AngleAxis(rotSpeed * Time.deltaTime, leftWheel.right) *
                                                leftWheel.transform.rotation;
             }
 
-
-            if (Input.GetKey(KeyCode.D))
+            if (_inputSystemActions.Player.RightWheelUp.IsPressed())
             {
                 rightWheel.transform.rotation = Quaternion.AngleAxis(rotSpeed * Time.deltaTime, rightWheel.right) *
                                                 rightWheel.transform.rotation;
             }
-            else if (Input.GetKey(KeyCode.E))
+            else if (_inputSystemActions.Player.RightWheelDown.IsPressed())
             {
                 rightWheel.transform.rotation = Quaternion.AngleAxis(-rotSpeed * Time.deltaTime, rightWheel.right) *
                                                 rightWheel.transform.rotation;

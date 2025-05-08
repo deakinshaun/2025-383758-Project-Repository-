@@ -14,7 +14,6 @@ public class PlayerInputBehaviour : Fusion.Behaviour,INetworkRunnerCallbacks
         if(PlayerObject.Local == null ) return;
         if(GameManager.State.Current != GameState.EGameState.Game) return;
         if(GetInput==null) return;
-        Debug.Log("getting input");
         input.Set(GetInput.Invoke());
     }
     #region Unused Callbacks

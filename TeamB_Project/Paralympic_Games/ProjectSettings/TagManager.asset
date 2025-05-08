@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ball
+  - SamplesInfoPanel
   layers:
   - Default
   - TransparentFX
@@ -12,7 +13,7 @@ TagManager:
   - HiddenMesh
   - Water
   - UI
-  - 
+  - Overlay UI
   - 
   - 
   - 

@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using System;
+using Fusion;
 using OrgilFolder.Scripts;
 using OrgilFolder.Scripts.GamePlay;
 using OrgilFolder.Scripts.GamePlay.GameModes.Basketball;
@@ -16,12 +17,18 @@ public class GameState : NetworkBehaviour
         Outro,
         Postgame
     }
+
     [Networked] [field: ReadOnly] public EGameState Previous { get; set; }
     [Networked] [field: ReadOnly] public EGameState Current { get; set; }
     [Networked] TickTimer Delay { get; set; }
     [Networked] EGameState DelayedState { get; set; }
 
     protected StateMachine<EGameState> StateMachine = new();
+
+    public float DelayRemainingTime => Delay.RemainingTime(Runner).Value;
+    public event Action<EGameState> onSetState;
+    public event Action<EGameState, float> onSetDelaydState;
+
     public override void Spawned()
     {
         if (Runner.IsServer)
@@ -76,7 +83,8 @@ public class GameState : NetworkBehaviour
                 PlayerRegistry.ForEach((p, i) =>
                 {
                     (Vector3, Quaternion) spawnPosRot = Level.Current.GetSpawnPositionAndRotation(i, p.Team);
-                    Runner.Spawn(ResourcesManager.Instance.playerControllerPrefab, position: spawnPosRot.Item1, rotation: spawnPosRot.Item2,
+                    Runner.Spawn(ResourcesManager.Instance.playerControllerPrefab, position: spawnPosRot.Item1,
+                        rotation: spawnPosRot.Item2,
                         inputAuthority: p.Ref);
                     //TODO:Spawn each player on avialable spawn locations
                 });
@@ -91,9 +99,9 @@ public class GameState : NetworkBehaviour
                 PlayerRegistry.ForEach(p => { });
             }
 
-            //Maybe show some cinematic camera movement
+
             //TODO:Start countdown for game
-            Server_DelaySetState(EGameState.Game, 10);
+            Server_DelaySetState(EGameState.Game, 6f);
         };
 
         StateMachine[EGameState.Game].onEnter = prev =>
@@ -141,6 +149,7 @@ public class GameState : NetworkBehaviour
         Runner.SetIsSimulated(Object, true);
         StateMachine.Update(Current, Previous);
     }
+
     public override void FixedUpdateNetwork()
     {
         if (Runner.IsServer)
@@ -155,17 +164,23 @@ public class GameState : NetworkBehaviour
         if (Runner.IsForward)
             StateMachine.Update(Current, Previous);
     }
+
     public void Server_SetState(EGameState state)
     {
         if (Current == state) return;
         //Debug.Log($"Set State to {st}");
         Previous = Current;
         Current = state;
+
+        onSetState?.Invoke(Current);
     }
+
     public void Server_DelaySetState(EGameState newState, float delay)
     {
         Debug.Log($"Delay state change to {newState} for {delay}s");
         Delay = TickTimer.CreateFromSeconds(Runner, delay);
         DelayedState = newState;
+
+        onSetDelaydState?.Invoke(DelayedState, delay);
     }
 }
