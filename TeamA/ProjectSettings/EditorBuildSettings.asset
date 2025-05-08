@@ -6,14 +6,22 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Vikram/Scenes/Vikram.unity
+    path: Assets/Vikram/Scenes/Vikram_MarkerTracking.unity
     guid: 64392ad04e7c9504f85e6cd5855d7a48
-  - enabled: 1
+  - enabled: 0
     path: Assets/Aleena/Scenes/Aleena's Scene.unity
     guid: 60825738bad9cde498a27b4bd5bb9336
+  - enabled: 0
+    path: Assets/Vikram/Scenes/Vikram_GestureRecognitaion.unity
+    guid: a121ac7367a29df40acf79371410a6a1
+  - enabled: 1
+    path: Assets/Samples/XR Hands/1.5.1/Gestures/HandGestures.unity
+    guid: cd792f2302b8b6f4c9f264e2a4503e15
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 6bb559929486f0346a5974a69641dffb, type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: 46dbaad8b20474e46bd3afa3970463a4, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 915d66e217acfd4439828d6db1abe0f8, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 1b16dac5a795f564b833fcee392ff961, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 9f9661e17cc4bad49b5d75775063cd09, type: 2}
   m_UseUCBPForAssetBundles: 0

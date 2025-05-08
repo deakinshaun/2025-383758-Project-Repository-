@@ -1,10 +1,19 @@
 # ninja log v5
-2	5061	1744527343394235099	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	8989dc36e3f3f441
+5764	5915	1744527344249600053	/Users/dream/Desktop/SIT383NewProjectFolder/SIT383Project/TeamB_Project/Paralympic_Games/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/6u6s2w33/obj/arm64-v8a/libgame.so	c59d7760f956d8c1
+1	5764	1744527344090774664	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	f0cd89f78d7faa2b
+3	5638	1744527343967444197	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	9b9d3c99286ca12b
+9	5447	1744527343778385709	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	45ea8f4a7c3c3fec
+6	5293	1744527343612876578	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1bb4a362d0b50ece
+2	5290	1744527343593280523	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	5d421b22747e7181
 5	5079	1744527343398295641	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	c8f66022c0f9f310
 1	5096	1744527343431004693	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	dbecc7e2de027989
-2	5290	1744527343593280523	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	5d421b22747e7181
-6	5293	1744527343612876578	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1bb4a362d0b50ece
-9	5447	1744527343778385709	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	45ea8f4a7c3c3fec
-3	5638	1744527343967444197	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	9b9d3c99286ca12b
-1	5764	1744527344090774664	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	f0cd89f78d7faa2b
-5764	5915	1744527344249600053	/Users/dream/Desktop/SIT383NewProjectFolder/SIT383Project/TeamB_Project/Paralympic_Games/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/6u6s2w33/obj/arm64-v8a/libgame.so	c59d7760f956d8c1
+2	5061	1744527343394235099	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	8989dc36e3f3f441
+39	3222	1745731248595566903	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	c8f66022c0f9f310
+36	3235	1745731248618330291	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	8989dc36e3f3f441
+41	3249	1745731248627015311	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1bb4a362d0b50ece
+33	3251	1745731248634824182	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	dbecc7e2de027989
+35	3301	1745731248680995505	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	5d421b22747e7181
+43	3427	1745731248807475047	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	45ea8f4a7c3c3fec
+37	3520	1745731248900257793	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	9b9d3c99286ca12b
+31	3616	1745731248992483562	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	f0cd89f78d7faa2b
+3616	3858	1745731249243939968	/Users/dream/Desktop/SIT383NewProjectFolder/SIT383Project/TeamB_Project/Paralympic_Games/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/6u6s2w33/obj/arm64-v8a/libgame.so	c59d7760f956d8c1

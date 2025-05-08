@@ -8,4 +8,8 @@ public class AppController : MonoBehaviour
     {
         SceneManager.LoadScene("VoiceChat");
     }
+    public void ChangeSceneButtons()
+    {
+        SceneManager.LoadScene("Buttons");
+    }
 }
