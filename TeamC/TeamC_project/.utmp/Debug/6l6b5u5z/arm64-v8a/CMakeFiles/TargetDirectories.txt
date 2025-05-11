@@ -1,5 +1,0 @@
-C:/SIT383/2025-383758-Project-Repository-/TeamC/TeamC_project/.utmp/Debug/6l6b5u5z/arm64-v8a/CMakeFiles/edit_cache.dir
-C:/SIT383/2025-383758-Project-Repository-/TeamC/TeamC_project/.utmp/Debug/6l6b5u5z/arm64-v8a/CMakeFiles/rebuild_cache.dir
-C:/SIT383/2025-383758-Project-Repository-/TeamC/TeamC_project/.utmp/Debug/6l6b5u5z/arm64-v8a/GameActivity/CMakeFiles/game.dir
-C:/SIT383/2025-383758-Project-Repository-/TeamC/TeamC_project/.utmp/Debug/6l6b5u5z/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
-C:/SIT383/2025-383758-Project-Repository-/TeamC/TeamC_project/.utmp/Debug/6l6b5u5z/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
