@@ -870,7 +870,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectsToPlace:
-  - {fileID: 138252, guid: be999fe03c257ec4cb0a3a4b5ca72217, type: 3}
+  - {fileID: 5406216532793693267, guid: 54cf0cb8c4108af4fb80aba107816703, type: 3}
+  - {fileID: 404529157075006717, guid: 249c6bc530603cb40a6e74a35a889847, type: 3}
+  - {fileID: 8174806603297885247, guid: c94e1ec57accf1e4fa58aa4f0043f702, type: 3}
+  - {fileID: 205453725053136529, guid: 24e5c4efaa8f289408a9fe1b02ddccc6, type: 3}
 --- !u!114 &1375737374
 MonoBehaviour:
   m_ObjectHideFlags: 0

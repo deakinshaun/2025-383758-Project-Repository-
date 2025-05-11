@@ -18,72 +18,42 @@ MonoBehaviour:
     m_Storage: []
   m_Images:
   - m_SerializedGuid:
-      m_GuidLow: 5165233272953069910
-      m_GuidHigh: 17883883431936981392
+      m_GuidLow: 4644995113605432715
+      m_GuidHigh: 15910407111250673800
     m_SerializedTextureGuid:
-      m_GuidLow: 15191948609643035295
-      m_GuidHigh: 16700512198431045147
-    m_Size: {x: 0.2, y: 0.26666668}
-    m_SpecifySize: 0
-    m_Name: EastlandEntry
-    m_Texture: {fileID: 0}
-  - m_SerializedGuid:
-      m_GuidLow: 5551387118574289124
-      m_GuidHigh: 10587630375475574204
-    m_SerializedTextureGuid:
-      m_GuidLow: 14926086268631754613
-      m_GuidHigh: 8715680739299464666
+      m_GuidLow: 10301136450506715181
+      m_GuidHigh: 11441755251521217976
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: RealmCorner
+    m_Name: Bricks
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
-      m_GuidLow: 5678044919145153045
-      m_GuidHigh: 17200021225033514421
+      m_GuidLow: 5146830230443292299
+      m_GuidHigh: 527883777156816795
     m_SerializedTextureGuid:
-      m_GuidLow: 3842798374830622890
-      m_GuidHigh: 7310165617178622249
+      m_GuidLow: 5540563514982442518
+      m_GuidHigh: 10486134245006863131
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: RealmLogo
+    m_Name: lattice
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
-      m_GuidLow: 5280876150926723792
-      m_GuidHigh: 4583087130219570607
+      m_GuidLow: 5078196213254945309
+      m_GuidHigh: 9126717234738901138
     m_SerializedTextureGuid:
-      m_GuidLow: 16241189234252991009
-      m_GuidHigh: 5175958004956547131
+      m_GuidLow: 3288938922047513237
+      m_GuidHigh: 14354104100094704139
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: RealmStairs
+    m_Name: Tile
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
-      m_GuidLow: 5260363984442152077
-      m_GuidHigh: 8986464908408382610
+      m_GuidLow: 4683781933192375785
+      m_GuidHigh: 8864494075077305273
     m_SerializedTextureGuid:
-      m_GuidLow: 11769049465702339366
-      m_GuidHigh: 2900802108496676715
+      m_GuidLow: 8323908533167812709
+      m_GuidHigh: 3814207790872108555
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: RealmWestWall
-    m_Texture: {fileID: 0}
-  - m_SerializedGuid:
-      m_GuidLow: 5608615068794056160
-      m_GuidHigh: 2300068141527264141
-    m_SerializedTextureGuid:
-      m_GuidLow: 11165559668081940014
-      m_GuidHigh: 11641336108551497224
-    m_Size: {x: 0, y: 0}
-    m_SpecifySize: 0
-    m_Name: VRBuilding
-    m_Texture: {fileID: 0}
-  - m_SerializedGuid:
-      m_GuidLow: 4720346917288376195
-      m_GuidHigh: 3560973335751990431
-    m_SerializedTextureGuid:
-      m_GuidLow: 14971153074836992378
-      m_GuidHigh: 14523878268793584187
-    m_Size: {x: 0, y: 0}
-    m_SpecifySize: 0
-    m_Name: WindowArt
+    m_Name: VRbuilding2
     m_Texture: {fileID: 0}
