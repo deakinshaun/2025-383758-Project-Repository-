@@ -302,8 +302,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _possibleObjectsToPlace:
-  - {fileID: 334580906568695238, guid: 71dafee74375e4a4ea9f736bcc74f128, type: 3}
-  - {fileID: 5250739721147643005, guid: 6b3018e22f9bd694facbf639fdb75486, type: 3}
   - {fileID: 7590453392888686472, guid: c58829182f121f24aa5317a22823ca57, type: 3}
   - {fileID: 138252, guid: be999fe03c257ec4cb0a3a4b5ca72217, type: 3}
   - {fileID: 100102, guid: ff3dd417bb566b849b752ce57810bbf5, type: 3}
@@ -313,10 +311,6 @@ MonoBehaviour:
   - {fileID: 3106567675024232183, guid: b39f870bca3c65845b4018b6c923d528, type: 3}
   - {fileID: 100102, guid: ff3dd417bb566b849b752ce57810bbf5, type: 3}
   _latLongs:
-  - latitude: -37.80661
-    longitude: 145.2339
-  - latitude: -37.80672849705581
-    longitude: 145.23394892508279
   - latitude: -37.8147708
     longitude: 145.228881
   - latitude: -37.8146386
@@ -889,9 +883,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectsToPlace:
-  - {fileID: 5406216532793693267, guid: 54cf0cb8c4108af4fb80aba107816703, type: 3}
-  - {fileID: 404529157075006717, guid: 249c6bc530603cb40a6e74a35a889847, type: 3}
   - {fileID: 8174806603297885247, guid: c94e1ec57accf1e4fa58aa4f0043f702, type: 3}
+  - {fileID: 5406216532793693267, guid: 54cf0cb8c4108af4fb80aba107816703, type: 3}
+  - {fileID: 3131365678830870081, guid: c09083cd3eb23664f8aab1816b8b97a8, type: 3}
+  - {fileID: 7082793196582495681, guid: d4debfd3282e4974db90b3055f94957b, type: 3}
+  - {fileID: 892402055251382800, guid: a2bdf7081c61cba45b21fea7c192fe4e, type: 3}
   - {fileID: 205453725053136529, guid: 24e5c4efaa8f289408a9fe1b02ddccc6, type: 3}
 --- !u!114 &1375737374
 MonoBehaviour:

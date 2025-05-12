@@ -9,7 +9,7 @@ Library: C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\AugArt App\Temp\Burst
---key-folder=C:/Unity/Unity Editor/6000.0.45f1/Editor/Data/PlaybackEngines/AndroidPlayer
+--key-folder=C:/Program Files/Unity/Hub/Editor/6000.0.45f1/Editor/Data/PlaybackEngines/AndroidPlayer
 --decode-folder=C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\AugArt App\Library\Burst
 --output=C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\AugArt App\Temp\BurstOutput\tempburstlibs\armeabi-v7a\lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/
@@ -124,7 +124,7 @@ Library: C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\
 --float-mode=Fast
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\AugArt App\Temp\Burst
---key-folder=C:/Unity/Unity Editor/6000.0.45f1/Editor/Data/PlaybackEngines/AndroidPlayer
+--key-folder=C:/Program Files/Unity/Hub/Editor/6000.0.45f1/Editor/Data/PlaybackEngines/AndroidPlayer
 --decode-folder=C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\AugArt App\Library\Burst
 --output=C:\Users\zephy\Documents\GitHub\2025-383758-Project-Repository-\Team D\AugArt App\Temp\BurstOutput\tempburstlibs\armeabi-v7a\lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/

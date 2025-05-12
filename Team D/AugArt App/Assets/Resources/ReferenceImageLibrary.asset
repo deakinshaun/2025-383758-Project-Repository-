@@ -21,39 +21,59 @@ MonoBehaviour:
       m_GuidLow: 4644995113605432715
       m_GuidHigh: 15910407111250673800
     m_SerializedTextureGuid:
-      m_GuidLow: 10301136450506715181
-      m_GuidHigh: 11441755251521217976
+      m_GuidLow: 7864581782293473590
+      m_GuidHigh: 1106801319698471195
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: Bricks
+    m_Name: GroundTile
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
       m_GuidLow: 5146830230443292299
       m_GuidHigh: 527883777156816795
     m_SerializedTextureGuid:
-      m_GuidLow: 5540563514982442518
-      m_GuidHigh: 10486134245006863131
+      m_GuidLow: 8521950888560546452
+      m_GuidHigh: 9734369265750676633
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: lattice
+    m_Name: LibrarySign
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
       m_GuidLow: 5078196213254945309
       m_GuidHigh: 9126717234738901138
     m_SerializedTextureGuid:
-      m_GuidLow: 3288938922047513237
-      m_GuidHigh: 14354104100094704139
+      m_GuidLow: 13187942598592371918
+      m_GuidHigh: 3868869513979845307
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: Tile
+    m_Name: PosterSymbol
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
       m_GuidLow: 4683781933192375785
       m_GuidHigh: 8864494075077305273
     m_SerializedTextureGuid:
-      m_GuidLow: 8323908533167812709
-      m_GuidHigh: 3814207790872108555
+      m_GuidLow: 13804835239288473199
+      m_GuidHigh: 872736497127678683
     m_Size: {x: 0, y: 0}
     m_SpecifySize: 0
-    m_Name: VRbuilding2
+    m_Name: EastlandSignPart
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5543478021575831122
+      m_GuidHigh: 10328519239558992535
+    m_SerializedTextureGuid:
+      m_GuidLow: 11566617364980604095
+      m_GuidHigh: 6701231195667670875
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: DoorSection
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5033763080261304066
+      m_GuidHigh: 5227073109037632436
+    m_SerializedTextureGuid:
+      m_GuidLow: 15475711646797604544
+      m_GuidHigh: 13890449847473009450
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: DoorSection2
     m_Texture: {fileID: 0}
