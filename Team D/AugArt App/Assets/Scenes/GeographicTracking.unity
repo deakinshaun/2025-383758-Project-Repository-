@@ -304,14 +304,14 @@ MonoBehaviour:
   _possibleObjectsToPlace:
   - {fileID: 334580906568695238, guid: 71dafee74375e4a4ea9f736bcc74f128, type: 3}
   - {fileID: 5250739721147643005, guid: 6b3018e22f9bd694facbf639fdb75486, type: 3}
-  - {fileID: 6169525533320400764, guid: 1af457c4543f47146bcbac1e468ce093, type: 3}
-  - {fileID: 6100051382755329669, guid: aa48c47149f986045a6694fe3b8dd0a7, type: 3}
-  - {fileID: 1853211041006570, guid: 64cefbcd8a06eb0438d916f5ef8269b0, type: 3}
-  - {fileID: 3106567675024232183, guid: b39f870bca3c65845b4018b6c923d528, type: 3}
-  - {fileID: 3106567675024232183, guid: b39f870bca3c65845b4018b6c923d528, type: 3}
-  - {fileID: 919132149155446097, guid: 43022ec746362b54eab4d824ef799c58, type: 3}
-  - {fileID: 919132149155446097, guid: 83315f7f22b9b254b96e9710ba77fc27, type: 3}
   - {fileID: 7590453392888686472, guid: c58829182f121f24aa5317a22823ca57, type: 3}
+  - {fileID: 138252, guid: be999fe03c257ec4cb0a3a4b5ca72217, type: 3}
+  - {fileID: 100102, guid: ff3dd417bb566b849b752ce57810bbf5, type: 3}
+  - {fileID: 2901283608850068971, guid: 4665189939fc5ad46b7667326270073c, type: 3}
+  - {fileID: 138252, guid: be999fe03c257ec4cb0a3a4b5ca72217, type: 3}
+  - {fileID: 6169525533320400764, guid: 1af457c4543f47146bcbac1e468ce093, type: 3}
+  - {fileID: 3106567675024232183, guid: b39f870bca3c65845b4018b6c923d528, type: 3}
+  - {fileID: 100102, guid: ff3dd417bb566b849b752ce57810bbf5, type: 3}
   _latLongs:
   - latitude: -37.80661
     longitude: 145.2339
@@ -656,7 +656,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 30
+  far clip plane: 50
   field of view: 60
   orthographic: 0
   orthographic size: 5
