@@ -325,8 +325,8 @@ MonoBehaviour:
     longitude: 145.2290919
   - latitude: -37.8145787
     longitude: 145.2289145
-  - latitude: -37.8145787
-    longitude: 145.2289145
+  - latitude: -37.8144667
+    longitude: 145.2288964
   _positioningManager: {fileID: 1375737370}
   _objectHelper: {fileID: 1375737369}
 --- !u!4 &773190231
