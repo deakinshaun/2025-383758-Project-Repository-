@@ -12,33 +12,28 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         [SerializeField] private float speedDiffThreshold = 2f;
         [Header("PC Only")] [SerializeField] private float rotSpeed = 3;
-
         private float leftPrevAngle;
         private float rightPrevAngle;
         private float wheelBase;
-
-
         private Vector3 leftWheelUpLocal;
         private Vector3 rightWheelUpLocal;
-
-
         private InputSystem_Actions _inputSystemActions;
 
         private Vector3 inputVel;
         private Quaternion inputRot;
-
-        private void Start()
+        
+        public override void Spawned()
         {
+            base.Spawned();
+
             leftWheelUpLocal = transform.InverseTransformDirection(leftWheel.transform.up);
             rightWheelUpLocal = transform.InverseTransformDirection(rightWheel.transform.up);
             leftPrevAngle = GetCurrentRotAngle(leftWheel, transform.TransformDirection(leftWheelUpLocal));
             rightPrevAngle = GetCurrentRotAngle(rightWheel, transform.TransformDirection(rightWheelUpLocal));
             wheelBase = Vector3.Distance(leftWheel.transform.position, rightWheel.transform.position);
-        }
 
-        public override void Spawned()
-        {
-            base.Spawned();
+            inputRot = transform.rotation;
+
             _inputSystemActions = new InputSystem_Actions();
             _inputSystemActions.Enable();
             if (HasInputAuthority)
@@ -50,8 +45,10 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             base.Despawned(runner, hasState);
-
-            PlayerInputBehaviour.GetInput -= ProvideInput;
+            if (HasInputAuthority)
+            {
+                PlayerInputBehaviour.GetInput -= ProvideInput;
+            }
         }
 
         private PlayerInput ProvideInput()
@@ -107,7 +104,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             if (Mathf.Abs(rotAngVel) > speedDiffThreshold)
             {
                 inputRot = Quaternion.AngleAxis(rotAngVel * Time.fixedDeltaTime, Vector3.up) *
-                           transform.rotation;
+                           inputRot;
             }
 
             leftPrevAngle = LRotAngle;

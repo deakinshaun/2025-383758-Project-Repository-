@@ -7,17 +7,25 @@ namespace OrgilFolder.Scripts.GamePlay
     {
         [Networked] PlayerInput CurrentInput { get; set; }
         private PlayerInput PreviousInput = default;
+
+        [SerializeField] private GameObject camera;
+        [HideInInspector] public PlayerObject playerObject;
+
+        public override void Spawned()
+        {
+            base.Spawned();
+            camera.SetActive(HasInputAuthority);
+        }
+
         public override void FixedUpdateNetwork()
         {
-            if (GetInput(out PlayerInput input))
-            {
-                CurrentInput = input;
-                if (Runner.IsForward)
-                {
-                    transform.position += input.velocity * Runner.DeltaTime;
-                    transform.rotation = input.rotation;
-                }
-            }
+            if (!HasInputAuthority) return;
+            if (!GetInput(out PlayerInput input)) return;
+            if (!Runner.IsForward) return;
+
+            CurrentInput = input;
+            transform.position += input.velocity * Runner.DeltaTime;
+            transform.rotation = input.rotation;
         }
     }
 }
