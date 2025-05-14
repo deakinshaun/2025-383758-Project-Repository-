@@ -3,6 +3,7 @@ using UnityEngine.XR.ARFoundation;
 
 public class ARManager : MonoBehaviour
 {
+    public static ARManager aRManager { get; private set; }
     public GameObject arSession;
     public GameObject xrOrigin;
     public ARTrackedImageManager trackedImageManager;
@@ -10,7 +11,19 @@ public class ARManager : MonoBehaviour
     public GameObject mainMenu;
     public GameObject gameMenu;
     public GameObject mainCamera;
-    public void StartAR()
+
+    public  string nameOfThePart;
+    private void Awake()
+    {
+        if (aRManager != null && aRManager != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        aRManager = this;
+    }
+    public void StartAR(string partName)
     {
         arSession.SetActive(true);
         xrOrigin.SetActive(true);
@@ -20,7 +33,8 @@ public class ARManager : MonoBehaviour
 
         mainMenu.SetActive(false);
         gameMenu.SetActive(true);
-        
+
+        nameOfThePart = partName;
     }
 
     private System.Collections.IEnumerator EnableTrackingDelayed()

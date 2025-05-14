@@ -17,6 +17,7 @@ public class ARObjectSpawner : MonoBehaviour
 
     public TMP_Text debugText;
 
+    public GameObject wrongObjectPanel;
     void Awake()
     {
         if (arObjectSpawnerInstacne != null && arObjectSpawnerInstacne != this)
@@ -55,6 +56,10 @@ public class ARObjectSpawner : MonoBehaviour
     {
         foreach (var trackedImage in args.added)
         {
+            if (ARManager.aRManager.nameOfThePart != trackedImage.referenceImage.name)
+            {
+                wrongObjectPanel.SetActive(true);
+            }
             SpawnObject(trackedImage);
         }
 
