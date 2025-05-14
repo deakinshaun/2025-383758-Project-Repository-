@@ -310,23 +310,26 @@ MonoBehaviour:
   - {fileID: 6169525533320400764, guid: 1af457c4543f47146bcbac1e468ce093, type: 3}
   - {fileID: 3106567675024232183, guid: b39f870bca3c65845b4018b6c923d528, type: 3}
   - {fileID: 100102, guid: ff3dd417bb566b849b752ce57810bbf5, type: 3}
+  - {fileID: 100102, guid: ff3dd417bb566b849b752ce57810bbf5, type: 3}
   _latLongs:
-  - latitude: -37.8147708
-    longitude: 145.228881
-  - latitude: -37.8146386
-    longitude: 145.2287328
-  - latitude: -37.8150825
-    longitude: 145.2288461
-  - latitude: -37.8155052
-    longitude: 145.2289551
-  - latitude: -37.8147427
-    longitude: 145.2291278
-  - latitude: -37.8146744
-    longitude: 145.2290919
-  - latitude: -37.8145787
-    longitude: 145.2289145
+  - latitude: -37.8146668281597
+    longitude: 145.22888980404284
+  - latitude: -37.814788667107
+    longitude: 145.22881067887963
+  - latitude: -37.81484699843274
+    longitude: 145.22873450893954
+  - latitude: -37.81465411451769
+    longitude: 145.22868193285203
+  - latitude: -37.814360171553055
+    longitude: 145.22879888195672
+  - latitude: -37.81465570372292
+    longitude: 145.22898435190803
+  - latitude: -37.81543244646678
+    longitude: 145.22889088312147
   - latitude: -37.8144667
     longitude: 145.2288964
+  - latitude: -37.81413733353458
+    longitude: 145.23389914341075
   _positioningManager: {fileID: 1375737370}
   _objectHelper: {fileID: 1375737369}
 --- !u!4 &773190231
@@ -1078,7 +1081,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1964602098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1086,7 +1089,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1964602097}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a433ccfa051d974e8cb7b830fa2d6fa, type: 3}
   m_Name: 
