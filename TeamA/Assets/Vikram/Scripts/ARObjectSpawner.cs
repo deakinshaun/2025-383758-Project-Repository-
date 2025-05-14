@@ -18,7 +18,8 @@ public class ARObjectSpawner : MonoBehaviour
     public TMP_Text debugText;
 
     public GameObject wrongObjectPanel;
-    
+
+    public VibrationControl vibrationControl;
     void Awake()
     {
         if (arObjectSpawnerInstacne != null && arObjectSpawnerInstacne != this)
@@ -60,6 +61,11 @@ public class ARObjectSpawner : MonoBehaviour
             if (ARManager.aRManager.nameOfThePart != trackedImage.referenceImage.name)
             {
                 wrongObjectPanel.SetActive(true);
+                vibrationControl.MakeVibration(500);
+            }
+            else
+            {
+                vibrationControl.MakeVibration(2000);
             }
             ARManager.aRManager.ObjectSpawnMenu.SetActive(true);
             

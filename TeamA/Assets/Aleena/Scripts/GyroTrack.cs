@@ -14,7 +14,7 @@ public class GyroTrackWithPause : MonoBehaviour
     private float lastYaw;
     private float accumulatedYaw;
     private bool isPaused = false;
-
+    public GameObject pauseMenu;
     void Start()
     {
         // cache initial yaw
@@ -58,6 +58,7 @@ public class GyroTrackWithPause : MonoBehaviour
 
     private void TogglePause()
     {
+        pauseMenu.SetActive(true);
         isPaused = !isPaused;
 
 
@@ -65,23 +66,5 @@ public class GyroTrackWithPause : MonoBehaviour
         // freeze/unfreeze game
         Time.timeScale = isPaused ? 0f : 1f;
 
-        // pause/unpause all audio
-        AudioListener.pause = isPaused;
-    }
-
-    void OnGUI()
-    {
-        if (!isPaused) return;
-
-        // draw centered "PAUSED" label
-        GUIStyle style = new GUIStyle(GUI.skin.label)
-        {
-            alignment = TextAnchor.MiddleCenter,
-            fontSize = 48,
-            fontStyle = FontStyle.Bold
-        };
-        // full?screen rect
-        Rect rect = new Rect(0, 0, Screen.width, Screen.height);
-        GUI.Label(rect, "PAUSED", style);
     }
 }
