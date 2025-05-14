@@ -13,6 +13,8 @@ public class ARManager : MonoBehaviour
     public GameObject mainCamera;
 
     public  string nameOfThePart;
+
+    public GameObject ObjectSpawnMenu;
     private void Awake()
     {
         if (aRManager != null && aRManager != this)
@@ -55,5 +57,6 @@ public class ARManager : MonoBehaviour
       
         mainMenu.SetActive(true);
         gameMenu.SetActive(false);
+        ObjectSpawnMenu.SetActive(false);
     }
 }

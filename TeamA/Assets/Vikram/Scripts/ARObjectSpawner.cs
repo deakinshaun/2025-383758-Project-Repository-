@@ -18,6 +18,7 @@ public class ARObjectSpawner : MonoBehaviour
     public TMP_Text debugText;
 
     public GameObject wrongObjectPanel;
+    
     void Awake()
     {
         if (arObjectSpawnerInstacne != null && arObjectSpawnerInstacne != this)
@@ -60,6 +61,8 @@ public class ARObjectSpawner : MonoBehaviour
             {
                 wrongObjectPanel.SetActive(true);
             }
+            ARManager.aRManager.ObjectSpawnMenu.SetActive(true);
+            
             SpawnObject(trackedImage);
         }
 
@@ -90,7 +93,9 @@ public class ARObjectSpawner : MonoBehaviour
     private void SpawnObject(ARTrackedImage trackedImage)
     {
        trackedObjects[trackedImage.referenceImage.name].SetActive(true);
-       trackedObjects[trackedImage.referenceImage.name].transform.localScale = new Vector3(1, 1, 1);
+       InstructionManagerForUser.instructionManagerForUser.SetObject(trackedImage.referenceImage.name);
+      
+        trackedObjects[trackedImage.referenceImage.name].transform.localScale = new Vector3(1, 1, 1);
     }
 
     void Update()
