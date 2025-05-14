@@ -6,6 +6,7 @@ using TMPro;
 
 public class ARObjectSpawner : MonoBehaviour
 {
+    public static ARObjectSpawner arObjectSpawnerInstacne { get; private set; }
     public List<GameObject> objectsToSpawn;
 
     [SerializeField] public Dictionary<string, GameObject> trackedObjects = new Dictionary<string, GameObject>();
@@ -18,6 +19,15 @@ public class ARObjectSpawner : MonoBehaviour
 
     void Awake()
     {
+        if (arObjectSpawnerInstacne != null && arObjectSpawnerInstacne != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        arObjectSpawnerInstacne = this;
+
+      
         arTrackedImageManager = GetComponent<ARTrackedImageManager>();
     }
 
