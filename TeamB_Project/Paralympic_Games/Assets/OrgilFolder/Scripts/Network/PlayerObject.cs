@@ -38,7 +38,7 @@ public class PlayerObject : NetworkBehaviour
 
         Ref = pRef;
         Index = index;
-        Color = Random.ColorHSV(0, 1, 0.5f, 1, 0.5f, 1);
+        Color = Random.ColorHSV(0, 1, 0.5f, 1, 0.8f, 1);
     }
     public override void Spawned()
     {

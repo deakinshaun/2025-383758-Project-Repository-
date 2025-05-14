@@ -1,5 +1,6 @@
 ﻿using System;
 using Fusion;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
@@ -21,7 +22,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         private Vector3 inputVel;
         private Quaternion inputRot;
-        
+
         public override void Spawned()
         {
             base.Spawned();
@@ -35,10 +36,12 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             inputRot = transform.rotation;
 
             _inputSystemActions = new InputSystem_Actions();
-            _inputSystemActions.Enable();
+
             if (HasInputAuthority)
             {
-                PlayerInputBehaviour.GetInput += ProvideInput;
+                _inputSystemActions.Enable();
+                Debug.Log("Registering for player input");
+                PlayerInputBehaviour.GetInput = ProvideInput;
             }
         }
 
@@ -51,13 +54,14 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             }
         }
 
-        private PlayerInput ProvideInput()
+        public PlayerInput ProvideInput()
         {
-            return new PlayerInput
-            {
-                rotation = inputRot,
-                velocity = inputVel
-            };
+            var input = new PlayerInput();
+            input.rotation = inputRot;
+            input.velocity = inputVel;
+            inputVel = Vector3.zero;
+            
+            return input;
         }
 
         private void Update()
@@ -99,12 +103,12 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             float forwardSpeed = (leftSpeed + rightSpeed) * 0.5f;
             float rotAngVel = Mathf.Rad2Deg * (leftSpeed - rightSpeed) / wheelBase;
 
-            inputVel = transform.forward * forwardSpeed;
+            inputVel += transform.forward * forwardSpeed;
 
             if (Mathf.Abs(rotAngVel) > speedDiffThreshold)
             {
                 inputRot = Quaternion.AngleAxis(rotAngVel * Time.fixedDeltaTime, Vector3.up) *
-                           inputRot;
+                           transform.rotation;
             }
 
             leftPrevAngle = LRotAngle;

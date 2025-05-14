@@ -17,7 +17,7 @@ MonoBehaviour:
   matchDuration: 300
   teams: 2
   playersPerTeam: 5
-  scenePath: Assets/OrgilFolder/Scenes/BasketballCourt.unity
+  scenePath: Assets/Scenes/MainScene.unity
   previewImage: {fileID: 2800000, guid: 9f085cfd241a58040b2057e83092d6ba, type: 3}
   description: 'Wheelchair basketball descriptioin
 

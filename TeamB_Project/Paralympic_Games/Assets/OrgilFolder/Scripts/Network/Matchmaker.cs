@@ -92,6 +92,9 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
         if (Runner) Runner.Shutdown();
         Runner = Instantiate(runnerPrefab);
 
+        Runner.ProvideInput = true;
+        
+
         Task<StartGameResult> task = Runner.StartGame(new StartGameArgs()
         {
             GameMode = GameMode.Client,
