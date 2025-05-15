@@ -12189,7 +12189,7 @@ MonoBehaviour:
   gameInfoPrefab: {fileID: 6654096280496940067, guid: 7d1021c39291c914297ae70a7a996ade, type: 3}
   gameModes:
   - {fileID: 11400000, guid: dd8db5503e641ef43976a6fd2361003a, type: 2}
-  - {fileID: 11400000, guid: c3bda486932fa79448cf47db487c10bc, type: 2}
+  - {fileID: 11400000, guid: 7695bfd4b739d314cbc4e44a1a8f4a1c, type: 2}
   - {fileID: 11400000, guid: 7695bfd4b739d314cbc4e44a1a8f4a1c, type: 2}
 --- !u!224 &2104744686000745802 stripped
 RectTransform:
