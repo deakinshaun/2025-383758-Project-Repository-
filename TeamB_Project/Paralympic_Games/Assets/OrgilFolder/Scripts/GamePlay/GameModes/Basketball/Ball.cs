@@ -1,5 +1,6 @@
 ﻿using System;
 using Fusion;
+using Oculus.Interaction;
 using OrgilFolder.Scripts.Utility;
 using UnityEngine;
 
@@ -12,6 +13,25 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         [SerializeField] private AudioSource audioSource;
         //TODO: Handle Team assignemnt
+
+        public override void Spawned()
+        {
+            base.Spawned();
+            var eventWrapper = GetComponentInChildren<InteractableUnityEventWrapper>();
+
+            eventWrapper.WhenSelect.AddListener(HandlePossesion);
+            eventWrapper.WhenUnselect.AddListener(() => { StampShotOrigin(transform.position); });
+        }
+
+        private void HandlePossesion()
+        {
+            var playerController = GetComponentInParent<PlayerController>();
+            if (playerController)
+            {
+                int team = playerController.playerObject.Team;
+                RPCAssignPossession(team);
+            }
+        }
 
         public void ResetNeutral()
         {
@@ -31,8 +51,9 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         private void OnCollisionEnter(Collision other)
         {
-            audioSource.PlayOneShot(audioSource.clip, new Vector2(0.9f,1.1f), 1.0f);
+            audioSource.PlayOneShot(audioSource.clip, new Vector2(0.9f, 1.1f), 1.0f);
         }
+
 
         /// <summary>
         /// Call this right before you actually launch/throw the ball.

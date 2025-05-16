@@ -38,14 +38,10 @@ public class GameState : NetworkBehaviour
 
         StateMachine[EGameState.Pregame].onEnter = prev =>
         {
-            if (prev == EGameState.Postgame)
-            {
-                if (Runner.IsServer)
-                {
-                    Runner.LoadScene("Menu");
-                    if (!Runner.SessionInfo.IsOpen) Runner.SessionInfo.IsOpen = true;
-                }
-            }
+            if (prev != EGameState.Postgame) return;
+            if (!Runner.IsServer) return;
+            Runner.LoadScene("Menu");
+            if (!Runner.SessionInfo.IsOpen) Runner.SessionInfo.IsOpen = true;
         };
 
         StateMachine[EGameState.Pregame].onExit = next =>
@@ -55,40 +51,34 @@ public class GameState : NetworkBehaviour
 
         StateMachine[EGameState.Loading].onEnter = prev =>
         {
-            if (prev == EGameState.Pregame)
+            if (prev != EGameState.Pregame) return;
+            if (Runner.IsServer)
             {
-                if (Runner.IsServer)
-                {
-                    Runner.LoadScene(Runner.SessionInfo.Properties["Scene"]);
-                }
+                Runner.LoadScene(Runner.SessionInfo.Properties["Scene"]);
             }
         };
 
         StateMachine[EGameState.Loading].onUpdate = () =>
         {
-            if (Runner.IsServer)
+            if (!Runner.IsServer) return;
+            if (PlayerRegistry.All(p => p.IsLoaded, true))
             {
-                if (PlayerRegistry.All(p => p.IsLoaded, true))
-                {
-                    Server_SetState(EGameState.Intro);
-                }
+                Server_SetState(EGameState.Intro);
             }
         };
 
         StateMachine[EGameState.Loading].onExit = next =>
         {
-            if (Runner.IsServer)
+            if (!Runner.IsServer) return;
+            PlayerRegistry.ForEach(p => p.IsLoaded = false, true);
+            PlayerRegistry.ForEach((p, i) =>
             {
-                PlayerRegistry.ForEach(p => p.IsLoaded = false, true);
-                PlayerRegistry.ForEach((p, i) =>
-                {
-                    (Vector3, Quaternion) spawnPosRot = Level.Current.GetSpawnPositionAndRotation(i, p.Team);
-                    Runner.Spawn(ResourcesManager.Instance.playerControllerPrefab, position: spawnPosRot.Item1,
-                        rotation: spawnPosRot.Item2,
-                        inputAuthority: p.Ref);
-                    //TODO:Spawn each player on avialable spawn locations
-                });
-            }
+                (Vector3, Quaternion) spawnPosRot = Level.Current.GetSpawnPositionAndRotation(i, p.Team);
+                var playerController = Runner.Spawn(ResourcesManager.Instance.playerControllerPrefab, position: spawnPosRot.Item1,
+                    rotation: spawnPosRot.Item2,
+                    inputAuthority: p.Ref);
+                playerController.playerObject = p;
+            });
         };
 
 
@@ -98,9 +88,6 @@ public class GameState : NetworkBehaviour
             {
                 PlayerRegistry.ForEach(p => { });
             }
-
-
-            //TODO:Start countdown for game
             Server_DelaySetState(EGameState.Game, 6f);
         };
 
@@ -113,33 +100,24 @@ public class GameState : NetworkBehaviour
 
         StateMachine[EGameState.Game].onUpdate = () =>
         {
-            //Broadcast tick timer
-            // HUD.SetTimerText(GameManager.Time);
             if (Runner.IsServer && GameManager.Time >= GameManager.Instance.MaxTime)
             {
-                Debug.Log("Time's up");
+                Server_SetState(EGameState.Outro);
             }
         };
 
         StateMachine[EGameState.Outro].onEnter = prev =>
         {
-            // GameManager.CalculateScores();
-            // UIScreen.activeScreen.BackTo(InterfaceManager.Instance.hud);
-            // UIScreen.Focus(InterfaceManager.Instance.scoreboard);
-            // UIScreen.Focus(InterfaceManager.Instance.performance.screen);
-            //
-            // GameManager.Instance.TickStarted = 0;
+    
         };
 
         StateMachine[EGameState.Outro].onExit = next =>
         {
-            // UIScreen.activeScreen.Back();
         };
 
 
         StateMachine[EGameState.Postgame].onEnter = prev =>
         {
-            // Unload Level
             Server_DelaySetState(EGameState.Pregame, 5);
         };
 
@@ -168,19 +146,15 @@ public class GameState : NetworkBehaviour
     public void Server_SetState(EGameState state)
     {
         if (Current == state) return;
-        //Debug.Log($"Set State to {st}");
         Previous = Current;
         Current = state;
-
         onSetState?.Invoke(Current);
     }
 
     public void Server_DelaySetState(EGameState newState, float delay)
     {
-        Debug.Log($"Delay state change to {newState} for {delay}s");
         Delay = TickTimer.CreateFromSeconds(Runner, delay);
         DelayedState = newState;
-
         onSetDelaydState?.Invoke(DelayedState, delay);
     }
 }

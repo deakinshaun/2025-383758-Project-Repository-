@@ -2541,7 +2541,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5999780693900278058
 Transform:
   m_ObjectHideFlags: 0
@@ -6237,7 +6237,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &911775033835941364
 Transform:
   m_ObjectHideFlags: 0
@@ -8719,9 +8719,10 @@ GameObject:
   - component: {fileID: 1894328985817603656}
   - component: {fileID: 7380753425043345221}
   - component: {fileID: 5793297409809873174}
-  - component: {fileID: 5295477723798817734}
   - component: {fileID: 147024131308649543}
   - component: {fileID: 5463045609871806832}
+  - component: {fileID: 6076203340497811912}
+  - component: {fileID: 1981222366738690959}
   m_Layer: 0
   m_Name: PlayerAvatar
   m_TagString: Untagged
@@ -8760,6 +8761,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72dda6c22714c02a7694f7f339c2a0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camera: {fileID: 4775182898579259651}
+  playerObject: {fileID: 0}
 --- !u!114 &5793297409809873174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8778,26 +8781,9 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7380753425043345221}
-  - {fileID: 5295477723798817734}
   - {fileID: 147024131308649543}
+  - {fileID: 1981222366738690959}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &5295477723798817734
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2292003505184199224}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _stateAuthorityChangeErrorCorrectionDelta: 0
-  SyncScale: 0
-  SyncParent: 0
-  _autoAOIOverride: 1
-  DisableSharedModeInterpolation: 0
 --- !u!114 &147024131308649543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8823,7 +8809,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2292003505184199224}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 80
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -8842,6 +8828,50 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!143 &6076203340497811912
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2292003505184199224}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.5
+  m_Radius: 0.4
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!114 &1981222366738690959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2292003505184199224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378411a89480da345945c2f888327a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  gravity: -20
+  jumpImpulse: 8
+  acceleration: 10
+  braking: 10
+  maxSpeed: 2
+  rotationSpeed: 15
 --- !u!1 &2310361128140816603
 GameObject:
   m_ObjectHideFlags: 0
@@ -25090,6 +25120,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8fa3570c7972f1046acb95acd18cc1e7, type: 3}
+--- !u!1 &4775182898579259651 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3643703817099526051, guid: 8fa3570c7972f1046acb95acd18cc1e7, type: 3}
+  m_PrefabInstance: {fileID: 8130636539582873248}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6934069479606100931 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1220213466290806115, guid: 8fa3570c7972f1046acb95acd18cc1e7, type: 3}

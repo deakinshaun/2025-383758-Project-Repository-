@@ -13,7 +13,7 @@ public class ARManager : MonoBehaviour
     public GameObject mainCamera;
 
     public  string nameOfThePart;
-
+    public GameObject ARcam;
     public GameObject ObjectSpawnMenu;
     private void Awake()
     {
@@ -35,7 +35,7 @@ public class ARManager : MonoBehaviour
 
         mainMenu.SetActive(false);
         gameMenu.SetActive(true);
-
+        ARcam.GetComponent<Camera>().enabled = true;
         nameOfThePart = partName;
     }
 
@@ -47,11 +47,11 @@ public class ARManager : MonoBehaviour
 
     public void BackButton()
     {
-       
 
-        trackedImageManager.enabled = false;
-        arSession.SetActive(false);
-        xrOrigin.SetActive(false);
+        ARcam.GetComponent<Camera>().enabled = false;
+        //trackedImageManager.enabled = false;
+        //arSession.SetActive(false);
+        // xrOrigin.SetActive(false);
         mainCamera.SetActive(true);
 
       

@@ -1,5 +1,6 @@
 ﻿using System;
 using Fusion;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
@@ -12,55 +13,55 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         [SerializeField] private float speedDiffThreshold = 2f;
         [Header("PC Only")] [SerializeField] private float rotSpeed = 3;
-
         private float leftPrevAngle;
         private float rightPrevAngle;
         private float wheelBase;
-
-
         private Vector3 leftWheelUpLocal;
         private Vector3 rightWheelUpLocal;
-
-
         private InputSystem_Actions _inputSystemActions;
 
         private Vector3 inputVel;
         private Quaternion inputRot;
 
-        private void Start()
+        public override void Spawned()
         {
+            base.Spawned();
+
             leftWheelUpLocal = transform.InverseTransformDirection(leftWheel.transform.up);
             rightWheelUpLocal = transform.InverseTransformDirection(rightWheel.transform.up);
             leftPrevAngle = GetCurrentRotAngle(leftWheel, transform.TransformDirection(leftWheelUpLocal));
             rightPrevAngle = GetCurrentRotAngle(rightWheel, transform.TransformDirection(rightWheelUpLocal));
             wheelBase = Vector3.Distance(leftWheel.transform.position, rightWheel.transform.position);
-        }
 
-        public override void Spawned()
-        {
-            base.Spawned();
+            inputRot = transform.rotation;
+
             _inputSystemActions = new InputSystem_Actions();
-            _inputSystemActions.Enable();
+
             if (HasInputAuthority)
             {
-                PlayerInputBehaviour.GetInput += ProvideInput;
+                _inputSystemActions.Enable();
+                Debug.Log("Registering for player input");
+                PlayerInputBehaviour.GetInput = ProvideInput;
             }
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             base.Despawned(runner, hasState);
-
-            PlayerInputBehaviour.GetInput -= ProvideInput;
+            if (HasInputAuthority)
+            {
+                PlayerInputBehaviour.GetInput -= ProvideInput;
+            }
         }
 
-        private PlayerInput ProvideInput()
+        public PlayerInput ProvideInput()
         {
-            return new PlayerInput
-            {
-                rotation = inputRot,
-                velocity = inputVel
-            };
+            var input = new PlayerInput();
+            input.rotation = inputRot;
+            input.velocity = inputVel;
+            inputVel = Vector3.zero;
+            
+            return input;
         }
 
         private void Update()
@@ -102,7 +103,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             float forwardSpeed = (leftSpeed + rightSpeed) * 0.5f;
             float rotAngVel = Mathf.Rad2Deg * (leftSpeed - rightSpeed) / wheelBase;
 
-            inputVel = transform.forward * forwardSpeed;
+            inputVel += transform.forward * forwardSpeed;
 
             if (Mathf.Abs(rotAngVel) > speedDiffThreshold)
             {

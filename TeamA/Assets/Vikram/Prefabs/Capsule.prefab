@@ -12,10 +12,9 @@ GameObject:
   - component: {fileID: 4918047396899764511}
   - component: {fileID: 5804615232880953177}
   - component: {fileID: 1326248419212456699}
-  - component: {fileID: 2851791147763128148}
   m_Layer: 3
   m_Name: Capsule
-  m_TagString: IO
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -111,19 +110,3 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2851791147763128148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5465278461801583002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56db9116d76fa654e97561a58ee51091, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotationSpeed: 4
-  scaleSpeed: 0.01
-  minScale: 0.1
-  maxScale: 2

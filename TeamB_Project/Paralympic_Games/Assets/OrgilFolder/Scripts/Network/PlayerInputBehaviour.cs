@@ -4,23 +4,19 @@ using Fusion;
 using Fusion.Sockets;
 using OrgilFolder.Scripts;
 using UnityEngine;
-using UnityEngine.XR;
 
-public class PlayerInputBehaviour : Fusion.Behaviour,INetworkRunnerCallbacks
+public class PlayerInputBehaviour : SimulationBehaviour,INetworkRunnerCallbacks
 {
     public static Func<PlayerInput> GetInput;
+    
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         if(PlayerObject.Local == null ) return;
         if(GameManager.State.Current != GameState.EGameState.Game) return;
         if(GetInput==null) return;
-        input.Set(GetInput.Invoke());
+        input.Set(GetInput());
     }
     #region Unused Callbacks
-
-    
-
-
     public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
     {
     }
@@ -94,13 +90,4 @@ public class PlayerInputBehaviour : Fusion.Behaviour,INetworkRunnerCallbacks
     {
     }
     #endregion
-}
-
-public struct PlayerInput : INetworkInput
-{
-    public float leftWheelRoll;
-    public float rightWheelRoll;
-    
-    public Quaternion rotation;
-    public Vector3 velocity;
 }

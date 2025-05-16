@@ -9,7 +9,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         [SerializeField] private Transform ballSpawnNeutralTf;
         [SerializeField] private Transform team1BallSpawnTf;
         [SerializeField] private Transform team2BallSpawnTf;
-        
+
         public static BasketballGameRule Instance { get; private set; }
         [SerializeField] private NetworkPrefabRef ballPrefab;
         [Networked] public int TeamAScore { get; private set; }
@@ -17,8 +17,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         [Header("3-point line distance ")] [SerializeField]
         private float threePointRadius = 7.0f;
-
-        public event System.Action<int, int> OnScored;
+        public event Action<int, int> OnScored;
 
         private void Awake()
         {
@@ -33,17 +32,21 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         public void SpawnBallNeutral()
         {
-            Runner.Spawn(ballPrefab, ballSpawnNeutralTf.position, ballSpawnNeutralTf.rotation, onBeforeSpawned: (runner, obj) =>
+            if (Runner.IsServer)
             {
-                var ball = obj.GetComponent<Ball>();
+                Runner.Spawn(ballPrefab, ballSpawnNeutralTf.position, ballSpawnNeutralTf.rotation,
+                    onBeforeSpawned: (runner, obj) =>
+                    {
+                        var ball = obj.GetComponent<Ball>();
 
-                ball.ResetNeutral();
-            });
+                        ball.ResetNeutral();
+                    });
+            }
         }
 
         private void SpawnBallForTeam(int team)
         {
-
+            if (!Runner.IsServer) return;
             Transform spawnTf = team switch
             {
                 1 => team1BallSpawnTf,
@@ -63,8 +66,8 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             int points = 2;
             if (shootingTeam == 0) TeamAScore += points;
             else TeamBScore += points;
-            
-            OnScored?.Invoke(shootingTeam,points);
+
+            OnScored?.Invoke(shootingTeam, points);
         }
     }
 }

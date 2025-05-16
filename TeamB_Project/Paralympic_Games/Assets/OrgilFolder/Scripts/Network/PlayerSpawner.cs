@@ -1,18 +1,15 @@
 using Fusion;
-public class PlayerSpawner : SimulationBehaviour,IPlayerJoined,IPlayerLeft
+
+public class PlayerSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 {
     public NetworkObject playerObject;
+
     public void PlayerJoined(PlayerRef player)
     {
-        if (Runner.Topology == Topologies.ClientServer)
+        if (Runner.CanSpawn)
         {
-            if (Runner.CanSpawn)
-            {
-                Runner.Spawn(playerObject, inputAuthority: player);
-            }
-        }else if (Runner.LocalPlayer == player)
-        {
-            Runner.Spawn(playerObject, inputAuthority: player);
+            var pObject = Runner.Spawn(playerObject, inputAuthority: player);
+            Runner.SetPlayerObject(player,pObject);
         }
     }
 
