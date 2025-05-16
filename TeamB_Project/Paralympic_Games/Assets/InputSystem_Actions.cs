@@ -207,6 +207,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""menu"",
+                    ""type"": ""Button"",
+                    ""id"": ""1d63a675-bd07-4530-ad34-b3eb4d8c0701"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -636,6 +645,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""RightWheelDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2c7082e0-9f61-4977-8df9-b62916956da2"",
+                    ""path"": ""<XRController>{LeftHand}/{Menu}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";XR"",
+                    ""action"": ""menu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1236,6 +1256,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_LeftWheelDown = m_Player.FindAction("LeftWheelDown", throwIfNotFound: true);
         m_Player_RightWheelUp = m_Player.FindAction("RightWheelUp", throwIfNotFound: true);
         m_Player_RightWheelDown = m_Player.FindAction("RightWheelDown", throwIfNotFound: true);
+        m_Player_menu = m_Player.FindAction("menu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1342,6 +1363,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_LeftWheelDown;
     private readonly InputAction m_Player_RightWheelUp;
     private readonly InputAction m_Player_RightWheelDown;
+    private readonly InputAction m_Player_menu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1405,6 +1427,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/RightWheelDown".
         /// </summary>
         public InputAction @RightWheelDown => m_Wrapper.m_Player_RightWheelDown;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/menu".
+        /// </summary>
+        public InputAction @menu => m_Wrapper.m_Player_menu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1470,6 +1496,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @RightWheelDown.started += instance.OnRightWheelDown;
             @RightWheelDown.performed += instance.OnRightWheelDown;
             @RightWheelDown.canceled += instance.OnRightWheelDown;
+            @menu.started += instance.OnMenu;
+            @menu.performed += instance.OnMenu;
+            @menu.canceled += instance.OnMenu;
         }
 
         /// <summary>
@@ -1520,6 +1549,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @RightWheelDown.started -= instance.OnRightWheelDown;
             @RightWheelDown.performed -= instance.OnRightWheelDown;
             @RightWheelDown.canceled -= instance.OnRightWheelDown;
+            @menu.started -= instance.OnMenu;
+            @menu.performed -= instance.OnMenu;
+            @menu.canceled -= instance.OnMenu;
         }
 
         /// <summary>
@@ -1911,6 +1943,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnRightWheelDown(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "menu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMenu(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
