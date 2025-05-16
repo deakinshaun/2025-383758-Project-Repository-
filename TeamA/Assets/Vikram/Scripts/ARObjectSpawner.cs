@@ -1,4 +1,4 @@
-using UnityEngine;
+ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.InputSystem;
@@ -30,7 +30,6 @@ public class ARObjectSpawner : MonoBehaviour
 
         arObjectSpawnerInstacne = this;
 
-      
         arTrackedImageManager = GetComponent<ARTrackedImageManager>();
     }
 
@@ -68,19 +67,19 @@ public class ARObjectSpawner : MonoBehaviour
                 vibrationControl.MakeVibration(2000);
             }
             ARManager.aRManager.ObjectSpawnMenu.SetActive(true);
-            
+
             SpawnObject(trackedImage);
         }
 
         foreach (var updatedImage in args.updated)
         {
-            
+
             UpdateObjectTransform(updatedImage);
         }
 
         foreach (var removedImage in args.removed)
         {
-           
+
             RemovedObjects(removedImage);
         }
     }
@@ -98,9 +97,13 @@ public class ARObjectSpawner : MonoBehaviour
 
     private void SpawnObject(ARTrackedImage trackedImage)
     {
+
        trackedObjects[trackedImage.referenceImage.name].SetActive(true);
        InstructionManagerForUser.instructionManagerForUser.SetObject(trackedImage.referenceImage.name);
       
+        trackedObjects[trackedImage.referenceImage.name].SetActive(true);
+        InstructionManagerForUser.instructionManagerForUser.SetObject(trackedImage.referenceImage.name);
+        ARManager.aRManager.ObjectSpawnMenu.SetActive(true);
         trackedObjects[trackedImage.referenceImage.name].transform.localScale = new Vector3(1, 1, 1);
     }
 
@@ -122,7 +125,7 @@ public class ARObjectSpawner : MonoBehaviour
                 {
                     // remove previous highlight
                     HighlightObject(lastSelected, false);
-                    
+
                 }
 
                 HighlightObject(selectedObject, true);
