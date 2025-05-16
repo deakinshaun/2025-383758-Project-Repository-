@@ -75,7 +75,13 @@ public class ARObjectSpawner : MonoBehaviour
     private void SpawnObject(ARTrackedImage trackedImage)
     {
        trackedObjects[trackedImage.referenceImage.name].SetActive(true);
+<<<<<<< Updated upstream
        trackedObjects[trackedImage.referenceImage.name].transform.localScale = new Vector3(1, 1, 1);
+=======
+       InstructionManagerForUser.instructionManagerForUser.SetObject(trackedImage.referenceImage.name);
+        ARManager.aRManager.ObjectSpawnMenu.SetActive(true);
+        trackedObjects[trackedImage.referenceImage.name].transform.localScale = new Vector3(1, 1, 1);
+>>>>>>> Stashed changes
     }
 
     void Update()
