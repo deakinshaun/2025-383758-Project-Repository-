@@ -47,7 +47,7 @@ public class WeatherAPIClient : MonoBehaviour
             if (weatherData != null && weatherData.current != null)
             {
                 LatestWeather = weatherData.current;
-                Debug.Log("✅ Weather updated");
+                Debug.Log("Weather updated");
             }
             else
             {

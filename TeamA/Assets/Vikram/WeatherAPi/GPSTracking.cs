@@ -52,6 +52,6 @@ public class GPSTracking : MonoBehaviour
         longitude = Input.location.lastData.longitude;
         altitude = Input.location.lastData.altitude;
 
-        Debug.Log($"📍 Location: {latitude}, {longitude}, Alt: {altitude}m");
+        Debug.Log($"Location: {latitude}, {longitude}, Alt: {altitude}m");
     }
 }

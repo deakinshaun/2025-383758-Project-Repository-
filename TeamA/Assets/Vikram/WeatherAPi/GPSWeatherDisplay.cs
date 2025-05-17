@@ -40,7 +40,7 @@ public class GPSWeatherDisplay : MonoBehaviour
                $"Daytime: {(w.is_day == 1 ? "Yes" : "No")}";
 
 
-            // ✅ Task 3: Show instruction based on weather
+            // Task 3: Show instruction based on weather
             if (w.rain > 0f)
                 instruction = "️ It's raining — take an umbrella!";
             else if (w.is_day == 0)
