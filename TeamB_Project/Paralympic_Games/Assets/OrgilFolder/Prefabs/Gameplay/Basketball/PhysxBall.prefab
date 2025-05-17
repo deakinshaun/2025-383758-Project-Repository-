@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3699499536850810614}
   - component: {fileID: 1897202264040623872}
   - component: {fileID: 5652750149174744113}
+  - component: {fileID: 1546539282170930623}
   m_Layer: 13
   m_Name: Grab
   m_TagString: Untagged
@@ -285,6 +286,22 @@ MonoBehaviour:
   _renderer: {fileID: 6033042872509195397}
   _customIcon: {fileID: 0}
   _snappiness: 1
+--- !u!114 &1546539282170930623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458374944413789797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deb5586d855c7b84db210f870cc6fe5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 0.313
+  frequency: 0.328
+  amplitude: 1
+  grabInteractable: {fileID: 8141348018654954847}
 --- !u!1 &1964731971264578227
 GameObject:
   m_ObjectHideFlags: 0
