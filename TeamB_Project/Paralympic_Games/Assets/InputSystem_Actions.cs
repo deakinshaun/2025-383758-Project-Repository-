@@ -173,37 +173,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""LeftWheelUp"",
-                    ""type"": ""Button"",
-                    ""id"": ""e27307ae-c858-468f-827a-1bd5254adb5e"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""LeftWheelDown"",
-                    ""type"": ""Button"",
-                    ""id"": ""95fd57b5-023f-4739-ab30-10305014edf2"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""RightWheelUp"",
-                    ""type"": ""Button"",
+                    ""name"": ""RightWheel"",
+                    ""type"": ""Value"",
                     ""id"": ""e5ff4e97-8598-4c56-8e8b-eb929fd6a43f"",
-                    ""expectedControlType"": """",
+                    ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""RightWheelDown"",
-                    ""type"": ""Button"",
-                    ""id"": ""2b5f4b61-21ba-47f9-80a1-e11fac8bd561"",
-                    ""expectedControlType"": """",
+                    ""name"": ""LeftWheel"",
+                    ""type"": ""Value"",
+                    ""id"": ""6c0024db-da27-49a2-9b93-c165227b4877"",
+                    ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
@@ -605,46 +587,156 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""d8d541ca-c2cf-4b31-ba66-71b322b29a63"",
-                    ""path"": ""<Keyboard>/z"",
+                    ""name"": ""Keyboard"",
+                    ""id"": ""5288c4b5-f6cd-48a1-904b-2c8700e3bad1"",
+                    ""path"": ""1DAxis"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""LeftWheelUp"",
-                    ""isComposite"": false,
+                    ""groups"": """",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""9d60e6de-9f2f-47ec-83c4-8500e5337bdd"",
-                    ""path"": ""<Keyboard>/x"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""LeftWheelDown"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""99ad383b-6a9c-4465-9bbd-91509259bcf7"",
-                    ""path"": ""<Keyboard>/m"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""RightWheelUp"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""3c5c4a87-761d-4865-890b-d2ac0066b693"",
+                    ""name"": ""negative"",
+                    ""id"": ""7451542a-57b8-4a45-b602-3c31e3a1fd18"",
                     ""path"": ""<Keyboard>/n"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""RightWheelDown"",
+                    ""groups"": """",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""fa0c74a7-6f40-4a45-a14b-fd236c944d20"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""XR Thumbstick"",
+                    ""id"": ""ec418cb1-6c12-41e4-b6c0-d1257734810a"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""dce85436-d85b-4141-a155-1cfa81ad277c"",
+                    ""path"": ""<XRController>{RightHand}/thumbstickDpadDown"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""62447d53-7643-485e-8638-a289b362113e"",
+                    ""path"": ""<XRController>{RightHand}/thumbstickDpadUp"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0c49c6ab-b4e5-413e-8555-82dd67dcf878"",
+                    ""path"": ""<QuestTouchPlusController>{RightHand}/thumbstick/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Joystick"",
+                    ""action"": ""RightWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""fcc2eaac-9ae0-4308-9a51-72fb41c99091"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftWheel"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""be2155b5-85cc-4a84-9f6e-060831fd04a3"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""5fbad848-b53d-4cf2-b498-e14c95c486e2"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""XR Thumbstick"",
+                    ""id"": ""9cafd512-7155-4ba7-9b17-6580eec08bbc"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftWheel"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""9721a900-937a-45f6-a91c-930c9b2aeda0"",
+                    ""path"": ""<XRController>{LeftHand}/thumbstickDpadDown"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""8fde8318-cfd8-4099-aa10-e2a22177b02c"",
+                    ""path"": ""<XRController>{LeftHand}/thumbstickDpadUp"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""20b25bd8-7f5f-4eff-b6af-7edd70b8dbd1"",
+                    ""path"": ""<QuestTouchPlusController>{LeftHand}/thumbstick/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Joystick"",
+                    ""action"": ""LeftWheel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1252,10 +1344,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
         m_Player_Next = m_Player.FindAction("Next", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
-        m_Player_LeftWheelUp = m_Player.FindAction("LeftWheelUp", throwIfNotFound: true);
-        m_Player_LeftWheelDown = m_Player.FindAction("LeftWheelDown", throwIfNotFound: true);
-        m_Player_RightWheelUp = m_Player.FindAction("RightWheelUp", throwIfNotFound: true);
-        m_Player_RightWheelDown = m_Player.FindAction("RightWheelDown", throwIfNotFound: true);
+        m_Player_RightWheel = m_Player.FindAction("RightWheel", throwIfNotFound: true);
+        m_Player_LeftWheel = m_Player.FindAction("LeftWheel", throwIfNotFound: true);
         m_Player_menu = m_Player.FindAction("menu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -1359,10 +1449,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Previous;
     private readonly InputAction m_Player_Next;
     private readonly InputAction m_Player_Sprint;
-    private readonly InputAction m_Player_LeftWheelUp;
-    private readonly InputAction m_Player_LeftWheelDown;
-    private readonly InputAction m_Player_RightWheelUp;
-    private readonly InputAction m_Player_RightWheelDown;
+    private readonly InputAction m_Player_RightWheel;
+    private readonly InputAction m_Player_LeftWheel;
     private readonly InputAction m_Player_menu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
@@ -1412,21 +1500,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         /// <summary>
-        /// Provides access to the underlying input action "Player/LeftWheelUp".
+        /// Provides access to the underlying input action "Player/RightWheel".
         /// </summary>
-        public InputAction @LeftWheelUp => m_Wrapper.m_Player_LeftWheelUp;
+        public InputAction @RightWheel => m_Wrapper.m_Player_RightWheel;
         /// <summary>
-        /// Provides access to the underlying input action "Player/LeftWheelDown".
+        /// Provides access to the underlying input action "Player/LeftWheel".
         /// </summary>
-        public InputAction @LeftWheelDown => m_Wrapper.m_Player_LeftWheelDown;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/RightWheelUp".
-        /// </summary>
-        public InputAction @RightWheelUp => m_Wrapper.m_Player_RightWheelUp;
-        /// <summary>
-        /// Provides access to the underlying input action "Player/RightWheelDown".
-        /// </summary>
-        public InputAction @RightWheelDown => m_Wrapper.m_Player_RightWheelDown;
+        public InputAction @LeftWheel => m_Wrapper.m_Player_LeftWheel;
         /// <summary>
         /// Provides access to the underlying input action "Player/menu".
         /// </summary>
@@ -1484,18 +1564,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
-            @LeftWheelUp.started += instance.OnLeftWheelUp;
-            @LeftWheelUp.performed += instance.OnLeftWheelUp;
-            @LeftWheelUp.canceled += instance.OnLeftWheelUp;
-            @LeftWheelDown.started += instance.OnLeftWheelDown;
-            @LeftWheelDown.performed += instance.OnLeftWheelDown;
-            @LeftWheelDown.canceled += instance.OnLeftWheelDown;
-            @RightWheelUp.started += instance.OnRightWheelUp;
-            @RightWheelUp.performed += instance.OnRightWheelUp;
-            @RightWheelUp.canceled += instance.OnRightWheelUp;
-            @RightWheelDown.started += instance.OnRightWheelDown;
-            @RightWheelDown.performed += instance.OnRightWheelDown;
-            @RightWheelDown.canceled += instance.OnRightWheelDown;
+            @RightWheel.started += instance.OnRightWheel;
+            @RightWheel.performed += instance.OnRightWheel;
+            @RightWheel.canceled += instance.OnRightWheel;
+            @LeftWheel.started += instance.OnLeftWheel;
+            @LeftWheel.performed += instance.OnLeftWheel;
+            @LeftWheel.canceled += instance.OnLeftWheel;
             @menu.started += instance.OnMenu;
             @menu.performed += instance.OnMenu;
             @menu.canceled += instance.OnMenu;
@@ -1537,18 +1611,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
-            @LeftWheelUp.started -= instance.OnLeftWheelUp;
-            @LeftWheelUp.performed -= instance.OnLeftWheelUp;
-            @LeftWheelUp.canceled -= instance.OnLeftWheelUp;
-            @LeftWheelDown.started -= instance.OnLeftWheelDown;
-            @LeftWheelDown.performed -= instance.OnLeftWheelDown;
-            @LeftWheelDown.canceled -= instance.OnLeftWheelDown;
-            @RightWheelUp.started -= instance.OnRightWheelUp;
-            @RightWheelUp.performed -= instance.OnRightWheelUp;
-            @RightWheelUp.canceled -= instance.OnRightWheelUp;
-            @RightWheelDown.started -= instance.OnRightWheelDown;
-            @RightWheelDown.performed -= instance.OnRightWheelDown;
-            @RightWheelDown.canceled -= instance.OnRightWheelDown;
+            @RightWheel.started -= instance.OnRightWheel;
+            @RightWheel.performed -= instance.OnRightWheel;
+            @RightWheel.canceled -= instance.OnRightWheel;
+            @LeftWheel.started -= instance.OnLeftWheel;
+            @LeftWheel.performed -= instance.OnLeftWheel;
+            @LeftWheel.canceled -= instance.OnLeftWheel;
             @menu.started -= instance.OnMenu;
             @menu.performed -= instance.OnMenu;
             @menu.canceled -= instance.OnMenu;
@@ -1916,33 +1984,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSprint(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftWheelUp" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "RightWheel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftWheelUp(InputAction.CallbackContext context);
+        void OnRightWheel(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "LeftWheelDown" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "LeftWheel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnLeftWheelDown(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightWheelUp" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightWheelUp(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "RightWheelDown" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRightWheelDown(InputAction.CallbackContext context);
+        void OnLeftWheel(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "menu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

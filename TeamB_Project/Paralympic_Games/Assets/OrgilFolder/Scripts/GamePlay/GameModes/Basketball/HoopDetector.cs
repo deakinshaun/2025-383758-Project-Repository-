@@ -8,6 +8,8 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
     public class HoopDetector : MonoBehaviour
     {
         [Tooltip("Event raised when a ball scores.")]
+
+        public int Team;
         public UnityEvent onScore;
 
         private bool _enteredFromAbove;
@@ -18,20 +20,17 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             {
                 return;
             }
-
-            if (other.transform.position.y > transform.position.y)
-            {
-                _enteredFromAbove = true;
-            }
+            _enteredFromAbove = other.transform.position.y > transform.position.y;
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (!other.CompareTag("Ball") || !_enteredFromAbove) return;
-
+            if (other.transform.position.y > transform.position.y) return;
             if (other.TryGetComponent<NetworkObject>(out var netobj) && netobj.TryGetComponent<Ball>(out var ball))
             {
-                BasketballGameRule.Instance.RPCRegisterScore(ball.PossessingTeam, ball.ShotOrigin, netobj.InputAuthority);
+                BasketballGameRule.Instance.RPCRegisterScore(Team, ball.ShotOrigin,
+                    netobj.InputAuthority);
             }
 
             onScore?.Invoke();

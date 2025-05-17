@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Threading.Tasks;
 using Fusion;
+using OrgilFolder.Scripts.UI;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
@@ -17,6 +21,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
 
         [Header("3-point line distance ")] [SerializeField]
         private float threePointRadius = 7.0f;
+
         public event Action<int, int> OnScored;
 
         private void Awake()
@@ -28,6 +33,16 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         {
             TeamAScore = 0;
             TeamBScore = 0;
+
+            GameManager.State.onSetState += (state =>
+            {
+                if (state == GameState.EGameState.Outro)
+                {
+                    string text = TeamAScore > TeamBScore ? "Team 1 Wins!" : "Team 2 Wins!";
+                    if (TeamAScore == TeamBScore) text = "Draw!";
+                    PlayerObject.Local.gameObject.GetComponentInChildren<HUD>().SetPostGameText(text);
+                }
+            });
         }
 
         public void SpawnBallNeutral()
@@ -47,6 +62,11 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         private void SpawnBallForTeam(int team)
         {
             if (!Runner.IsServer) return;
+            foreach (var ball in FindObjectsByType<Ball>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            {
+                Runner.Despawn(ball.GetComponent<NetworkObject>());
+            }
+
             Transform spawnTf = team switch
             {
                 1 => team1BallSpawnTf,
@@ -60,14 +80,19 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         }
 
         [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-        public void RPCRegisterScore(int shootingTeam, Vector3 shotOrigin, PlayerRef scorer, RpcInfo info = default)
+        public async void RPCRegisterScore(int scoringTeam, Vector3 shotOrigin, PlayerRef scorer,
+            RpcInfo info = default)
         {
             //TODO: Make judgement on the 3 point line
             int points = 2;
-            if (shootingTeam == 0) TeamAScore += points;
+            if (scoringTeam == 0) TeamAScore += points;
             else TeamBScore += points;
 
-            OnScored?.Invoke(shootingTeam, points);
+            OnScored?.Invoke(scoringTeam, points);
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
+            SpawnBallForTeam(scoringTeam == 1 ? 2 : 1);
         }
     }
 }

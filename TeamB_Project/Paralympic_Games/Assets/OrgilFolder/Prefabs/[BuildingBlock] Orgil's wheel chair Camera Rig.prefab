@@ -14257,7 +14257,7 @@ GameObject:
   - component: {fileID: 939947346022405054}
   - component: {fileID: 88694870449577970}
   m_Layer: 0
-  m_Name: '[BuildingBlock] Orgil''s wheel chair Camera Rig '
+  m_Name: '[BuildingBlock] Orgil''s wheel chair Camera Rig'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

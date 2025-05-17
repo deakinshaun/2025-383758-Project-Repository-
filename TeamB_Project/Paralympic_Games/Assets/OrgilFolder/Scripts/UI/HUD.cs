@@ -18,6 +18,11 @@ namespace OrgilFolder.Scripts.UI
             }
         }
 
+        public void SetPostGameText(string text)
+        {
+            countDownText.SetText(text);
+        }
+
         IEnumerator CountDown(float timer)
         {
             float t = timer;

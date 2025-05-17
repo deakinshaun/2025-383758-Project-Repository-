@@ -60,33 +60,23 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             input.rotation = inputRot;
             input.velocity = inputVel;
             inputVel = Vector3.zero;
-            
+
             return input;
         }
 
         private void Update()
         {
-            if (_inputSystemActions.Player.LeftWheelUp.IsPressed())
-            {
-                leftWheel.transform.rotation = Quaternion.AngleAxis(-rotSpeed * Time.deltaTime, leftWheel.right) *
-                                               leftWheel.transform.rotation;
-            }
-            else if (_inputSystemActions.Player.LeftWheelDown.IsPressed())
-            {
-                leftWheel.transform.rotation = Quaternion.AngleAxis(rotSpeed * Time.deltaTime, leftWheel.right) *
-                                               leftWheel.transform.rotation;
-            }
+            float leftWheelInput = _inputSystemActions.Player.LeftWheel.ReadValue<float>();
+            float rightWheelInput = _inputSystemActions.Player.RightWheel.ReadValue<float>();
 
-            if (_inputSystemActions.Player.RightWheelUp.IsPressed())
-            {
-                rightWheel.transform.rotation = Quaternion.AngleAxis(rotSpeed * Time.deltaTime, rightWheel.right) *
-                                                rightWheel.transform.rotation;
-            }
-            else if (_inputSystemActions.Player.RightWheelDown.IsPressed())
-            {
-                rightWheel.transform.rotation = Quaternion.AngleAxis(-rotSpeed * Time.deltaTime, rightWheel.right) *
-                                                rightWheel.transform.rotation;
-            }
+            leftWheel.transform.rotation =
+                Quaternion.AngleAxis(-leftWheelInput * rotSpeed * Time.deltaTime, leftWheel.right) *
+                leftWheel.transform.rotation;
+
+
+            rightWheel.transform.rotation =
+                Quaternion.AngleAxis(rightWheelInput * rotSpeed * Time.deltaTime, rightWheel.right) *
+                rightWheel.transform.rotation;
         }
 
         private void FixedUpdate()
@@ -103,14 +93,10 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             float forwardSpeed = (leftSpeed + rightSpeed) * 0.5f;
             float rotAngVel = Mathf.Rad2Deg * (leftSpeed - rightSpeed) / wheelBase;
 
-            inputVel += transform.forward * forwardSpeed;
-
-            if (Mathf.Abs(rotAngVel) > speedDiffThreshold)
-            {
-                inputRot = Quaternion.AngleAxis(rotAngVel * Time.fixedDeltaTime, Vector3.up) *
-                           transform.rotation;
-            }
-
+            inputVel = transform.forward * forwardSpeed;
+            inputRot = Quaternion.Slerp(inputRot, Quaternion.AngleAxis(rotAngVel * Time.fixedDeltaTime, Vector3.up) *
+                                                  transform.rotation,
+                Mathf.Lerp(0, 1, Mathf.Abs(rotAngVel) / speedDiffThreshold));
             leftPrevAngle = LRotAngle;
             rightPrevAngle = RRotAngle;
         }

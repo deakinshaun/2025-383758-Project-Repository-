@@ -46,7 +46,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
             preview.SetActive(false);
             ballCollider.transform.parent = transform;
             ballCollider.transform.position = transform.position;
-            ballCollider.attachedRigidbody.isKinematic = true;
+            ballCollider.attachedRigidbody.isKinematic = false;
         }
     }
 }

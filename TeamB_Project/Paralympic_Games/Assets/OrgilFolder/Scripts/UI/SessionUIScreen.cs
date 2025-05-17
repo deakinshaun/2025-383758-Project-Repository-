@@ -10,7 +10,6 @@ using UnityEngine.UI;
 
 public class SessionUIScreen : MonoBehaviour
 {
-    public Transform unassignedPlayersItemHolder;
     public Transform team1PlayerItemHolder;
     public Transform team2PlayerItemHolder;
     public Button team1JoinButton;
@@ -53,6 +52,8 @@ public class SessionUIScreen : MonoBehaviour
 
     private void Initialization()
     {
+        
+        
         foreach (var player in PlayerRegistry.Players)
         {
             SpawnPlayerItem(PlayerRegistry.Instance.Runner, player.Ref, player.Team);
@@ -65,7 +66,6 @@ public class SessionUIScreen : MonoBehaviour
         {
             1 => team1PlayerItemHolder,
             2 => team2PlayerItemHolder,
-            -1 => unassignedPlayersItemHolder,
             _ => spectatorItemHolder
         };
 
@@ -84,6 +84,14 @@ public class SessionUIScreen : MonoBehaviour
             PlayerSessionItemUI item = runner.Spawn(playerSessionItemUIPrefab, inputAuthority: player);
             playerItems[player] = item;
             item.transform.SetParent(parentHolder, false);
+
+            PlayerRegistry.GetPlayer(player).OnSpectatorChanged += (() =>
+            {
+                if (PlayerRegistry.GetPlayer(player).IsSpectator)
+                {
+                    item.transform.SetParent(spectatorItemHolder, false);
+                }
+            });
         }
     }
 
