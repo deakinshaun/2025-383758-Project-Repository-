@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using System.Collections.Generic;
-using System.Collections;
 public class VRButton : MonoBehaviour
 {
     public GameObject button;

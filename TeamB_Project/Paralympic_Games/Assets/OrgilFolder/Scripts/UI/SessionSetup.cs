@@ -1,5 +1,4 @@
-﻿using System;
-using OrgilFolder.Scripts;
+﻿using OrgilFolder.Scripts;
 using OrgilFolder.Scripts.UI;
 using UnityEngine;
 using UnityEngine.Events;

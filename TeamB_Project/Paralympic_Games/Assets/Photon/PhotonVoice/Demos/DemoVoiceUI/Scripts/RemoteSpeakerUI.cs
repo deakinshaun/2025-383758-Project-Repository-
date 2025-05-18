@@ -1,10 +1,10 @@
 ﻿namespace Photon.Voice.Unity.Demos.DemoVoiceUI
 {
     using ExitGames.Client.Photon;
+    using Realtime;
     using Unity;
     using UnityEngine;
     using UnityEngine.UI;
-    using Realtime;
 
     public class RemoteSpeakerUI : MonoBehaviour, IInRoomCallbacks
     {
@@ -125,10 +125,10 @@
             this.webrtcVad.enabled = this.Actor.HasWebRTCVAD();
             this.aec.enabled = this.Actor.HasAEC();
             this.agc.enabled = this.Actor.HasAGC();
-            this.agc.text = "AGC Gain: " + this.Actor.GetAGCGain() + " Level: "+this.Actor.GetAGCLevel();
+            this.agc.text = "AGC Gain: " + this.Actor.GetAGCGain() + " Level: " + this.Actor.GetAGCLevel();
             var micVal = this.Actor.GetMic();
             this.mic.enabled = micVal.HasValue;
-            this.mic.text = micVal.HasValue?(micVal == Recorder.MicType.Unity?"Unity MIC":"Photon MIC"):"";
+            this.mic.text = micVal.HasValue ? (micVal == Recorder.MicType.Unity ? "Unity MIC" : "Photon MIC") : "";
         }
 
         protected virtual void SetMutedState(bool isMuted)

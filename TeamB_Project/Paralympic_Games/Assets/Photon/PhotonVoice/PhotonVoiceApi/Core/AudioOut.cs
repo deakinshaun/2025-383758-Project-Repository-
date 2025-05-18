@@ -164,7 +164,7 @@ namespace Photon.Voice
                 {
                     int d = this.writeSamplePos - (int)(OutPos % this.bufferSamples);
                     // detect ring buffer wrapping and convert to ms
-                    return (d > bufferSamplesHalf ? d - bufferSamples : d < -bufferSamplesHalf ? d + bufferSamples : d) *1000 / frequency;
+                    return (d > bufferSamplesHalf ? d - bufferSamples : d < -bufferSamplesHalf ? d + bufferSamples : d) * 1000 / frequency;
                 }
                 else
                 {
@@ -321,7 +321,7 @@ namespace Photon.Voice
                     }
                 }
 
-return;
+                return;
             }
             else
             {
@@ -389,7 +389,7 @@ return;
             if (frameIsWritten)
             {
 
-return;
+                return;
             }
 
             if (catchingUp)

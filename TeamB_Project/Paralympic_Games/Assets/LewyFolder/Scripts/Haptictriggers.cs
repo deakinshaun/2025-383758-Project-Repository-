@@ -1,8 +1,7 @@
+using System.Collections;
 using Oculus.Interaction;
 using Oculus.Interaction.Input;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;
 
 
 public class Haptictriggers : MonoBehaviour
@@ -46,11 +45,11 @@ public class Haptictriggers : MonoBehaviour
         StartCoroutine(TriggerHapticsRoutine(controller));
     }
 
-        public IEnumerator TriggerHapticsRoutine(OVRInput.Controller controller)
-        {
-            OVRInput.SetControllerVibration(frequency, amplitude, controller);
-            yield return new WaitForSeconds(duration);
-            OVRInput.SetControllerVibration(0, 0, controller);
-        }
-    
+    public IEnumerator TriggerHapticsRoutine(OVRInput.Controller controller)
+    {
+        OVRInput.SetControllerVibration(frequency, amplitude, controller);
+        yield return new WaitForSeconds(duration);
+        OVRInput.SetControllerVibration(0, 0, controller);
+    }
+
 }

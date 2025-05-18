@@ -1,8 +1,8 @@
 ﻿namespace Photon.Voice.Unity.Editor
 {
-    using UnityEngine;
-    using UnityEditor;
     using Unity;
+    using UnityEditor;
+    using UnityEngine;
 
     [CustomEditor(typeof(Speaker), true)]
     public class SpeakerEditor : Editor

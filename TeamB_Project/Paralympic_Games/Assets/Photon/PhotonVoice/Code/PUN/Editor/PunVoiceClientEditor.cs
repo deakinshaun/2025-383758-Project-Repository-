@@ -1,12 +1,10 @@
 ﻿#if PUN_2_OR_NEWER
-using System;
-
 namespace Photon.Voice.PUN.Editor
 {
+    using Pun;
     using Unity.Editor;
     using UnityEditor;
     using UnityEngine;
-    using Pun;
 
     [CustomEditor(typeof(PunVoiceClient), true)]
     public class PunVoiceClientEditor : VoiceConnectionEditor

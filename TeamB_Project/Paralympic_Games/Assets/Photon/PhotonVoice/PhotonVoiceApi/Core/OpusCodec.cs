@@ -1,6 +1,6 @@
-﻿using POpusCodec.Enums;
+﻿using System;
 using POpusCodec;
-using System;
+using POpusCodec.Enums;
 
 namespace Photon.Voice
 {

@@ -4,9 +4,9 @@ using Fusion.Sockets;
 
 namespace Photon.Voice.Fusion.Demo
 {
-    using UnityEngine;
-    using System.Collections.Generic;
     using System;
+    using System.Collections.Generic;
+    using UnityEngine;
 
     public class PrefabSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
@@ -18,7 +18,7 @@ namespace Photon.Voice.Fusion.Demo
         [SerializeField]
         private bool debugLogs;
 
-#region INetworkRunnerCallbacks
+        #region INetworkRunnerCallbacks
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {

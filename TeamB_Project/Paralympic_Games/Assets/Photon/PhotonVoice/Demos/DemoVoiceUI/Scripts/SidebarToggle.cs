@@ -1,7 +1,7 @@
 ﻿namespace Photon.Voice.Unity.Demos
 {
-    using UnityEngine.UI;
     using UnityEngine;
+    using UnityEngine.UI;
 
     public class SidebarToggle : MonoBehaviour
     {

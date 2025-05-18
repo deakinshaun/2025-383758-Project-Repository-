@@ -2,14 +2,14 @@ using System;
 
 namespace LudicWorlds
 {
-	public interface IState<T> : IDisposable
-	{
-		T ID { get; }
+    public interface IState<T> : IDisposable
+    {
+        T ID { get; }
 
-		void Enter();
-		void Update();
-		void Exit();
-	}
+        void Enter();
+        void Update();
+        void Exit();
+    }
 }
 
 

@@ -1,7 +1,7 @@
+using System.Collections;
 using LudicWorlds;
 using Unity.Sentis;
 using UnityEngine;
-using System.Collections;
 
 public class RunEncoderState : SentisWhisperState
 {
@@ -47,7 +47,7 @@ public class RunEncoderState : SentisWhisperState
 
     private void StartModel()
     {
-        m_Schedule = whisper.EncoderEngine.ScheduleIterable( whisper.SpectroOutput );
+        m_Schedule = whisper.EncoderEngine.ScheduleIterable(whisper.SpectroOutput);
         stage = 1;
     }
 

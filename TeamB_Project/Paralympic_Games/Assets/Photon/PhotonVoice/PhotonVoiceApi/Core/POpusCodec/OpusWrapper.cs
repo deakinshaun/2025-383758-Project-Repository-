@@ -34,8 +34,8 @@
 
 using System;
 using System.Runtime.InteropServices;
-using POpusCodec.Enums;
 using Photon.Voice;
+using POpusCodec.Enums;
 
 namespace POpusCodec
 {

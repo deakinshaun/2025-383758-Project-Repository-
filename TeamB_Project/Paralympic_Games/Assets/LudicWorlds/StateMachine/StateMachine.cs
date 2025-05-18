@@ -1,52 +1,49 @@
 //Finite State Machine
-using UnityEngine;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace LudicWorlds
 {
-	public class StateMachine<T> : IStateMachine<T>
-	{
-		protected IState<T> currentState;
-		protected IState<T> prevState;
-		protected Dictionary<T, IState<T>> states;
-					
-		public IState<T> CurrentState 
-		{
-			get{ return currentState; }
-		}
+    public class StateMachine<T> : IStateMachine<T>
+    {
+        protected IState<T> currentState;
+        protected IState<T> prevState;
+        protected Dictionary<T, IState<T>> states;
 
-		public IState<T> PreviousState
-		{
-			get{ return prevState; }
-		}
-		
-		
-		//------------------------
-		// Methods
-		//------------------------
-		
-		public StateMachine ()
-		{
-			currentState = null;
-			states = new Dictionary<T, IState<T>>();				
-		}
-				
-		public void Update()
-		{
+        public IState<T> CurrentState
+        {
+            get { return currentState; }
+        }
+
+        public IState<T> PreviousState
+        {
+            get { return prevState; }
+        }
+
+
+        //------------------------
+        // Methods
+        //------------------------
+
+        public StateMachine()
+        {
+            currentState = null;
+            states = new Dictionary<T, IState<T>>();
+        }
+
+        public void Update()
+        {
             if (currentState != null)
             {
                 currentState.Update();
             }
-		}
+        }
 
-        public void AddState( IState<T> state )
-		{
-			//Debug.Log("-> StateMachine::AddState() - state ID: " + state.ID);
-			this.states.Add( state.ID, state );
-		}
-				
+        public void AddState(IState<T> state)
+        {
+            //Debug.Log("-> StateMachine::AddState() - state ID: " + state.ID);
+            this.states.Add(state.ID, state);
+        }
+
         public bool SetState(IState<T> state)
         {
             if (state != null)

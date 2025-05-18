@@ -1,7 +1,5 @@
 using TMPro;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;
 
 public class Keyboard_Button : MonoBehaviour
 {
@@ -18,7 +16,7 @@ public class Keyboard_Button : MonoBehaviour
         if (buttonText.text.Length == 1)
         {
             NameToButtonText(); // Call the method to set the button text
-            GetComponentInChildren<VRButton>().onRelease.AddListener(delegate { keyboard.InsertChar(buttonText.text); }); 
+            GetComponentInChildren<VRButton>().onRelease.AddListener(delegate { keyboard.InsertChar(buttonText.text); });
             // Call the InsertChar method from the Keyboard script
         }
 

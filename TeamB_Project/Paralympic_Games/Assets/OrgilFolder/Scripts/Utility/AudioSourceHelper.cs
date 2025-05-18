@@ -1,10 +1,9 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace OrgilFolder.Scripts.Utility
 {
-    public static class AudioSourceHelper 
+    public static class AudioSourceHelper
     {
 
         public static void PlayOneShot(this AudioSource audioSource, AudioClip clip, Vector2 pitchRange,
@@ -15,6 +14,6 @@ namespace OrgilFolder.Scripts.Utility
             audioSource.pitch = Random.Range(pitchRange.y, pitchRange.y);
             audioSource.Play();
         }
-        
+
     }
 }

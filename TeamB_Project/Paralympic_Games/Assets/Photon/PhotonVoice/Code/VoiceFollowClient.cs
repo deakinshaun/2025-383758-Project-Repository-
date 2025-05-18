@@ -10,10 +10,9 @@
 // ----------------------------------------------------------------------------
 
 using ExitGames.Client.Photon;
-using UnityEngine;
 using Photon.Realtime;
 using Photon.Voice.Unity;
-using System;
+using UnityEngine;
 
 namespace Photon.Voice
 {

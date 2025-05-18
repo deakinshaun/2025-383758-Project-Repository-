@@ -15,12 +15,10 @@
 
 #if PUN_2_OR_NEWER
 
-using ExitGames.Client.Photon;
-using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using Photon.Voice.Unity;
-using System;
+using UnityEngine;
 
 namespace Photon.Voice.PUN
 {

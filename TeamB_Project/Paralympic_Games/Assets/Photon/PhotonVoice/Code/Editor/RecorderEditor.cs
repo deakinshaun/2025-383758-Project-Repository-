@@ -1,8 +1,8 @@
 ﻿namespace Photon.Voice.Unity.Editor
 {
-    using POpusCodec.Enums;
     using System;
     using System.Linq;
+    using POpusCodec.Enums;
     using Unity;
     using UnityEditor;
     using UnityEngine;
@@ -285,7 +285,7 @@
 
         private static T GetEnumValueByIndex<T>(int i)
         {
-            return (T) Enum.GetValues(typeof(T)).GetValue(i);
+            return (T)Enum.GetValues(typeof(T)).GetValue(i);
         }
 
         bool iosAudioSessionFoldout;

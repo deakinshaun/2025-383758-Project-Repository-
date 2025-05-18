@@ -1,8 +1,8 @@
 ﻿#if PHOTON_VOICE_FMOD_AVAILABLE
 using Photon.Voice.Unity.Editor;
 #endif
-using Photon.Realtime;
 using System;
+using Photon.Realtime;
 using UnityEditor;
 
 namespace Photon.Voice.Unity.FMOD.Editor

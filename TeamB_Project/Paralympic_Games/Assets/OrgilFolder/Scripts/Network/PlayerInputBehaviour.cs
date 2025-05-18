@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
 using OrgilFolder.Scripts;
-using UnityEngine;
 
-public class PlayerInputBehaviour : SimulationBehaviour,INetworkRunnerCallbacks
+public class PlayerInputBehaviour : SimulationBehaviour, INetworkRunnerCallbacks
 {
     public static Func<PlayerInput> GetInput;
-    
+
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        if(PlayerObject.Local == null ) return;
-        if(GameManager.State.Current != GameState.EGameState.Game) return;
-        if(GetInput==null) return;
+        if (PlayerObject.Local == null) return;
+        if (GameManager.State.Current != GameState.EGameState.Game) return;
+        if (GetInput == null) return;
         input.Set(GetInput());
     }
     #region Unused Callbacks
@@ -61,7 +60,7 @@ public class PlayerInputBehaviour : SimulationBehaviour,INetworkRunnerCallbacks
     {
     }
 
- 
+
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {
     }

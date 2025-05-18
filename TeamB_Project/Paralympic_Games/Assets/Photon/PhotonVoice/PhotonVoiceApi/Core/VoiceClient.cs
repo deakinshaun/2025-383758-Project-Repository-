@@ -9,7 +9,6 @@
 // ----------------------------------------------------------------------------
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace Photon.Voice
@@ -510,7 +509,7 @@ namespace Photon.Voice
             this.logger.Log(LogLevel.Info, voice.LogPrefix + " removed");
         }
 
-#region nonpublic
+        #region nonpublic
 
         private Dictionary<byte, LocalVoice> localVoices = new Dictionary<byte, LocalVoice>();
         private Dictionary<int, List<LocalVoice>> localVoicesPerChannel = new Dictionary<int, List<LocalVoice>>();
@@ -792,7 +791,7 @@ namespace Photon.Voice
         //    return string.Format("Photon.Voice.Client, local: {0}, remote: {1}",  localVoices.Count, remoteVoices.Count);
         //}
 
-#endregion
+        #endregion
 
         public void Dispose()
         {

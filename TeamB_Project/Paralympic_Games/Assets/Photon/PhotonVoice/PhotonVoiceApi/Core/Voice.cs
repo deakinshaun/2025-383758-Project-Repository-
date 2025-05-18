@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -263,7 +262,7 @@ namespace Photon.Voice
             this.id = id;
 
 
-            this.shortName  = "v#" + id + "ch#" + voiceClient.channelStr(channelId);
+            this.shortName = "v#" + id + "ch#" + voiceClient.channelStr(channelId);
             this.Name = "Local " + info.Codec + " v#" + id + " ch#" + voiceClient.channelStr(channelId);
             this.LogPrefix = "[PV] " + Name;
 
@@ -397,7 +396,7 @@ namespace Photon.Voice
                     {
                         if (voiceClient.logger.Level >= LogLevel.Trace) this.voiceClient.logger.Log(LogLevel.Trace, LogPrefix + " Got config frame from encoder, " + configFrame.Count + " bytes: repeated, not sending");
 
-return;
+                        return;
                     }
                     else
                     {
@@ -431,7 +430,7 @@ return;
             if (!targetExits(targetMe, targetPlayers))
             {
 
-return;
+                return;
             }
 
             bool fragment = Fragment && (flags & FrameFlags.Config) == 0; // fragmentation of config frames is not supported (see RemoteVoice.configFrameQueue)
@@ -500,7 +499,7 @@ return;
                 }
 
                 if (voiceClient.logger.Level >= LogLevel.Trace) voiceClient.logger.Log(LogLevel.Trace, LogPrefix + " ev#" + evNumber + " fr#" + FramesSent + " c#" + fragCount + " Fragmented sent from events " + (byte)(evNumber - fragCount) + "-" + evNumber + ", size: " + compressed.Count + ", flags: " + flags);
-            this.FramesSentFragmented++;
+                this.FramesSentFragmented++;
             }
             this.FramesSent++;
             this.FramesSentBytes += compressed.Count;
@@ -534,7 +533,7 @@ return;
         {
             int fec = FEC;
 
-//            if (this.evNumber % 7 != 0)
+            //            if (this.evNumber % 7 != 0)
             this.voiceClient.transport.SendFrame(data, flags, this.evNumber, (byte)this.FramesSent, id, this.channelId, sendFramePar);
 
             this.sendSpacingProfile.Update(false, false);
@@ -1090,7 +1089,7 @@ return;
                         }
                         if (voiceClient.logger.Level >= LogLevel.Debug) voiceClient.logger.Log(LogLevel.Debug, LogPrefix + " ev#" + lostEvNum + " FEC failed to recover from events " + from + "-" + fecEvNum + " because at least 2 events are lost");
 
-return false;
+                        return false;
                     }
                 }
             }
@@ -1146,7 +1145,7 @@ return false;
                 Interlocked.Exchange(ref eventQueueLock[begEvNum], 0);           // unlock frame 1st event
                 frameReadPos++;
 
-return 1;
+                return 1;
             }
 
             if (begEv.Array == null)
@@ -1155,7 +1154,7 @@ return 1;
                 Interlocked.Exchange(ref eventQueueLock[begEvNum], 0);           // unlock frame 1st event
                 this.voiceClient.EventsLost++;
 
-return 1;
+                return 1;
             }
 
             // issue null frames if frameReadPos is behind the current event frame
@@ -1170,9 +1169,9 @@ return 1;
                 if ((byte)(maxFrameReadPos - frameReadPos) >= 127) // maxFrameReadPos < mFrameReadPos, wait for write pos to increment
                 {
                     Interlocked.Exchange(ref eventQueueLock[begEvNum], 0);           // unlock frame 1st event
-                    // mFrameReadPos points to the next frame
+                                                                                     // mFrameReadPos points to the next frame
 
-return 0;
+                    return 0;
                 }
             }
 
@@ -1191,7 +1190,7 @@ return 0;
                     this.voiceClient.logger.Log(LogLevel.Warning, LogPrefix + " ev#" + begEvNum + " fr#" + begEv.FrameNum + " c#" + fragCount + " 1st event corrupted: 0 fragments count");
                     Interlocked.Exchange(ref eventQueueLock[begEvNum], 0);           // unlock frame 1st event
 
-return 1;
+                    return 1;
                 }
 
                 int begEvPayloadSize = begEv.Length - 1; // - last byte with count, all fragments but the last are of this size
@@ -1212,7 +1211,7 @@ return 1;
                     voiceClient.logger.Log(LogLevel.Error, LogPrefix + " Fragmented pool is full, allocating " + maxPayloadSize + " bytes directly");
                     fragmented = new byte[maxPayloadSize];
                 }
-                else  if (fragmentedPool[poolIdx] == null || fragmentedPool[poolIdx].Buf.Length < maxPayloadSize)  // reallocate buffer if needed
+                else if (fragmentedPool[poolIdx] == null || fragmentedPool[poolIdx].Buf.Length < maxPayloadSize)  // reallocate buffer if needed
                 {
                     fragmented = new byte[maxPayloadSize];
                 }
@@ -1282,7 +1281,7 @@ return 1;
                 options.Decoder.Input(ref fragFrame);
                 fragFrame.Release();
 
-return fragCount;
+                return fragCount;
             }
             else if (fragMask == 0) // unfragemented
             {
@@ -1300,7 +1299,7 @@ return fragCount;
 
             Interlocked.Exchange(ref eventQueueLock[begEvNum], 0);           // unlock frame 1st event
 
-return 1;
+            return 1;
         }
 
         void decodeThread()
@@ -1384,14 +1383,14 @@ return 1;
             // On the other hand, we can simply drop all references to the wait handle and allow the garbage collector to do the job for you sometime later (wait handles implement the disposal pattern whereby the finalizer calls Close).
             // This is one of the few scenarios where relying on this backup is (arguably)acceptable, because wait handles have a light OS burden (asynchronous delegates rely on exactly this mechanism to release their IAsyncResult’s wait handle):
             // https://www.cnblogs.com/malaikuangren/archive/2012/06/02/2532239.html
-//            if (frameQueueReady != null)
-//            {
-//#if NETFX_CORE
-//                frameQueueReady.Dispose();
-//#else
-//                frameQueueReady.Close();
-//#endif
-//            }
+            //            if (frameQueueReady != null)
+            //            {
+            //#if NETFX_CORE
+            //                frameQueueReady.Dispose();
+            //#else
+            //                frameQueueReady.Close();
+            //#endif
+            //            }
 
             for (int i = 0; i < eventQueue.Length; i++)
             {

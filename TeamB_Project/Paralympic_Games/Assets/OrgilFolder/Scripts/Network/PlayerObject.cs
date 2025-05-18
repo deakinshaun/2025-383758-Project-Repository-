@@ -4,17 +4,17 @@ using UnityEngine;
 public class PlayerObject : NetworkBehaviour
 {
     public static PlayerObject Local { get; private set; }
-    
+
     [Networked]
     public PlayerRef Ref { get; set; }
     [Networked]
     public byte Index { get; set; }
-    
+
     [Networked, OnChangedRender(nameof(StatChanged))]
     public string Nickname { get; set; }
     [Networked, OnChangedRender(nameof(StatChanged))]
     public Color Color { get; set; }
-    
+
     [Networked]
     public bool IsLoaded { get; set; }
     [Networked, OnChangedRender(nameof(SpectatorChanged))]
@@ -22,15 +22,16 @@ public class PlayerObject : NetworkBehaviour
 
     [Networked, OnChangedRender(nameof(TeamChanged))]
     public int Team { get; set; } = -1;
-    
+
     public event System.Action OnStatChanged;
     public event System.Action OnSpectatorChanged;
-    
-    public static event System.Action<NetworkRunner,PlayerRef, int> onPlayerTeamChanged;
 
-    private  void TeamChanged() {
-   
-        onPlayerTeamChanged?.Invoke(Runner,Ref,Team);
+    public static event System.Action<NetworkRunner, PlayerRef, int> onPlayerTeamChanged;
+
+    private void TeamChanged()
+    {
+
+        onPlayerTeamChanged?.Invoke(Runner, Ref, Team);
     }
     public void Server_Init(PlayerRef pRef, byte index)
     {
@@ -60,7 +61,7 @@ public class PlayerObject : NetworkBehaviour
     public void ClearGameplayData()
     {
     }
-    
+
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     void Rpc_SetNickname(string nick)
     {

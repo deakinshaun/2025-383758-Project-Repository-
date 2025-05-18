@@ -110,7 +110,7 @@ namespace Photon.Voice.Unity
                 }
             }
         }
-        private static string GetFormatString(LogLevel level, string tag, string objName,  string fmt)
+        private static string GetFormatString(LogLevel level, string tag, string objName, string fmt)
         {
             return string.Format("[{0}] [{1}] [{2}] [{3}] {4}", GetTimestamp(), level, tag, objName, fmt);
         }

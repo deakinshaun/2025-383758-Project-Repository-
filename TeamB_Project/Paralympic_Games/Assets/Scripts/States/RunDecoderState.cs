@@ -1,8 +1,8 @@
-using LudicWorlds;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using LudicWorlds;
 using Unity.Sentis;
 using UnityEngine;
 
@@ -110,7 +110,7 @@ public class RunDecoderState : SentisWhisperState
         }
     }
 
-     
+
     // Translates encoded special characters to Unicode
     string GetUnicodeText(string text)
     {

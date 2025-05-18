@@ -1,17 +1,17 @@
 ﻿namespace Photon.Voice.Unity.Demos.DemoVoiceUI
 {
-    using Realtime;
     using ExitGames.Client.Photon;
+    using Realtime;
 
     public static partial class PhotonDemoExtensions // todo: USE C.A.S. ALWAYS
     {
         // this demo uses a Custom Property (as explained in the Realtime API), to sync if a player muted her microphone. that value needs a string key.
-        internal const string MUTED_KEY      = "mu";
+        internal const string MUTED_KEY = "mu";
         internal const string PHOTON_VAD_KEY = "pv";
         internal const string WEBRTC_AEC_KEY = "ec";
         internal const string WEBRTC_VAD_KEY = "wv";
         internal const string WEBRTC_AGC_KEY = "gc";
-        internal const string MIC_KEY        = "m";
+        internal const string MIC_KEY = "m";
 
         public static bool Mute(this Player player)
         {
@@ -32,7 +32,7 @@
         {
             return player.SetCustomProperties(new Hashtable(1) { { PHOTON_VAD_KEY, value } });
         }
-        
+
         public static bool SetWebRTCVAD(this Player player, bool value)
         {
             return player.SetCustomProperties(new Hashtable(1) { { WEBRTC_VAD_KEY, value } });
@@ -46,12 +46,12 @@
 
         public static bool SetAGC(this Player player, bool agcEnabled, int gain, int level)
         {
-            return player.SetCustomProperties(new Hashtable(1) { { WEBRTC_AGC_KEY, new object[] { agcEnabled, gain,level} } });
+            return player.SetCustomProperties(new Hashtable(1) { { WEBRTC_AGC_KEY, new object[] { agcEnabled, gain, level } } });
         }
 
         public static bool SetMic(this Player player, Recorder.MicType type)
         {
-            return player.SetCustomProperties(new Hashtable(1) { { MIC_KEY, type } } );
+            return player.SetCustomProperties(new Hashtable(1) { { MIC_KEY, type } });
         }
 
 
@@ -95,7 +95,8 @@
             {
                 mic = (Recorder.MicType)player.GetObjectProperty(MIC_KEY);
             }
-            catch {
+            catch
+            {
                 mic = null;
             }
 

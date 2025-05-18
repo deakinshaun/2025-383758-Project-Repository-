@@ -1,5 +1,4 @@
-﻿using System;
-using OrgilFolder.Scripts.GamePlay;
+﻿using OrgilFolder.Scripts.GamePlay;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts

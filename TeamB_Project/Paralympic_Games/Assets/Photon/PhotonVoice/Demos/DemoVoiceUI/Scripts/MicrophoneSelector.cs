@@ -33,8 +33,8 @@
 
     public class MicrophoneSelector : VoiceComponent
     {
-        public class MicrophoneSelectorEvent: UnityEvent<MicType, DeviceInfo>
-        {}
+        public class MicrophoneSelectorEvent : UnityEvent<MicType, DeviceInfo>
+        { }
 
         public MicrophoneSelectorEvent onValueChanged = new MicrophoneSelectorEvent();
 
@@ -150,7 +150,7 @@
 
             this.micDropdown.AddOptions(micOptionsStrings);
             this.micDropdown.onValueChanged.RemoveAllListeners();
-            this.micDropdown.onValueChanged.AddListener( (x) => this.SwitchToSelectedMic() );
+            this.micDropdown.onValueChanged.AddListener((x) => this.SwitchToSelectedMic());
         }
 
         public void SwitchToSelectedMic()
@@ -207,7 +207,7 @@
 
         public void RefreshMicrophones()
         {
-        	// the result is processed in photonMicEnum.OnReady
+            // the result is processed in photonMicEnum.OnReady
             this.unityMicEnum.Refresh();
             this.photonMicEnum.Refresh();
 #if PHOTON_VOICE_FMOD_ENABLE

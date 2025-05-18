@@ -1,6 +1,4 @@
-﻿using System;
-using Fusion;
-using Unity.XR.CoreUtils;
+﻿using Fusion;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
@@ -12,7 +10,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         [SerializeField] private float wheelRadius;
 
         [SerializeField] private float speedDiffThreshold = 2f;
-        [Header("PC Only")] [SerializeField] private float rotSpeed = 3;
+        [Header("PC Only")][SerializeField] private float rotSpeed = 3;
         private float leftPrevAngle;
         private float rightPrevAngle;
         private float wheelBase;

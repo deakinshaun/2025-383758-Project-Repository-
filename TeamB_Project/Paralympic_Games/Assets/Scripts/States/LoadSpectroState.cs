@@ -1,6 +1,5 @@
 using LudicWorlds;
 using Unity.Sentis;
-using UnityEngine;
 
 public class LoadSpectroState : SentisWhisperState
 {

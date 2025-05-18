@@ -9,15 +9,15 @@ namespace Photon.Voice.Fusion
     [AddComponentMenu("Photon Voice/Fusion/Voice Network Object")]
     public class VoiceNetworkObject : NetworkBehaviour
     {
-#region Private Fields
+        #region Private Fields
 
         // VoiceComponentImpl instance instead if VoiceComponent inheritance
         private VoiceComponentImpl voiceComponentImpl = new VoiceComponentImpl();
 
         private VoiceConnection voiceConnection;
 
-#endregion
-#region Properties
+        #endregion
+        #region Properties
 
         protected Voice.ILogger Logger => voiceComponentImpl.Logger;
 
@@ -42,9 +42,9 @@ namespace Photon.Voice.Fusion
 #else
         public bool IsLocal => Runner.Topology == SimulationConfig.Topologies.Shared ? this.Object.HasStateAuthority : this.Object.HasInputAuthority;
 #endif
-#endregion
+        #endregion
 
-#region Private Methods
+        #region Private Methods
 
         private void SetupRecorder()
         {
@@ -150,7 +150,7 @@ namespace Photon.Voice.Fusion
             this.voiceConnection.RemoveRecorder(this.RecorderInUse);
         }
 
-#endregion
+        #endregion
     }
 }
 #endif

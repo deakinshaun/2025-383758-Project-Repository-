@@ -1,9 +1,4 @@
 using LudicWorlds;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
-using System.IO;
 using Unity.Sentis;
 
 public class SentisWhisperState : GameObjectState<WhisperStateID>

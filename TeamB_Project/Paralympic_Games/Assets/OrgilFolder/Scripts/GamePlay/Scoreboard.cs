@@ -37,7 +37,7 @@ namespace OrgilFolder.Scripts.GamePlay
 
         private void FixedUpdate()
         {
-            if(GameManager.Instance==null) return;
+            if (GameManager.Instance == null) return;
             timer.text = TimeSpan.FromSeconds(GameManager.Instance.MaxTime - GameManager.Time).ToString(@"mm\:ss");
         }
     }

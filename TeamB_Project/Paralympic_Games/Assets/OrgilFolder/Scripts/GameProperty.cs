@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 [CreateAssetMenu(menuName = "SO/GameProperty", fileName = "GameProperty")]
 public class GameProperty : ScriptableObject

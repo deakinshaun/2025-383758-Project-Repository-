@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
 using Fusion;
 using OrgilFolder.Scripts.UI;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
-using Button = UnityEngine.UI.Button;
-using Random = UnityEngine.Random;
 
 public class JoinSessionUI : MonoBehaviour
 {
@@ -43,5 +40,5 @@ public class JoinSessionUI : MonoBehaviour
             };
         }
     }
-    
+
 }

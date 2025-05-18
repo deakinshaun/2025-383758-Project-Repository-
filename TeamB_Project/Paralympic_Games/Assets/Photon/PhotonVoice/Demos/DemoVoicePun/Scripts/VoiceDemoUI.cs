@@ -18,11 +18,11 @@ using Photon.Voice.PUN;
 
 namespace ExitGames.Demos.DemoPunVoice
 {
+    using System.Linq;
+    using Client.Photon;
     using Photon.Pun;
     using UnityEngine;
     using UnityEngine.UI;
-    using Client.Photon;
-    using System.Linq;
 
 #if !UNITY_EDITOR && UNITY_PS4
     using Sony.NP;

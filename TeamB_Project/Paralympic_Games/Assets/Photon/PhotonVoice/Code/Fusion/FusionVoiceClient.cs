@@ -1,16 +1,16 @@
 #if FUSION_WEAVER
 namespace Photon.Voice.Fusion
 {
+    using System;
+    using System.Collections.Generic;
+    using ExitGames.Client.Photon;
     using global::Fusion;
     using global::Fusion.Sockets;
-    using PhotonAppSettings = global::Fusion.Photon.Realtime.PhotonAppSettings;
-    using System.Collections.Generic;
     using Realtime;
-    using ExitGames.Client.Photon;
-    using UnityEngine;
     using Unity;
-    using System;
+    using UnityEngine;
     using LogLevel = Photon.Voice.LogLevel;
+    using PhotonAppSettings = global::Fusion.Photon.Realtime.PhotonAppSettings;
 
     [AddComponentMenu("Photon Voice/Fusion/Fusion Voice Client")]
     [RequireComponent(typeof(NetworkRunner))]
@@ -20,7 +20,7 @@ namespace Photon.Voice.Fusion
         protected override bool LeaderInRoom => this.networkRunner.SessionInfo.IsValid;
         protected override bool LeaderOfflineMode => networkRunner.GameMode == GameMode.Single;
 
-#region Private Fields
+        #region Private Fields
 
         private NetworkRunner networkRunner;
 
@@ -30,9 +30,9 @@ namespace Photon.Voice.Fusion
         };
 
         bool voiceFollowClientStarted = false;
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// Whether or not to use the Voice AppId and all the other AppSettings from Fusion's RealtimeAppSettings ScriptableObject singleton in the Voice client/app.
@@ -48,9 +48,9 @@ namespace Photon.Voice.Fusion
         [field: SerializeField]
         public bool UseFusionAuthValues = true;
 
-#endregion
+        #endregion
 
-#region Private Methods
+        #region Private Methods
 
         protected override void Start()
         {
@@ -65,7 +65,8 @@ namespace Photon.Voice.Fusion
 
         // Starts the VoiceFollowClient and add the recorder.
         //  Can be either be called from Start, or once the local player has joined the session, if the NetworkRunner was not yet starting during the Start() call
-        void VoiceFollowClientStart() {
+        void VoiceFollowClientStart()
+        {
             if (voiceFollowClientStarted) return;
 
             voiceFollowClientStarted = true;
@@ -309,13 +310,13 @@ namespace Photon.Voice.Fusion
 
         private static short SerializeFusionNetworkId(StreamBuffer outstream, object customobject)
         {
-            NetworkId networkId = (NetworkId) customobject;
+            NetworkId networkId = (NetworkId)customobject;
             return (short)WriteCompressedUInt64(outstream, networkId.Raw);
         }
 
-#endregion
+        #endregion
 
-#region INetworkRunnerCallbacks
+        #region INetworkRunnerCallbacks
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
@@ -398,7 +399,7 @@ namespace Photon.Voice.Fusion
         {
         }
 
- #if FUSION2
+#if FUSION2
         public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
         {
         }
@@ -420,7 +421,7 @@ namespace Photon.Voice.Fusion
         {
         }
 #endif
-#endregion
+        #endregion
     }
 }
 #endif

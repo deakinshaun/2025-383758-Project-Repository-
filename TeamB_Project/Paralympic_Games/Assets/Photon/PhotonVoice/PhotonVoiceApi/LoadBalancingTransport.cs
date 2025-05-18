@@ -10,8 +10,6 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Realtime;
 
@@ -228,18 +226,18 @@ namespace Photon.Voice
                         }
                         break;
                     case (byte)EventCode.Leave:
-                    {
-                        playerId = ev.Sender;
-                        if (playerId == this.LocalPlayer.ActorNumber)
                         {
-                            this.voiceClient.onLeaveAllChannels();
+                            playerId = ev.Sender;
+                            if (playerId == this.LocalPlayer.ActorNumber)
+                            {
+                                this.voiceClient.onLeaveAllChannels();
+                            }
+                            else
+                            {
+                                this.voiceClient.onPlayerLeave(playerId);
+                            }
                         }
-                        else
-                        {
-                            this.voiceClient.onPlayerLeave(playerId);
-                        }
-                    }
-                    break;
+                        break;
                 }
             }
         }

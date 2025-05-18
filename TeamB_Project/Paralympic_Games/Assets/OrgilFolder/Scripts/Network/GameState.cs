@@ -18,14 +18,14 @@ public class GameState : NetworkBehaviour
         Postgame
     }
 
-    [Networked] [field: ReadOnly] public EGameState Previous { get; set; }
-    [Networked] [field: ReadOnly] public EGameState Current { get; set; }
+    [Networked][field: ReadOnly] public EGameState Previous { get; set; }
+    [Networked][field: ReadOnly] public EGameState Current { get; set; }
     [Networked] TickTimer Delay { get; set; }
     [Networked] EGameState DelayedState { get; set; }
 
     protected StateMachine<EGameState> StateMachine = new();
 
-    
+
     public float DelayRemainingTime => Delay.RemainingTime(Runner).Value;
     public event Action<EGameState> onSetState;
     public event Action<EGameState, float> onSetDelaydState;
@@ -109,7 +109,7 @@ public class GameState : NetworkBehaviour
 
         StateMachine[EGameState.Outro].onEnter = prev =>
         {
-            
+
 
         };
 

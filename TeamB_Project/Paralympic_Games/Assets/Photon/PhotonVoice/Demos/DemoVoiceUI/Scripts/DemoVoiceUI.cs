@@ -1,11 +1,11 @@
 namespace Photon.Voice.Unity.Demos.DemoVoiceUI
 {
     using System.Collections.Generic;
-    using Realtime;
     using ExitGames.Client.Photon;
-    using UtilityScripts;
+    using Realtime;
     using UnityEngine;
     using UnityEngine.UI;
+    using UtilityScripts;
 
     [RequireComponent(typeof(UnityVoiceClient), typeof(ConnectAndJoin))]
     public class DemoVoiceUI : MonoBehaviour, IInRoomCallbacks, IMatchmakingCallbacks

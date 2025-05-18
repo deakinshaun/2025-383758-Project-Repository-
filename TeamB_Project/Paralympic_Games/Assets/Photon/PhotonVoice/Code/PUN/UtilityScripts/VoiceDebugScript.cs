@@ -2,10 +2,9 @@
 namespace Photon.Voice.PUN.UtilityScripts
 {
     using Pun;
-    using Unity;
     using Realtime;
+    using Unity;
     using UnityEngine;
-    using ExitGames.Client.Photon;
 
     /// <summary> Utility script to be attached next to PhotonVoiceView & PhotonView on the player prefab to be network instantiated.
     /// Call voiceDebugScript.CantHearYou() on the networked object of the remote (or local) player if you can't hear the corresponding player. </summary>

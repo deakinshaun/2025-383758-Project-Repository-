@@ -1,6 +1,5 @@
 using LudicWorlds;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class StartTranscriptionState : SentisWhisperState
 {

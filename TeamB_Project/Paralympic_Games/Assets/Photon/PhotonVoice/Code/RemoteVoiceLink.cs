@@ -1,7 +1,7 @@
 ﻿namespace Photon.Voice.Unity
 {
-    using Voice;
     using System;
+    using Voice;
 
     public class RemoteVoiceLink
     {

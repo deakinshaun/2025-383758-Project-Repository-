@@ -12,7 +12,6 @@ using System;
 using POpusCodec.Enums;
 using UnityEngine;
 using UnityEngine.Serialization;
-using System.Linq;
 
 namespace Photon.Voice.Unity
 {
@@ -583,21 +582,27 @@ namespace Photon.Voice.Unity
             }
         }
 
-        public bool AndroidMicrophoneAGC {
-			get {
-				return this.androidMicrophoneSettings.EnableAGC;
-			}
-		}
-        public bool AndroidMicrophoneAEC {
-			get {
-				return this.androidMicrophoneSettings.EnableAEC;
-			}
-		}
-        public bool AndroidMicrophoneNS  {
-			get {
-				return this.androidMicrophoneSettings.EnableNS;
-			}
-		}
+        public bool AndroidMicrophoneAGC
+        {
+            get
+            {
+                return this.androidMicrophoneSettings.EnableAGC;
+            }
+        }
+        public bool AndroidMicrophoneAEC
+        {
+            get
+            {
+                return this.androidMicrophoneSettings.EnableAEC;
+            }
+        }
+        public bool AndroidMicrophoneNS
+        {
+            get
+            {
+                return this.androidMicrophoneSettings.EnableNS;
+            }
+        }
 
         #endregion
 
@@ -835,148 +840,148 @@ namespace Photon.Voice.Unity
             switch (this.SourceType)
             {
                 case InputSourceType.Microphone:
-                {
-                    bool fallbackMicrophone = false;
-                    switch (this.MicrophoneType)
                     {
-                        case MicType.Unity:
+                        bool fallbackMicrophone = false;
+                        switch (this.MicrophoneType)
                         {
-                            // if fallback, switch to default device from set by other type
-                            DeviceInfo micDev = fallbackMicrophone ? DeviceInfo.Default : this.MicrophoneDevice;
-                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to Unity microphone device {0}", micDev);
-                            // mic can ignore passed sampling rate and set its own
-                            if (this.UseOnAudioFilterRead)
-                            {
-                                this.inputSource = new MicWrapperPusher(gameObject, micDev.IDString, samplingRateInt, this.Logger);
-                            }
-                            else
-                            {
-                                this.inputSource = new MicWrapper(micDev.IDString, samplingRateInt, this.Logger);
-                            }
-                            if (this.inputSource != null)
-                            {
-                                if (this.inputSource.Error != null)
+                            case MicType.Unity:
                                 {
-                                    this.Logger.Log(LogLevel.Error, "Unity microphone input source creation failure: {0}", this.inputSource.Error);
+                                    // if fallback, switch to default device from set by other type
+                                    DeviceInfo micDev = fallbackMicrophone ? DeviceInfo.Default : this.MicrophoneDevice;
+                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to Unity microphone device {0}", micDev);
+                                    // mic can ignore passed sampling rate and set its own
+                                    if (this.UseOnAudioFilterRead)
+                                    {
+                                        this.inputSource = new MicWrapperPusher(gameObject, micDev.IDString, samplingRateInt, this.Logger);
+                                    }
+                                    else
+                                    {
+                                        this.inputSource = new MicWrapper(micDev.IDString, samplingRateInt, this.Logger);
+                                    }
+                                    if (this.inputSource != null)
+                                    {
+                                        if (this.inputSource.Error != null)
+                                        {
+                                            this.Logger.Log(LogLevel.Error, "Unity microphone input source creation failure: {0}", this.inputSource.Error);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (this.UseMicrophoneTypeFallback && !fallbackMicrophone)
+                                    {
+                                        fallbackMicrophone = true;
+                                        this.Logger.Log(LogLevel.Error, "Unity microphone failed. Falling back to Photon microphone");
+                                        goto case MicType.Photon;
+                                    }
                                 }
-                                else
+                                break;
+                            case MicType.Photon:
                                 {
-                                    break;
-                                }
-                            }
-                            if (this.UseMicrophoneTypeFallback && !fallbackMicrophone)
-                            {
-                                fallbackMicrophone = true;
-                                this.Logger.Log(LogLevel.Error, "Unity microphone failed. Falling back to Photon microphone");
-                                goto case MicType.Photon;
-                            }
-                        }
-                        break;
-                        case MicType.Photon:
-                        {
-                            object otherParams = null;
-                            // if fallback, switch to default device from set by other type
-                            DeviceInfo micDev = fallbackMicrophone ? DeviceInfo.Default : this.MicrophoneDevice;
-                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to Photon microphone device={0}", micDev);
+                                    object otherParams = null;
+                                    // if fallback, switch to default device from set by other type
+                                    DeviceInfo micDev = fallbackMicrophone ? DeviceInfo.Default : this.MicrophoneDevice;
+                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to Photon microphone device={0}", micDev);
 
-                            // TODO: only iOS and Android need specific processing
-                            // Per platform Logging left to save something from previous file version
-                            switch (Application.platform)
-                            {
-                                case RuntimePlatform.WindowsPlayer:
-                                case RuntimePlatform.WindowsEditor:
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to WindowsAudioInPusher");
-                                    break;
-                                case RuntimePlatform.WSAPlayerARM:
-                                case RuntimePlatform.WSAPlayerX64:
-                                case RuntimePlatform.WSAPlayerX86:
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to UWP.AudioInPusher");
-                                    break;
-                                case RuntimePlatform.IPhonePlayer:
+                                    // TODO: only iOS and Android need specific processing
+                                    // Per platform Logging left to save something from previous file version
+                                    switch (Application.platform)
+                                    {
+                                        case RuntimePlatform.WindowsPlayer:
+                                        case RuntimePlatform.WindowsEditor:
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to WindowsAudioInPusher");
+                                            break;
+                                        case RuntimePlatform.WSAPlayerARM:
+                                        case RuntimePlatform.WSAPlayerX64:
+                                        case RuntimePlatform.WSAPlayerX86:
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to UWP.AudioInPusher");
+                                            break;
+                                        case RuntimePlatform.IPhonePlayer:
 #if UNITY_VISIONOS
                                 case RuntimePlatform.VisionOS:
 #endif
-                                    otherParams = audioSessionParameters;
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to IOS.AudioInPusher with session {0}", audioSessionParameters);
-                                    break;
-                                case RuntimePlatform.OSXPlayer:
-                                case RuntimePlatform.OSXEditor:
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to MacOS.AudioInPusher");
-                                    break;
-                                case RuntimePlatform.Switch:
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to Switch.AudioInPusher");
-                                    break;
-                                case RuntimePlatform.Android:
-                                    otherParams = androidMicrophoneSettings;
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to UnityAndroidAudioInAEC");
-                                    break;
-                                case RuntimePlatform.WebGLPlayer:
+                                            otherParams = audioSessionParameters;
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to IOS.AudioInPusher with session {0}", audioSessionParameters);
+                                            break;
+                                        case RuntimePlatform.OSXPlayer:
+                                        case RuntimePlatform.OSXEditor:
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to MacOS.AudioInPusher");
+                                            break;
+                                        case RuntimePlatform.Switch:
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to Switch.AudioInPusher");
+                                            break;
+                                        case RuntimePlatform.Android:
+                                            otherParams = androidMicrophoneSettings;
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to UnityAndroidAudioInAEC");
+                                            break;
+                                        case RuntimePlatform.WebGLPlayer:
 #if UNITY_2021_2_OR_NEWER // requires ES6
-                                    this.Logger.Log(LogLevel.Info, "Setting recorder's source to Unity.WebAudioMicIn");
-                                    break;
+                                            this.Logger.Log(LogLevel.Info, "Setting recorder's source to Unity.WebAudioMicIn");
+                                            break;
 #else
                                     this.Logger.Log(LogLevel.Error, "Microphone cature requies Unity 2021.2 or newer for WebGL");
                                     goto default;
 #endif
-                                default:
-                                    this.Logger.Log(LogLevel.Error, "Photon microphone type is not supported for the current platform {0}", Application.platform);
-                                    break;
-                            }
-                            this.inputSource = Platform.CreateDefaultAudioSource(this.Logger, micDev, samplingRateInt, 1, otherParams);
+                                        default:
+                                            this.Logger.Log(LogLevel.Error, "Photon microphone type is not supported for the current platform {0}", Application.platform);
+                                            break;
+                                    }
+                                    this.inputSource = Platform.CreateDefaultAudioSource(this.Logger, micDev, samplingRateInt, 1, otherParams);
 
-                            if (this.inputSource != null)
-                            {
-                                if (this.inputSource.Error != null)
-                                {
-                                    this.Logger.Log(LogLevel.Error, "Photon microphone input source creation failure: {0}", this.inputSource.Error);
-                                }
-                                else
-                                {
+                                    if (this.inputSource != null)
+                                    {
+                                        if (this.inputSource.Error != null)
+                                        {
+                                            this.Logger.Log(LogLevel.Error, "Photon microphone input source creation failure: {0}", this.inputSource.Error);
+                                        }
+                                        else
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    if (this.UseMicrophoneTypeFallback && !fallbackMicrophone)
+                                    {
+                                        fallbackMicrophone = true;
+                                        this.Logger.Log(LogLevel.Error, "Photon microphone failed. Falling back to Unity microphone");
+                                        goto case MicType.Unity;
+                                    }
                                     break;
                                 }
-                            }
-                            if (this.UseMicrophoneTypeFallback && !fallbackMicrophone)
-                            {
-                                fallbackMicrophone = true;
-                                this.Logger.Log(LogLevel.Error, "Photon microphone failed. Falling back to Unity microphone");
-                                goto case MicType.Unity;
-                            }
-                            break;
+                            default:
+                                this.Logger.Log(LogLevel.Error, "unknown MicrophoneType value {0}", this.MicrophoneType);
+                                return LocalVoiceAudioDummy.Dummy;
                         }
-                        default:
-                            this.Logger.Log(LogLevel.Error, "unknown MicrophoneType value {0}", this.MicrophoneType);
-                            return LocalVoiceAudioDummy.Dummy;
                     }
-                }
-                break;
+                    break;
                 case InputSourceType.AudioClip:
-                {
-                    if (ReferenceEquals(null, this.AudioClip))
                     {
-                        this.Logger.Log(LogLevel.Error, "AudioClip property must be set for AudioClip audio source");
-                        return LocalVoiceAudioDummy.Dummy;
+                        if (ReferenceEquals(null, this.AudioClip))
+                        {
+                            this.Logger.Log(LogLevel.Error, "AudioClip property must be set for AudioClip audio source");
+                            return LocalVoiceAudioDummy.Dummy;
+                        }
+                        AudioClipWrapper audioClipWrapper = new AudioClipWrapper(this.AudioClip); // never fails, no need to check Error
+                        audioClipWrapper.Loop = this.LoopAudioClip;
+                        this.inputSource = audioClipWrapper;
                     }
-                    AudioClipWrapper audioClipWrapper = new AudioClipWrapper(this.AudioClip); // never fails, no need to check Error
-                    audioClipWrapper.Loop = this.LoopAudioClip;
-                    this.inputSource = audioClipWrapper;
-                }
-                break;
+                    break;
                 case InputSourceType.Factory:
-                {
-                    if (this.InputFactory == null)
                     {
-                        // this.Logger.Log(LogLevel.Error, "Recorder.InputFactory must be specified if Recorder.Source set to Factory");
-                        // return LocalVoiceAudioDummy.Dummy;
-                        this.Logger.Log(LogLevel.Warning, "Recorder.Source is Factory but Recorder.InputFactory is not set. Setting it to ToneAudioReader.");
-                        this.InputFactory = () => new AudioUtil.ToneAudioPusher<float>();
+                        if (this.InputFactory == null)
+                        {
+                            // this.Logger.Log(LogLevel.Error, "Recorder.InputFactory must be specified if Recorder.Source set to Factory");
+                            // return LocalVoiceAudioDummy.Dummy;
+                            this.Logger.Log(LogLevel.Warning, "Recorder.Source is Factory but Recorder.InputFactory is not set. Setting it to ToneAudioReader.");
+                            this.InputFactory = () => new AudioUtil.ToneAudioPusher<float>();
+                        }
+                        this.inputSource = this.InputFactory();
+                        if (this.inputSource.Error != null)
+                        {
+                            this.Logger.Log(LogLevel.Error, "InputFactory creation failure: {0}.", this.inputSource.Error);
+                        }
                     }
-                    this.inputSource = this.InputFactory();
-                    if (this.inputSource.Error != null)
-                    {
-                        this.Logger.Log(LogLevel.Error, "InputFactory creation failure: {0}.", this.inputSource.Error);
-                    }
-                }
-                break;
+                    break;
                 default:
                     this.Logger.Log(LogLevel.Error, "unknown Source value {0}", this.SourceType);
                     return LocalVoiceAudioDummy.Dummy;
@@ -1126,7 +1131,7 @@ namespace Photon.Voice.Unity
             }
         }
 
-#endregion
+        #endregion
 
         public enum InputSourceType
         {

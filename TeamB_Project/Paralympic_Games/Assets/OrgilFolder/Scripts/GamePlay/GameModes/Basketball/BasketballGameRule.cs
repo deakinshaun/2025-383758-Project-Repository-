@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Threading.Tasks;
 using Fusion;
 using OrgilFolder.Scripts.UI;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
@@ -19,7 +17,8 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         [Networked] public int TeamAScore { get; private set; }
         [Networked] public int TeamBScore { get; private set; }
 
-        [Header("3-point line distance ")] [SerializeField]
+        [Header("3-point line distance ")]
+        [SerializeField]
         private float threePointRadius = 7.0f;
 
         public event Action<int, int> OnScored;

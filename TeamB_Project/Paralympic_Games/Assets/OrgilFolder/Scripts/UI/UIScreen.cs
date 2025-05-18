@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 
 [RequireComponent(typeof(CanvasGroup))]
@@ -9,7 +8,7 @@ public class UIScreen : MonoBehaviour
     public bool isModal = false;
     public UnityEvent onFocused;
     public UnityEvent onDefocused;
-    
+
     CanvasGroup _group = null;
     public CanvasGroup Group
     {

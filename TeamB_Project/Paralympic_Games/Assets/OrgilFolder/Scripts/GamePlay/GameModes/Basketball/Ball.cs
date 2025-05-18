@@ -1,5 +1,4 @@
-﻿using System;
-using Fusion;
+﻿using Fusion;
 using Oculus.Interaction;
 using OrgilFolder.Scripts.Utility;
 using UnityEngine;

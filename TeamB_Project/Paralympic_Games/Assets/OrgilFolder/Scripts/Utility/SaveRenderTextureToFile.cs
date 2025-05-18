@@ -1,7 +1,8 @@
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-public class SaveRenderTextureToFile {
+public class SaveRenderTextureToFile
+{
     [MenuItem("Assets/Save RenderTexture to file")]
     public static void SaveRTToFile()
     {
@@ -14,7 +15,7 @@ public class SaveRenderTextureToFile {
 
         byte[] bytes;
         bytes = tex.EncodeToPNG();
-        
+
         string path = AssetDatabase.GetAssetPath(rt) + ".png";
         System.IO.File.WriteAllBytes(path, bytes);
         AssetDatabase.ImportAsset(path);

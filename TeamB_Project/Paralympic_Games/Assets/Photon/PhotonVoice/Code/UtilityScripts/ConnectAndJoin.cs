@@ -11,9 +11,9 @@
 // <author>developer@exitgames.com</author>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Photon.Realtime;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace Photon.Voice.Unity.UtilityScripts
 {
@@ -40,7 +40,7 @@ namespace Photon.Voice.Unity.UtilityScripts
         public bool IsConnected { get { return this.voiceConnection != null && this.voiceConnection.Client != null && this.voiceConnection.Client.IsConnected; } }
 
         private void Start()
-       {
+        {
             this.voiceConnection = this.GetComponent<VoiceConnection>();
             this.voiceConnection.Client.AddCallbackTarget(this);
             if (this.autoConnect)

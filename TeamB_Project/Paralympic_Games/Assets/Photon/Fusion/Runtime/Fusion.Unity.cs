@@ -157,178 +157,220 @@ namespace Fusion {
 
 #region NetworkAssetSourceResource.cs
 
-namespace Fusion {
-  using System;
-  using System.Runtime.ExceptionServices;
-  using UnityEngine;
-  using Object = UnityEngine.Object;
-  using UnityResources = UnityEngine.Resources;
-
-  /// <summary>
-  /// Resources-based implementation of the asset source pattern.
-  /// </summary>
-  /// <typeparam name="T"></typeparam>
-  [Serializable]
-  public partial class NetworkAssetSourceResource<T> where T : UnityEngine.Object {
-    
-    /// <summary>
-    /// Resource path. Note that this is a Unity resource path, not a file path.
-    /// </summary>
-    [UnityResourcePath(typeof(Object))]
-    public string ResourcePath;
-    /// <summary>
-    /// Sub-object name. If empty, the main object is loaded.
-    /// </summary>
-    public string SubObjectName;
-
-    [NonSerialized]
-    private object _state;
-    [NonSerialized]
-    private int    _acquireCount;
+namespace Fusion
+{
+    using System;
+    using System.Runtime.ExceptionServices;
+    using UnityEngine;
+    using Object = UnityEngine.Object;
+    using UnityResources = UnityEngine.Resources;
 
     /// <summary>
-    /// Loads the asset. In synchronous mode, the asset is loaded immediately. In asynchronous mode, the asset is loaded in the background.
+    /// Resources-based implementation of the asset source pattern.
     /// </summary>
-    /// <param name="synchronous"></param>
-    public void Acquire(bool synchronous) {
-      if (_acquireCount == 0) {
-        LoadInternal(synchronous);
-      }
-      _acquireCount++;
-    }
+    /// <typeparam name="T"></typeparam>
+    [Serializable]
+    public partial class NetworkAssetSourceResource<T> where T : UnityEngine.Object
+    {
 
-    /// <summary>
-    /// Unloads the asset. If the asset is not loaded, an exception is thrown. If the asset is loaded multiple times, it is only
-    /// unloaded when the last acquire is released.
-    /// </summary>
-    /// <exception cref="Exception"></exception>
-    public void Release() {
-      if (_acquireCount <= 0) {
-        throw new Exception("Asset is not loaded");
-      }
-      if (--_acquireCount == 0) {
-        UnloadInternal();
-      }
-    }
+        /// <summary>
+        /// Resource path. Note that this is a Unity resource path, not a file path.
+        /// </summary>
+        [UnityResourcePath(typeof(Object))]
+        public string ResourcePath;
+        /// <summary>
+        /// Sub-object name. If empty, the main object is loaded.
+        /// </summary>
+        public string SubObjectName;
 
-    /// <summary>
-    /// Returns <see langword="true"/> if the asset is loaded.
-    /// </summary>
-    public bool IsCompleted {
-      get {
-        if (_state == null) {
-          // hasn't started
-          return false;
-        }
-        
-        if (_state is ResourceRequest asyncOp && !asyncOp.isDone) {
-          // still loading, wait
-          return false;
+        [NonSerialized]
+        private object _state;
+        [NonSerialized]
+        private int _acquireCount;
+
+        /// <summary>
+        /// Loads the asset. In synchronous mode, the asset is loaded immediately. In asynchronous mode, the asset is loaded in the background.
+        /// </summary>
+        /// <param name="synchronous"></param>
+        public void Acquire(bool synchronous)
+        {
+            if (_acquireCount == 0)
+            {
+                LoadInternal(synchronous);
+            }
+            _acquireCount++;
         }
 
-        return true;
-      }
-    }
-
-    /// <summary>
-    /// Blocks until the asset is loaded. If the asset is not loaded, an exception is thrown.
-    /// </summary>
-    /// <returns>The loaded asset</returns>
-    public T WaitForResult() {
-      Assert.Check(_state != null);
-      if (_state is ResourceRequest asyncOp) {
-        if (asyncOp.isDone) {
-          FinishAsyncOp(asyncOp);
-        } else {
-          // just load synchronously, then pass through
-          _state = null;
-          LoadInternal(synchronous: true);
-        }
-      }
-      
-      if (_state == null) {
-        throw new InvalidOperationException($"Failed to load asset {typeof(T)}: {ResourcePath}[{SubObjectName}]. Asset is null.");  
-      }
-
-      if (_state is T asset) {
-        return asset;
-      }
-
-      if (_state is ExceptionDispatchInfo exception) {
-        exception.Throw();
-        throw new NotSupportedException();
-      }
-
-      throw new InvalidOperationException($"Failed to load asset {typeof(T)}: {ResourcePath}, SubObjectName: {SubObjectName}");
-    }
-
-    private void FinishAsyncOp(ResourceRequest asyncOp) {
-      try {
-        var asset = string.IsNullOrEmpty(SubObjectName) ? asyncOp.asset : LoadNamedResource(ResourcePath, SubObjectName);
-        if (asset) {
-          _state = asset;
-        } else {
-          throw new InvalidOperationException($"Missing Resource: {ResourcePath}, SubObjectName: {SubObjectName}");
-        }
-      } catch (Exception ex) {
-        _state = ExceptionDispatchInfo.Capture(ex);
-      }
-    }
-    
-    private static T LoadNamedResource(string resoucePath, string subObjectName) {
-      var assets = UnityResources.LoadAll<T>(resoucePath);
-
-      for (var i = 0; i < assets.Length; ++i) {
-        var asset = assets[i];
-        if (string.Equals(asset.name, subObjectName, StringComparison.Ordinal)) {
-          return asset;
-        }
-      }
-
-      return null;
-    }
-    
-    private void LoadInternal(bool synchronous) {
-      Assert.Check(_state == null);
-      try {
-        if (synchronous) {
-          _state = string.IsNullOrEmpty(SubObjectName) ? UnityResources.Load<T>(ResourcePath) : LoadNamedResource(ResourcePath, SubObjectName);
-        } else {
-          _state = UnityResources.LoadAsync<T>(ResourcePath);
+        /// <summary>
+        /// Unloads the asset. If the asset is not loaded, an exception is thrown. If the asset is loaded multiple times, it is only
+        /// unloaded when the last acquire is released.
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        public void Release()
+        {
+            if (_acquireCount <= 0)
+            {
+                throw new Exception("Asset is not loaded");
+            }
+            if (--_acquireCount == 0)
+            {
+                UnloadInternal();
+            }
         }
 
-        if (_state == null) {
-          _state = new InvalidOperationException($"Missing Resource: {ResourcePath}, SubObjectName: {SubObjectName}");
+        /// <summary>
+        /// Returns <see langword="true"/> if the asset is loaded.
+        /// </summary>
+        public bool IsCompleted
+        {
+            get
+            {
+                if (_state == null)
+                {
+                    // hasn't started
+                    return false;
+                }
+
+                if (_state is ResourceRequest asyncOp && !asyncOp.isDone)
+                {
+                    // still loading, wait
+                    return false;
+                }
+
+                return true;
+            }
         }
-      } catch (Exception ex) {
-        _state = ExceptionDispatchInfo.Capture(ex);
-      }
-    }
 
-    private void UnloadInternal() {
-      if (_state is ResourceRequest asyncOp) {
-        asyncOp.completed += op => {
-          // unload stuff
-        };
-      } else if (_state is Object) {
-        // unload stuff
-      }
+        /// <summary>
+        /// Blocks until the asset is loaded. If the asset is not loaded, an exception is thrown.
+        /// </summary>
+        /// <returns>The loaded asset</returns>
+        public T WaitForResult()
+        {
+            Assert.Check(_state != null);
+            if (_state is ResourceRequest asyncOp)
+            {
+                if (asyncOp.isDone)
+                {
+                    FinishAsyncOp(asyncOp);
+                }
+                else
+                {
+                    // just load synchronously, then pass through
+                    _state = null;
+                    LoadInternal(synchronous: true);
+                }
+            }
 
-      _state = null;
-    }
-    
-    /// <summary>
-    /// The description of the asset source. Used for debugging.
-    /// </summary>
-    public string Description => $"Resource: {ResourcePath}{(!string.IsNullOrEmpty(SubObjectName) ? $"[{SubObjectName}]" : "")}";
-    
+            if (_state == null)
+            {
+                throw new InvalidOperationException($"Failed to load asset {typeof(T)}: {ResourcePath}[{SubObjectName}]. Asset is null.");
+            }
+
+            if (_state is T asset)
+            {
+                return asset;
+            }
+
+            if (_state is ExceptionDispatchInfo exception)
+            {
+                exception.Throw();
+                throw new NotSupportedException();
+            }
+
+            throw new InvalidOperationException($"Failed to load asset {typeof(T)}: {ResourcePath}, SubObjectName: {SubObjectName}");
+        }
+
+        private void FinishAsyncOp(ResourceRequest asyncOp)
+        {
+            try
+            {
+                var asset = string.IsNullOrEmpty(SubObjectName) ? asyncOp.asset : LoadNamedResource(ResourcePath, SubObjectName);
+                if (asset)
+                {
+                    _state = asset;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Missing Resource: {ResourcePath}, SubObjectName: {SubObjectName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _state = ExceptionDispatchInfo.Capture(ex);
+            }
+        }
+
+        private static T LoadNamedResource(string resoucePath, string subObjectName)
+        {
+            var assets = UnityResources.LoadAll<T>(resoucePath);
+
+            for (var i = 0; i < assets.Length; ++i)
+            {
+                var asset = assets[i];
+                if (string.Equals(asset.name, subObjectName, StringComparison.Ordinal))
+                {
+                    return asset;
+                }
+            }
+
+            return null;
+        }
+
+        private void LoadInternal(bool synchronous)
+        {
+            Assert.Check(_state == null);
+            try
+            {
+                if (synchronous)
+                {
+                    _state = string.IsNullOrEmpty(SubObjectName) ? UnityResources.Load<T>(ResourcePath) : LoadNamedResource(ResourcePath, SubObjectName);
+                }
+                else
+                {
+                    _state = UnityResources.LoadAsync<T>(ResourcePath);
+                }
+
+                if (_state == null)
+                {
+                    _state = new InvalidOperationException($"Missing Resource: {ResourcePath}, SubObjectName: {SubObjectName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _state = ExceptionDispatchInfo.Capture(ex);
+            }
+        }
+
+        private void UnloadInternal()
+        {
+            if (_state is ResourceRequest asyncOp)
+            {
+                asyncOp.completed += op =>
+                {
+                    // unload stuff
+                };
+            }
+            else if (_state is Object)
+            {
+                // unload stuff
+            }
+
+            _state = null;
+        }
+
+        /// <summary>
+        /// The description of the asset source. Used for debugging.
+        /// </summary>
+        public string Description => $"Resource: {ResourcePath}{(!string.IsNullOrEmpty(SubObjectName) ? $"[{SubObjectName}]" : "")}";
+
 #if UNITY_EDITOR
-    /// <summary>
-    /// Returns the asset instance for Editor purposes. Does not call <see cref="Acquire"/>.
-    /// </summary>
-    public T EditorInstance => string.IsNullOrEmpty(SubObjectName) ? UnityResources.Load<T>(ResourcePath) : LoadNamedResource(ResourcePath, SubObjectName);
+        /// <summary>
+        /// Returns the asset instance for Editor purposes. Does not call <see cref="Acquire"/>.
+        /// </summary>
+        public T EditorInstance => string.IsNullOrEmpty(SubObjectName) ? UnityResources.Load<T>(ResourcePath) : LoadNamedResource(ResourcePath, SubObjectName);
 #endif
-  }
+    }
 }
 
 #endregion
@@ -336,85 +378,98 @@ namespace Fusion {
 
 #region NetworkAssetSourceStatic.cs
 
-namespace Fusion {
-  using System;
-  using UnityEngine.Serialization;
-
-  /// <summary>
-  /// Hard reference-based implementation of the asset source pattern. This asset source forms a hard reference to the asset and never releases it.
-  /// This type is meant to be used at runtime. For edit-time, prefer <see cref="NetworkAssetSourceStaticLazy{T}"/>, as it delays
-  /// actually loading the asset, improving the editor performance.
-  /// </summary>
-  /// <typeparam name="T"></typeparam>
-  [Serializable]
-  public partial class NetworkAssetSourceStatic<T> where T : UnityEngine.Object {
+namespace Fusion
+{
+    using System;
+    using UnityEngine.Serialization;
 
     /// <summary>
-    /// The asset reference. Can point to an asset or to a runtime-created object.
+    /// Hard reference-based implementation of the asset source pattern. This asset source forms a hard reference to the asset and never releases it.
+    /// This type is meant to be used at runtime. For edit-time, prefer <see cref="NetworkAssetSourceStaticLazy{T}"/>, as it delays
+    /// actually loading the asset, improving the editor performance.
     /// </summary>
-    [FormerlySerializedAs("Prefab")]
-    public T Object;
-    
-    /// <see cref="Object"/>
-    [Obsolete("Use Asset instead")]
-    public T Prefab {
-      get => Object;
-      set => Object = value;
-    }
-    
-    /// <summary>
-    /// Returns <see langword="true"/>.
-    /// </summary>
-    public bool IsCompleted => true;
+    /// <typeparam name="T"></typeparam>
+    [Serializable]
+    public partial class NetworkAssetSourceStatic<T> where T : UnityEngine.Object
+    {
 
-    /// <summary>
-    /// Does nothing, the asset is always loaded.
-    /// </summary>
-    public void Acquire(bool synchronous) {
-      // do nothing
-    }
+        /// <summary>
+        /// The asset reference. Can point to an asset or to a runtime-created object.
+        /// </summary>
+        [FormerlySerializedAs("Prefab")]
+        public T Object;
 
-    /// <summary>
-    /// Does nothing, the asset is always loaded.
-    /// </summary>
-    public void Release() {
-      // do nothing
-    }
-
-    /// <summary>
-    /// Returns <seealso cref="Object"/> or throws an exception if the reference is missing.
-    /// </summary>
-    public T WaitForResult() {
-      if (Object == null) {
-        throw new InvalidOperationException("Missing static reference");
-      }
-
-      return Object;
-    }
-    
-    /// <inheritdoc cref="NetworkAssetSourceResource{T}.Description"/>
-    public string Description {
-      get {
-        if (Object) {
-#if UNITY_EDITOR
-          if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(Object, out var guid, out long fileID)) {
-            return $"Static: {guid}, fileID: {fileID}";
-          }
-#endif
-          return "Static: " + Object;
-        } else {
-          return "Static: (null)";
+        /// <see cref="Object"/>
+        [Obsolete("Use Asset instead")]
+        public T Prefab
+        {
+            get => Object;
+            set => Object = value;
         }
-      }
-    }
-    
+
+        /// <summary>
+        /// Returns <see langword="true"/>.
+        /// </summary>
+        public bool IsCompleted => true;
+
+        /// <summary>
+        /// Does nothing, the asset is always loaded.
+        /// </summary>
+        public void Acquire(bool synchronous)
+        {
+            // do nothing
+        }
+
+        /// <summary>
+        /// Does nothing, the asset is always loaded.
+        /// </summary>
+        public void Release()
+        {
+            // do nothing
+        }
+
+        /// <summary>
+        /// Returns <seealso cref="Object"/> or throws an exception if the reference is missing.
+        /// </summary>
+        public T WaitForResult()
+        {
+            if (Object == null)
+            {
+                throw new InvalidOperationException("Missing static reference");
+            }
+
+            return Object;
+        }
+
+        /// <inheritdoc cref="NetworkAssetSourceResource{T}.Description"/>
+        public string Description
+        {
+            get
+            {
+                if (Object)
+                {
 #if UNITY_EDITOR
-    /// <summary>
-    /// Returns <seealso cref="Object"/>.
-    /// </summary>
-    public T EditorInstance => Object;
+                    if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(Object, out var guid, out long fileID))
+                    {
+                        return $"Static: {guid}, fileID: {fileID}";
+                    }
 #endif
-  }
+                    return "Static: " + Object;
+                }
+                else
+                {
+                    return "Static: (null)";
+                }
+            }
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Returns <seealso cref="Object"/>.
+        /// </summary>
+        public T EditorInstance => Object;
+#endif
+    }
 }
 
 #endregion
@@ -422,78 +477,93 @@ namespace Fusion {
 
 #region NetworkAssetSourceStaticLazy.cs
 
-namespace Fusion {
-  using System;
-  using UnityEngine;
-  using UnityEngine.Serialization;
+namespace Fusion
+{
+    using System;
+    using UnityEngine;
+    using UnityEngine.Serialization;
 
-  /// <summary>
-  /// An edit-time optimised version of <see cref="NetworkAssetSourceStatic{T}"/>, taking advantage of Unity's lazy loading of
-  /// assets. At runtime, this type behaves exactly like <see cref="NetworkAssetSourceStatic{T}"/>, except for the inability
-  /// to use runtime-created objects.
-  /// </summary>
-  /// <typeparam name="T"></typeparam>
-  [Serializable]
-  public partial class NetworkAssetSourceStaticLazy<T> where T : UnityEngine.Object {
-    
     /// <summary>
-    /// The asset reference. Can only point to an asset, runtime-created objects will not work.
+    /// An edit-time optimised version of <see cref="NetworkAssetSourceStatic{T}"/>, taking advantage of Unity's lazy loading of
+    /// assets. At runtime, this type behaves exactly like <see cref="NetworkAssetSourceStatic{T}"/>, except for the inability
+    /// to use runtime-created objects.
     /// </summary>
-    [FormerlySerializedAs("Prefab")] 
-    public LazyLoadReference<T> Object;
-    
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Prefab"/>
-    [Obsolete("Use Object instead")]
-    public LazyLoadReference<T> Prefab {
-      get => Object;
-      set => Object = value;
-    }
-    
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.IsCompleted"/>
-    public bool IsCompleted => true;
-    
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Acquire"/>
-    public void Acquire(bool synchronous) {
-      // do nothing
-    }
-    
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Release"/>
-    public void Release() {
-      // do nothing
-    }
-    
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.WaitForResult"/>
-    public T WaitForResult() {
-      if (Object.asset == null) {
-        throw new InvalidOperationException("Missing static reference");
-      }
+    /// <typeparam name="T"></typeparam>
+    [Serializable]
+    public partial class NetworkAssetSourceStaticLazy<T> where T : UnityEngine.Object
+    {
 
-      return Object.asset;
-    }
-    
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Description"/>
-    public string Description {
-      get {
-        if (Object.isBroken) {
-          return "Static: (broken)";
-        } else if (Object.isSet) {
-#if UNITY_EDITOR
-          if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(Object.instanceID, out var guid, out long fileID)) {
-            return $"Static: {guid}, fileID: {fileID}";
-          }
-#endif
-          return "Static: " + Object.asset;
-        } else {
-          return "Static: (null)";
+        /// <summary>
+        /// The asset reference. Can only point to an asset, runtime-created objects will not work.
+        /// </summary>
+        [FormerlySerializedAs("Prefab")]
+        public LazyLoadReference<T> Object;
+
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Prefab"/>
+        [Obsolete("Use Object instead")]
+        public LazyLoadReference<T> Prefab
+        {
+            get => Object;
+            set => Object = value;
         }
-      }
-    }
-    
+
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.IsCompleted"/>
+        public bool IsCompleted => true;
+
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Acquire"/>
+        public void Acquire(bool synchronous)
+        {
+            // do nothing
+        }
+
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Release"/>
+        public void Release()
+        {
+            // do nothing
+        }
+
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.WaitForResult"/>
+        public T WaitForResult()
+        {
+            if (Object.asset == null)
+            {
+                throw new InvalidOperationException("Missing static reference");
+            }
+
+            return Object.asset;
+        }
+
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.Description"/>
+        public string Description
+        {
+            get
+            {
+                if (Object.isBroken)
+                {
+                    return "Static: (broken)";
+                }
+                else if (Object.isSet)
+                {
 #if UNITY_EDITOR
-    /// <inheritdoc cref="NetworkAssetSourceStatic{T}.EditorInstance"/>
-    public T EditorInstance => Object.asset;
+                    if (UnityEditor.AssetDatabase.TryGetGUIDAndLocalFileIdentifier(Object.instanceID, out var guid, out long fileID))
+                    {
+                        return $"Static: {guid}, fileID: {fileID}";
+                    }
 #endif
-  }
+                    return "Static: " + Object.asset;
+                }
+                else
+                {
+                    return "Static: (null)";
+                }
+            }
+        }
+
+#if UNITY_EDITOR
+        /// <inheritdoc cref="NetworkAssetSourceStatic{T}.EditorInstance"/>
+        public T EditorInstance => Object.asset;
+#endif
+    }
 }
 
 #endregion
@@ -501,36 +571,40 @@ namespace Fusion {
 
 #region FusionGlobalScriptableObjectAddressAttribute.cs
 
-namespace Fusion {
-  using System;
-  using UnityEngine.Scripting;
-#if (FUSION_ADDRESSABLES || FUSION_ENABLE_ADDRESSABLES) && !FUSION_DISABLE_ADDRESSABLES 
+namespace Fusion
+{
+    using System;
+    using UnityEngine.Scripting;
+#if (FUSION_ADDRESSABLES || FUSION_ENABLE_ADDRESSABLES) && !FUSION_DISABLE_ADDRESSABLES
   using UnityEngine.AddressableAssets;
   using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
-  using static InternalLogStreams;
-  
-  /// <summary>
-  /// If applied at the assembly level, allows <see cref="FusionGlobalScriptableObject{T}"/> to be loaded with Addressables.
-  /// </summary>
-  [Preserve]
-  public class FusionGlobalScriptableObjectAddressAttribute : FusionGlobalScriptableObjectSourceAttribute {
-    /// <param name="objectType">The type this attribute will attempt to load.</param>
-    /// <param name="address">The address to load from.</param>
-    public FusionGlobalScriptableObjectAddressAttribute(Type objectType, string address) : base(objectType) {
-      Address = address;
-    }
+    using static InternalLogStreams;
 
     /// <summary>
-    /// The address to load from.
+    /// If applied at the assembly level, allows <see cref="FusionGlobalScriptableObject{T}"/> to be loaded with Addressables.
     /// </summary>
-    public string Address { get; }
-    
-    /// <summary>
-    /// Loads the asset from the <see cref="Address"/>. Uses WaitForCompletion internally, so platforms that do not support it need
-    /// to preload the address prior to loading.
-    /// </summary>
-    public override FusionGlobalScriptableObjectLoadResult Load(Type type) {
+    [Preserve]
+    public class FusionGlobalScriptableObjectAddressAttribute : FusionGlobalScriptableObjectSourceAttribute
+    {
+        /// <param name="objectType">The type this attribute will attempt to load.</param>
+        /// <param name="address">The address to load from.</param>
+        public FusionGlobalScriptableObjectAddressAttribute(Type objectType, string address) : base(objectType)
+        {
+            Address = address;
+        }
+
+        /// <summary>
+        /// The address to load from.
+        /// </summary>
+        public string Address { get; }
+
+        /// <summary>
+        /// Loads the asset from the <see cref="Address"/>. Uses WaitForCompletion internally, so platforms that do not support it need
+        /// to preload the address prior to loading.
+        /// </summary>
+        public override FusionGlobalScriptableObjectLoadResult Load(Type type)
+        {
 #if (FUSION_ADDRESSABLES || FUSION_ENABLE_ADDRESSABLES) && !FUSION_DISABLE_ADDRESSABLES
       Assert.Check(!string.IsNullOrEmpty(Address));
       
@@ -545,11 +619,11 @@ namespace Fusion {
       LogTrace?.Log($"Failed to load addressable at address {Address} for type {type.FullName}: {op.OperationException}");
       return default;
 #else
-      LogTrace?.Log($"Addressables are not enabled. Unable to load addressable for {type.FullName}");
-      return default;
+            LogTrace?.Log($"Addressables are not enabled. Unable to load addressable for {type.FullName}");
+            return default;
 #endif
+        }
     }
-  }
 }
 
 #endregion
@@ -557,80 +631,93 @@ namespace Fusion {
 
 #region FusionGlobalScriptableObjectResourceAttribute.cs
 
-namespace Fusion {
-  using System;
-  using System.IO;
-  using System.Reflection;
-  using UnityEngine;
-  using UnityEngine.Scripting;
-  using Object = UnityEngine.Object;
-  using static InternalLogStreams;
-  
-  /// <summary>
-  /// If applied at the assembly level, allows <see cref="FusionGlobalScriptableObject{T}"/> to be loaded with Resources.
-  /// There is a default registration for this attribute, which attempts to load the asset from Resources using path from
-  /// <see cref="FusionGlobalScriptableObjectAttribute"/>.
-  /// </summary>
-  [Preserve]
-  public class FusionGlobalScriptableObjectResourceAttribute : FusionGlobalScriptableObjectSourceAttribute {
-    /// <param name="objectType">The type this attribute will attempt to load.</param>
-    /// <param name="resourcePath">Resources path or <see langword="null"/>/empty if path from <see cref="FusionGlobalScriptableObjectAttribute"/>
-    /// is to be used.</param>
-    public FusionGlobalScriptableObjectResourceAttribute(Type objectType, string resourcePath = "") : base(objectType) {
-      ResourcePath = resourcePath;
-    }
-    
-    /// <summary>
-    /// Path in Resources.
-    /// </summary>
-    public string ResourcePath { get; }
-    /// <summary>
-    /// If loaded in the editor, should the result be instantiated instead of returning the asset itself? The default is <see langword="true"/>. 
-    /// </summary>
-    public bool InstantiateIfLoadedInEditor { get; set; } = true;
-    
-    /// <summary>
-    /// Loads the asset from Resources synchronously.
-    /// </summary>
-    public override FusionGlobalScriptableObjectLoadResult Load(Type type) {
-      
-      var attribute = type.GetCustomAttribute<FusionGlobalScriptableObjectAttribute>();
-      Assert.Check(attribute != null);
+namespace Fusion
+{
+    using System;
+    using System.IO;
+    using System.Reflection;
+    using UnityEngine;
+    using UnityEngine.Scripting;
+    using static InternalLogStreams;
+    using Object = UnityEngine.Object;
 
-      string resourcePath;
-      if (string.IsNullOrEmpty(ResourcePath)) {
-        string defaultAssetPath = attribute.DefaultPath;
-        var indexOfResources = defaultAssetPath.LastIndexOf("/Resources/", StringComparison.OrdinalIgnoreCase);
-        if (indexOfResources < 0) {
-          LogTrace?.Log($"The default path {defaultAssetPath} does not contain a /Resources/ folder. Unable to load resource for {type.FullName}.");
-          return default;
+    /// <summary>
+    /// If applied at the assembly level, allows <see cref="FusionGlobalScriptableObject{T}"/> to be loaded with Resources.
+    /// There is a default registration for this attribute, which attempts to load the asset from Resources using path from
+    /// <see cref="FusionGlobalScriptableObjectAttribute"/>.
+    /// </summary>
+    [Preserve]
+    public class FusionGlobalScriptableObjectResourceAttribute : FusionGlobalScriptableObjectSourceAttribute
+    {
+        /// <param name="objectType">The type this attribute will attempt to load.</param>
+        /// <param name="resourcePath">Resources path or <see langword="null"/>/empty if path from <see cref="FusionGlobalScriptableObjectAttribute"/>
+        /// is to be used.</param>
+        public FusionGlobalScriptableObjectResourceAttribute(Type objectType, string resourcePath = "") : base(objectType)
+        {
+            ResourcePath = resourcePath;
         }
 
-        // try to load from resources, maybe?
-        resourcePath = defaultAssetPath.Substring(indexOfResources + "/Resources/".Length);
+        /// <summary>
+        /// Path in Resources.
+        /// </summary>
+        public string ResourcePath { get; }
+        /// <summary>
+        /// If loaded in the editor, should the result be instantiated instead of returning the asset itself? The default is <see langword="true"/>. 
+        /// </summary>
+        public bool InstantiateIfLoadedInEditor { get; set; } = true;
 
-        // drop the extension
-        if (Path.HasExtension(resourcePath)) {
-          resourcePath = resourcePath.Substring(0, resourcePath.LastIndexOf('.'));
+        /// <summary>
+        /// Loads the asset from Resources synchronously.
+        /// </summary>
+        public override FusionGlobalScriptableObjectLoadResult Load(Type type)
+        {
+
+            var attribute = type.GetCustomAttribute<FusionGlobalScriptableObjectAttribute>();
+            Assert.Check(attribute != null);
+
+            string resourcePath;
+            if (string.IsNullOrEmpty(ResourcePath))
+            {
+                string defaultAssetPath = attribute.DefaultPath;
+                var indexOfResources = defaultAssetPath.LastIndexOf("/Resources/", StringComparison.OrdinalIgnoreCase);
+                if (indexOfResources < 0)
+                {
+                    LogTrace?.Log($"The default path {defaultAssetPath} does not contain a /Resources/ folder. Unable to load resource for {type.FullName}.");
+                    return default;
+                }
+
+                // try to load from resources, maybe?
+                resourcePath = defaultAssetPath.Substring(indexOfResources + "/Resources/".Length);
+
+                // drop the extension
+                if (Path.HasExtension(resourcePath))
+                {
+                    resourcePath = resourcePath.Substring(0, resourcePath.LastIndexOf('.'));
+                }
+            }
+            else
+            {
+                resourcePath = ResourcePath;
+            }
+
+            var instance = UnityEngine.Resources.Load(resourcePath, type);
+            if (!instance)
+            {
+                LogTrace?.Log($"Unable to load resource at path {resourcePath} for type {type.FullName}");
+                return default;
+            }
+
+            if (InstantiateIfLoadedInEditor && Application.isEditor)
+            {
+                var clone = Object.Instantiate(instance);
+                return new((FusionGlobalScriptableObject)clone, x => Object.Destroy(clone));
+            }
+            else
+            {
+                return new((FusionGlobalScriptableObject)instance, x => UnityEngine.Resources.UnloadAsset(instance));
+            }
         }
-      } else {
-        resourcePath = ResourcePath;
-      }
-
-      var instance = UnityEngine.Resources.Load(resourcePath, type);
-      if (!instance) {
-        LogTrace?.Log($"Unable to load resource at path {resourcePath} for type {type.FullName}");
-        return default;
-      }
-
-      if (InstantiateIfLoadedInEditor && Application.isEditor) {
-        var clone = Object.Instantiate(instance);
-        return new((FusionGlobalScriptableObject)clone, x => Object.Destroy(clone));
-      } else {
-        return new((FusionGlobalScriptableObject)instance, x => UnityEngine.Resources.UnloadAsset(instance));  
-      }
     }
-  }
 }
 
 #endregion
@@ -649,68 +736,82 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/FusionCoroutine.cs
 
-﻿
-namespace Fusion {
-  using UnityEngine;
-  using System;
-  using System.Collections;
-  using System.Runtime.ExceptionServices;
 
-  public sealed class FusionCoroutine : ICoroutine, IDisposable  {
-    private readonly IEnumerator             _inner;
-    private          Action<IAsyncOperation> _completed;
-    private          float                   _progress;
-    private          Action                  _activateAsync;
+namespace Fusion
+{
+    using System;
+    using System.Collections;
+    using System.Runtime.ExceptionServices;
 
-    public FusionCoroutine(IEnumerator inner) {
-      _inner = inner ?? throw new ArgumentNullException(nameof(inner));
-    }
-      
-    public event Action<IAsyncOperation> Completed
+    public sealed class FusionCoroutine : ICoroutine, IDisposable
     {
-      add {
-        _completed += value;
-        if (IsDone) {
-          value(this);
+        private readonly IEnumerator _inner;
+        private Action<IAsyncOperation> _completed;
+        private float _progress;
+        private Action _activateAsync;
+
+        public FusionCoroutine(IEnumerator inner)
+        {
+            _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         }
-      }
-      remove => _completed -= value;
-    }
 
-    public bool                  IsDone { get; private set; }
-    public ExceptionDispatchInfo Error  { get; private set; }
-
-    bool IEnumerator.MoveNext() {
-      try {
-        if (_inner.MoveNext()) {
-          return true;
-        } else {
-          IsDone = true;
-          _completed?.Invoke(this);
-          return false;
+        public event Action<IAsyncOperation> Completed
+        {
+            add
+            {
+                _completed += value;
+                if (IsDone)
+                {
+                    value(this);
+                }
+            }
+            remove => _completed -= value;
         }
-      } catch (Exception e) {
-        IsDone = true;
-        Error  = ExceptionDispatchInfo.Capture(e);
-        _completed?.Invoke(this);
-        return false;
-      }
-    }
 
-    void IEnumerator.Reset() {
-      _inner.Reset();
-      IsDone = false;
-      Error  = null;
-    }
+        public bool IsDone { get; private set; }
+        public ExceptionDispatchInfo Error { get; private set; }
 
-    object IEnumerator.Current => _inner.Current;
-      
-    public void Dispose() {
-      if (_inner is IDisposable disposable) {
-        disposable.Dispose();
-      }
+        bool IEnumerator.MoveNext()
+        {
+            try
+            {
+                if (_inner.MoveNext())
+                {
+                    return true;
+                }
+                else
+                {
+                    IsDone = true;
+                    _completed?.Invoke(this);
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                IsDone = true;
+                Error = ExceptionDispatchInfo.Capture(e);
+                _completed?.Invoke(this);
+                return false;
+            }
+        }
+
+        void IEnumerator.Reset()
+        {
+            _inner.Reset();
+            IsDone = false;
+            Error = null;
+        }
+
+        object IEnumerator.Current => _inner.Current;
+
+        public void Dispose()
+        {
+            if (_inner is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
     }
-  }
 }
 
 #endregion
@@ -718,137 +819,172 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/FusionLogInitializer.Partial.cs
 
-﻿namespace Fusion {
-  using System.Text;
-  using System.Threading;
-  using UnityEngine;
+namespace Fusion
+{
+    using System.Text;
+    using System.Threading;
+    using UnityEngine;
 
-  partial class FusionLogInitializer {
-    static partial void InitializeUnityLoggerUser(ref FusionUnityLogger logger);
-    
-    static FusionUnityLogger CreateLogger(bool isDarkMode) {
-      return new FusionUnityLogger(System.Threading.Thread.CurrentThread, isDarkMode);
+    partial class FusionLogInitializer
+    {
+        static partial void InitializeUnityLoggerUser(ref FusionUnityLogger logger);
+
+        static FusionUnityLogger CreateLogger(bool isDarkMode)
+        {
+            return new FusionUnityLogger(System.Threading.Thread.CurrentThread, isDarkMode);
+        }
     }
-  }
-
-  /// <summary>
-  /// Fusion logger implementation for Unity.
-  /// </summary>
-  public class FusionUnityLogger : FusionUnityLoggerBase {
 
     /// <summary>
-    /// Is true, the active runner's tick will be logged.
+    /// Fusion logger implementation for Unity.
     /// </summary>
-    public bool LogActiveRunnerTick = false;
-    
-    /// <inheritdoc/>
-    public FusionUnityLogger(Thread mainThread, bool isDarkMode) : base(mainThread, isDarkMode) {
-    }
-    
-    /// <inheritdoc/>
-    protected override (string, Object) CreateMessage(in LogContext context) {
-      var sb = GetThreadSafeStringBuilder(out var isMainThread);
-      Debug.Assert(sb.Length == 0);
-      
-      var obj = context.Source?.GetUnityObject();
-      
-      try {
-        AppendPrefix(sb, context.Flags, context.Prefix);
+    public class FusionUnityLogger : FusionUnityLoggerBase
+    {
 
-        var pos = sb.Length;
-        if (obj != null) {
-          if (obj is NetworkRunner runner) {
-            TryAppendRunnerPrefix(sb, runner);
-          } else if (obj is NetworkObject networkObject) {
-            TryAppendNetworkObjectPrefix(sb, networkObject);
-          } else if (obj is SimulationBehaviour simulationBehaviour) {
-            TryAppendSimulationBehaviourPrefix(sb, simulationBehaviour);
-          } else {
-            AppendNameThreadSafe(sb, obj); 
-          }
+        /// <summary>
+        /// Is true, the active runner's tick will be logged.
+        /// </summary>
+        public bool LogActiveRunnerTick = false;
+
+        /// <inheritdoc/>
+        public FusionUnityLogger(Thread mainThread, bool isDarkMode) : base(mainThread, isDarkMode)
+        {
         }
 
-        if (LogActiveRunnerTick) {
-          for (var enumerator = NetworkRunner.GetInstancesEnumerator(); enumerator.MoveNext();) {
-            var runner = enumerator.Current;
-            if (runner == null || !runner.IsSimulationUpdating) {
-              continue;
+        /// <inheritdoc/>
+        protected override (string, Object) CreateMessage(in LogContext context)
+        {
+            var sb = GetThreadSafeStringBuilder(out var isMainThread);
+            Debug.Assert(sb.Length == 0);
+
+            var obj = context.Source?.GetUnityObject();
+
+            try
+            {
+                AppendPrefix(sb, context.Flags, context.Prefix);
+
+                var pos = sb.Length;
+                if (obj != null)
+                {
+                    if (obj is NetworkRunner runner)
+                    {
+                        TryAppendRunnerPrefix(sb, runner);
+                    }
+                    else if (obj is NetworkObject networkObject)
+                    {
+                        TryAppendNetworkObjectPrefix(sb, networkObject);
+                    }
+                    else if (obj is SimulationBehaviour simulationBehaviour)
+                    {
+                        TryAppendSimulationBehaviourPrefix(sb, simulationBehaviour);
+                    }
+                    else
+                    {
+                        AppendNameThreadSafe(sb, obj);
+                    }
+                }
+
+                if (LogActiveRunnerTick)
+                {
+                    for (var enumerator = NetworkRunner.GetInstancesEnumerator(); enumerator.MoveNext();)
+                    {
+                        var runner = enumerator.Current;
+                        if (runner == null || !runner.IsSimulationUpdating)
+                        {
+                            continue;
+                        }
+                        sb.Append($"[Tick {(int)runner.Tick}{(runner.IsFirstTick ? "F" : "")}{(runner.Stage == 0 ? "" : $" {runner.Stage}")}] ");
+                    }
+                }
+
+                if (sb.Length > pos)
+                {
+                    sb.Append(": ");
+                }
+
+                sb.Append(context.Message);
+                return (sb.ToString(), isMainThread ? obj : null);
             }
-            sb.Append($"[Tick {(int)runner.Tick}{(runner.IsFirstTick ? "F" : "")}{(runner.Stage == 0 ? "" : $" {runner.Stage}")}] ");
-          }
+            finally
+            {
+                sb.Clear();
+            }
         }
-        
-        if (sb.Length > pos) {
-          sb.Append(": ");
+
+        bool TryAppendRunnerPrefix(StringBuilder builder, NetworkRunner runner)
+        {
+            if ((object)runner == null)
+            {
+                return false;
+            }
+            if (runner.Config?.PeerMode != NetworkProjectConfig.PeerModes.Multiple)
+            {
+                return false;
+            }
+
+            AppendNameThreadSafe(builder, runner);
+
+            var localPlayer = runner.LocalPlayer;
+            if (localPlayer.IsRealPlayer)
+            {
+                builder.Append("[P").Append(localPlayer.PlayerId).Append("]");
+            }
+            else
+            {
+                builder.Append("[P-]");
+            }
+
+            return true;
         }
-        
-        sb.Append(context.Message);
-        return (sb.ToString(), isMainThread ? obj : null);
-      } finally {
-        sb.Clear();
-      }
+
+        bool TryAppendNetworkObjectPrefix(StringBuilder builder, NetworkObject networkObject)
+        {
+            if ((object)networkObject == null)
+            {
+                return false;
+            }
+
+            AppendNameThreadSafe(builder, networkObject);
+
+            if (networkObject.Id.IsValid)
+            {
+                builder.Append(" ");
+                builder.Append(networkObject.Id.ToString());
+            }
+
+            int pos = builder.Length;
+            if (TryAppendRunnerPrefix(builder, networkObject.Runner))
+            {
+                builder.Insert(pos, '@');
+            }
+
+            return true;
+        }
+
+        bool TryAppendSimulationBehaviourPrefix(StringBuilder builder, SimulationBehaviour simulationBehaviour)
+        {
+            if ((object)simulationBehaviour == null)
+            {
+                return false;
+            }
+
+            AppendNameThreadSafe(builder, simulationBehaviour);
+
+            if (simulationBehaviour is NetworkBehaviour nb && nb.Id.IsValid)
+            {
+                builder.Append(" ");
+                builder.Append(nb.Id.ToString());
+            }
+
+            int pos = builder.Length;
+            if (TryAppendRunnerPrefix(builder, simulationBehaviour.Runner))
+            {
+                builder.Insert(pos, '@');
+            }
+
+            return true;
+        }
     }
-    
-    bool TryAppendRunnerPrefix(StringBuilder builder, NetworkRunner runner) {
-      if ((object)runner == null) {
-        return false;
-      }
-      if (runner.Config?.PeerMode != NetworkProjectConfig.PeerModes.Multiple) {
-        return false;
-      }
-
-      AppendNameThreadSafe(builder, runner);
-
-      var localPlayer = runner.LocalPlayer;
-      if (localPlayer.IsRealPlayer) {
-        builder.Append("[P").Append(localPlayer.PlayerId).Append("]");
-      } else {
-        builder.Append("[P-]");
-      }
-      
-      return true;
-    }
-    
-    bool TryAppendNetworkObjectPrefix(StringBuilder builder, NetworkObject networkObject) {
-      if ((object)networkObject == null) {
-        return false;
-      }
-
-      AppendNameThreadSafe(builder, networkObject);
-      
-      if (networkObject.Id.IsValid) {
-        builder.Append(" ");
-        builder.Append(networkObject.Id.ToString());
-      }
-      
-      int pos = builder.Length;
-      if (TryAppendRunnerPrefix(builder, networkObject.Runner)) {
-        builder.Insert(pos, '@');
-      }
-
-      return true;
-    }
-    
-    bool TryAppendSimulationBehaviourPrefix(StringBuilder builder, SimulationBehaviour simulationBehaviour) {
-      if ((object)simulationBehaviour == null) {
-        return false;
-      }
-
-      AppendNameThreadSafe(builder, simulationBehaviour);
-      
-      if (simulationBehaviour is NetworkBehaviour nb && nb.Id.IsValid) {
-        builder.Append(" ");
-        builder.Append(nb.Id.ToString());
-      }
-      
-      int pos = builder.Length;
-      if (TryAppendRunnerPrefix(builder, simulationBehaviour.Runner)) {
-        builder.Insert(pos, '@');
-      }
-
-      return true;
-    }
-  }
 }
 
 #endregion
@@ -856,7 +992,8 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/FusionProfiler.cs
 
-namespace Fusion {
+namespace Fusion
+{
 #if FUSION_PROFILER_INTEGRATION
   using Unity.Profiling;
   using UnityEngine;
@@ -922,29 +1059,32 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/FusionRuntimeCheck.cs
 
-namespace Fusion {
-  using UnityEngine;
+namespace Fusion
+{
+    using UnityEngine;
 
-  static class FusionRuntimeCheck {
+    static class FusionRuntimeCheck
+    {
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void RuntimeCheck() {
-      RuntimeUnityFlagsSetup.Check_ENABLE_IL2CPP();
-      RuntimeUnityFlagsSetup.Check_ENABLE_MONO();
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void RuntimeCheck()
+        {
+            RuntimeUnityFlagsSetup.Check_ENABLE_IL2CPP();
+            RuntimeUnityFlagsSetup.Check_ENABLE_MONO();
 
-      RuntimeUnityFlagsSetup.Check_UNITY_EDITOR();
-      RuntimeUnityFlagsSetup.Check_UNITY_GAMECORE();
-      RuntimeUnityFlagsSetup.Check_UNITY_SWITCH();
-      RuntimeUnityFlagsSetup.Check_UNITY_WEBGL();
-      RuntimeUnityFlagsSetup.Check_UNITY_XBOXONE();
+            RuntimeUnityFlagsSetup.Check_UNITY_EDITOR();
+            RuntimeUnityFlagsSetup.Check_UNITY_GAMECORE();
+            RuntimeUnityFlagsSetup.Check_UNITY_SWITCH();
+            RuntimeUnityFlagsSetup.Check_UNITY_WEBGL();
+            RuntimeUnityFlagsSetup.Check_UNITY_XBOXONE();
 
-      RuntimeUnityFlagsSetup.Check_NETFX_CORE();
-      RuntimeUnityFlagsSetup.Check_NET_4_6();
-      RuntimeUnityFlagsSetup.Check_NET_STANDARD_2_0();
+            RuntimeUnityFlagsSetup.Check_NETFX_CORE();
+            RuntimeUnityFlagsSetup.Check_NET_4_6();
+            RuntimeUnityFlagsSetup.Check_NET_STANDARD_2_0();
 
-      RuntimeUnityFlagsSetup.Check_UNITY_2019_4_OR_NEWER();
+            RuntimeUnityFlagsSetup.Check_UNITY_2019_4_OR_NEWER();
+        }
     }
-  }
 }
 
 
@@ -955,9 +1095,12 @@ namespace Fusion {
 
 
 
-namespace Fusion {
-  static class TraceChannelsExtensions {
-    public static TraceChannels AddChannelsFromDefines(this TraceChannels traceChannels) {
+namespace Fusion
+{
+    static class TraceChannelsExtensions
+    {
+        public static TraceChannels AddChannelsFromDefines(this TraceChannels traceChannels)
+        {
 #if FUSION_TRACE_GLOBAL
       traceChannels |= TraceChannels.Global;
 #endif
@@ -1003,9 +1146,9 @@ namespace Fusion {
 #if FUSION_TRACE_TIME
       traceChannels |= TraceChannels.Time;
 #endif
-      return traceChannels;
+            return traceChannels;
+        }
     }
-  }
 }
 
 
@@ -1018,367 +1161,435 @@ namespace Fusion {
 
 #region JsonUtilityExtensions.cs
 
-namespace Fusion {
-  using System;
-  using System.Collections;
-  using System.Collections.Generic;
-  using System.IO;
-  using System.Text;
-  using System.Text.RegularExpressions;
-  using UnityEngine;
-
-  /// <summary>
-  /// Extends capabilities of <see cref="JsonUtility"/> by adding type annotations to the serialized JSON, Unity object reference
-  /// handling and integer enquotement.
-  /// </summary>
-  public static class JsonUtilityExtensions {
-    
-    /// <see cref="JsonUtilityExtensions.FromJsonWithTypeAnnotation"/>
-    public delegate Type TypeResolverDelegate(string typeName);
-    /// <see cref="JsonUtilityExtensions.ToJsonWithTypeAnnotation(object,Fusion.JsonUtilityExtensions.InstanceIDHandlerDelegate)"/>
-    public delegate string TypeSerializerDelegate(Type type);
-    /// <see cref="JsonUtilityExtensions.ToJsonWithTypeAnnotation(object,Fusion.JsonUtilityExtensions.InstanceIDHandlerDelegate)"/>
-    public delegate string InstanceIDHandlerDelegate(object context, int value);
-    
-    private const string TypePropertyName = "$type";
+namespace Fusion
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using UnityEngine;
 
     /// <summary>
-    /// Enquotes integers in the JSON string that are at least <paramref name="minDigits"/> long. This is useful for parsers that
-    /// interpret large integers as floating point numbers.
+    /// Extends capabilities of <see cref="JsonUtility"/> by adding type annotations to the serialized JSON, Unity object reference
+    /// handling and integer enquotement.
     /// </summary>
-    /// <param name="json">JSON to process</param>
-    /// <param name="minDigits">Digit threshold to perfom the enquoting</param>
-    /// <returns><paramref name="json"/> with long integers enquoted.</returns>
-    public static string EnquoteIntegers(string json, int minDigits = 8) {
-      var result = Regex.Replace(json, $@"(?<="":\s*)(-?[0-9]{{{minDigits},}})(?=[,}}\n\r\s])", "\"$1\"", RegexOptions.Compiled);
-      return result;
-    }
+    public static class JsonUtilityExtensions
+    {
 
-    /// <summary>
-    /// Converts the object to JSON with type annotations.
-    /// </summary>
-    /// <param name="obj">Object to be serialized.</param>
-    /// <param name="instanceIDHandler">Handler for UnityEngine.Object references. If the handler returns an empty string,
-    /// the reference is removed from the final result.</param>
-    public static string ToJsonWithTypeAnnotation(object obj, InstanceIDHandlerDelegate instanceIDHandler = null) {
-      var sb = new StringBuilder(1000);
-      using (var writer = new StringWriter(sb)) {
-        ToJsonWithTypeAnnotation(obj, writer, instanceIDHandler: instanceIDHandler);
-      }
-      return sb.ToString();
-    }
+        /// <see cref="JsonUtilityExtensions.FromJsonWithTypeAnnotation"/>
+        public delegate Type TypeResolverDelegate(string typeName);
+        /// <see cref="JsonUtilityExtensions.ToJsonWithTypeAnnotation(object,Fusion.JsonUtilityExtensions.InstanceIDHandlerDelegate)"/>
+        public delegate string TypeSerializerDelegate(Type type);
+        /// <see cref="JsonUtilityExtensions.ToJsonWithTypeAnnotation(object,Fusion.JsonUtilityExtensions.InstanceIDHandlerDelegate)"/>
+        public delegate string InstanceIDHandlerDelegate(object context, int value);
 
-    /// <summary>
-    /// Converts the object/IList to JSON with type annotations.
-    /// </summary>
-    /// <param name="obj">Object to be serialized.</param>
-    /// <param name="writer">The output TextWriter.</param>
-    /// <param name="integerEnquoteMinDigits"><see cref="EnquoteIntegers"/></param>
-    /// <param name="typeSerializer">Handler for obtaining serialized type names. If <see langword="null"/>, the short assembly
-    /// qualified name (namespace + name + assembly name) will be used.</param>
-    /// <param name="instanceIDHandler">Handler for UnityEngine.Object references. If the handler returns an empty string,
-    /// the reference is removed from the final result.</param>
-    public static void ToJsonWithTypeAnnotation(object obj, TextWriter writer, int? integerEnquoteMinDigits = null, TypeSerializerDelegate typeSerializer = null, InstanceIDHandlerDelegate instanceIDHandler = null) {
-      if (obj == null) {
-        writer.Write("null");
-        return;
-      }
+        private const string TypePropertyName = "$type";
 
-      if (obj is IList list) {
-        writer.Write("[");
-        for (var i = 0; i < list.Count; ++i) {
-          if (i > 0) {
-            writer.Write(",");
-          }
-
-          ToJsonInternal(list[i], writer, integerEnquoteMinDigits, typeSerializer, instanceIDHandler);
+        /// <summary>
+        /// Enquotes integers in the JSON string that are at least <paramref name="minDigits"/> long. This is useful for parsers that
+        /// interpret large integers as floating point numbers.
+        /// </summary>
+        /// <param name="json">JSON to process</param>
+        /// <param name="minDigits">Digit threshold to perfom the enquoting</param>
+        /// <returns><paramref name="json"/> with long integers enquoted.</returns>
+        public static string EnquoteIntegers(string json, int minDigits = 8)
+        {
+            var result = Regex.Replace(json, $@"(?<="":\s*)(-?[0-9]{{{minDigits},}})(?=[,}}\n\r\s])", "\"$1\"", RegexOptions.Compiled);
+            return result;
         }
 
-        writer.Write("]");
-      } else {
-        ToJsonInternal(obj, writer, integerEnquoteMinDigits, typeSerializer, instanceIDHandler);
-      }
-    }
-    
-    
-    /// <summary>
-    /// Converts JSON with type annotation to an instance of <typeparamref name="T"/>. If the JSON contains type annotations, they need to match
-    /// the expected result type. If there are no type annotations, use <paramref name="typeResolver"/> to return the expected type.
-    /// </summary>
-    /// <param name="json">JSON to be parsed</param>
-    /// <param name="typeResolver">Converts type name to a type instance.</param>
-    public static T FromJsonWithTypeAnnotation<T>(string json, TypeResolverDelegate typeResolver = null) {
-      if (typeof(T).IsArray) {
-        var listType = typeof(List<>).MakeGenericType(typeof(T).GetElementType());
-        var list = (IList)Activator.CreateInstance(listType);
-        FromJsonWithTypeAnnotationInternal(json, typeResolver, list);
-
-        var array = Array.CreateInstance(typeof(T).GetElementType(), list.Count);
-        list.CopyTo(array, 0);
-        return (T)(object)array;
-      }
-
-      if (typeof(T).GetInterface(typeof(IList).FullName) != null) {
-        var list = (IList)Activator.CreateInstance(typeof(T));
-        FromJsonWithTypeAnnotationInternal(json, typeResolver, list);
-        return (T)list;
-      }
-
-      return (T)FromJsonWithTypeAnnotationInternal(json, typeResolver);
-    }
-
-    /// <summary>
-    /// Converts JSON with type annotation. If there are no type annotations, use <paramref name="typeResolver"/> to return the expected type.
-    /// </summary>
-    /// <param name="json">JSON to be parsed</param>
-    /// <param name="typeResolver">Converts type name to a type instance.</param>
-    public static object FromJsonWithTypeAnnotation(string json, TypeResolverDelegate typeResolver = null) {
-      Assert.Check(json != null);
-
-      var i = SkipWhiteOrThrow(0);
-      if (json[i] == '[') {
-        var list = new List<object>();
-
-        // list
-        ++i;
-        for (var expectComma = false;; expectComma = true) {
-          i = SkipWhiteOrThrow(i);
-
-          if (json[i] == ']') {
-            break;
-          }
-
-          if (expectComma) {
-            if (json[i] != ',') {
-              throw new InvalidOperationException($"Malformed at {i}: expected ,");
-            }
-            i = SkipWhiteOrThrow(i + 1);
-          }
-
-          var item = FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
-          list.Add(item);
-        }
-
-        return list.ToArray();
-      }
-
-      return FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
-
-      int SkipWhiteOrThrow(int i) {
-        while (i < json.Length && char.IsWhiteSpace(json[i])) {
-          i++;
-        }
-
-        if (i == json.Length) {
-          throw new InvalidOperationException($"Malformed at {i}: expected more");
-        }
-
-        return i;
-      }
-    }
-
-    
-    private static object FromJsonWithTypeAnnotationInternal(string json, TypeResolverDelegate typeResolver = null, IList targetList = null) {
-      Assert.Check(json != null);
-
-      var i = SkipWhiteOrThrow(0);
-      if (json[i] == '[') {
-        var list = targetList ?? new List<object>();
-
-        // list
-        ++i;
-        for (var expectComma = false;; expectComma = true) {
-          i = SkipWhiteOrThrow(i);
-
-          if (json[i] == ']') {
-            break;
-          }
-
-          if (expectComma) {
-            if (json[i] != ',') {
-              throw new InvalidOperationException($"Malformed at {i}: expected ,");
-            }
-
-            i = SkipWhiteOrThrow(i + 1);
-          }
-
-          var item = FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
-          list.Add(item);
-        }
-
-        return targetList ?? ((List<object>)list).ToArray();
-      }
-
-      if (targetList != null) {
-        throw new InvalidOperationException($"Expected list, got {json[i]}");
-      }
-
-      return FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
-
-      int SkipWhiteOrThrow(int i) {
-        while (i < json.Length && char.IsWhiteSpace(json[i])) {
-          i++;
-        }
-
-        if (i == json.Length) {
-          throw new InvalidOperationException($"Malformed at {i}: expected more");
-        }
-
-        return i;
-      }
-    }
-
-    private static void ToJsonInternal(object obj, TextWriter writer, 
-      int? integerEnquoteMinDigits = null,
-      TypeSerializerDelegate typeResolver = null,
-      InstanceIDHandlerDelegate instanceIDHandler = null) {
-      Assert.Check(obj != null);
-      Assert.Check(writer != null);
-
-      var json = JsonUtility.ToJson(obj);
-      if (integerEnquoteMinDigits.HasValue) {
-        json = EnquoteIntegers(json, integerEnquoteMinDigits.Value);
-      }
-      
-      var type = obj.GetType();
-
-      writer.Write("{\"");
-      writer.Write(TypePropertyName);
-      writer.Write("\":\"");
-
-      writer.Write(typeResolver?.Invoke(type) ?? SerializableType.GetShortAssemblyQualifiedName(type));
-
-      writer.Write('\"');
-
-      if (json == "{}") {
-        writer.Write("}");
-      } else {
-        Assert.Check('{' == json[0]);
-        Assert.Check('}' == json[^1]);
-        writer.Write(',');
-        
-        if (instanceIDHandler != null) {
-          int i = 1;
-          
-          for (;;) {
-            const string prefix = "{\"instanceID\":";
-            
-            var nextInstanceId = json.IndexOf(prefix, i, StringComparison.Ordinal);
-            if (nextInstanceId < 0) {
-              break;
-            }
-            
-            // parse the number that follows; may be negative
-            var start = nextInstanceId + prefix.Length;
-            var end = json.IndexOf('}', start);
-            var instanceId = int.Parse(json.AsSpan(start, end - start));
-            
-            // append that part
-            writer.Write(json.AsSpan(i, nextInstanceId - i));
-            writer.Write(instanceIDHandler(obj, instanceId));
-            i = end + 1;
-          }
-          
-          writer.Write(json.AsSpan(i, json.Length - i));
-        } else {
-          writer.Write(json.AsSpan(1, json.Length - 1));
-        }
-      }
-    }
-
-    private static object FromJsonWithTypeAnnotationToObject(ref int i, string json, TypeResolverDelegate typeResolver) {
-      if (json[i] == '{') {
-        var endIndex = FindScopeEnd(json, i, '{', '}');
-        if (endIndex < 0) {
-          throw new InvalidOperationException($"Unable to find end of object's end (starting at {i})");
-        }
-        
-        Assert.Check(endIndex > i);
-        Assert.Check(json[endIndex] == '}');
-
-        var part = json.Substring(i, endIndex - i + 1);
-        i = endIndex + 1;
-
-        // read the object, only care about the type; there's no way to map dollar-prefixed property to a C# field,
-        // so some string replacing is necessary
-        var typeInfo = JsonUtility.FromJson<TypeNameWrapper>(part.Replace(TypePropertyName, nameof(TypeNameWrapper.__TypeName), StringComparison.Ordinal));
-
-        Type type;
-        if (typeResolver != null) {
-          type = typeResolver(typeInfo.__TypeName);
-          if (type == null) {
-            return null;
-          }
-        } else {
-          Assert.Check(!string.IsNullOrEmpty(typeInfo?.__TypeName));
-          type = Type.GetType(typeInfo.__TypeName, true);
-        }
-        
-        if (type.IsSubclassOf(typeof(ScriptableObject))) {
-          var instance = ScriptableObject.CreateInstance(type);
-          JsonUtility.FromJsonOverwrite(part, instance);
-          return instance;
-        } else {
-          var instance = JsonUtility.FromJson(part, type);
-          return instance;
-        }
-      }
-
-      if (i + 4 < json.Length && json.AsSpan(i, 4).SequenceEqual("null")) {
-        // is this null?
-        i += 4;
-        return null;
-      }
-
-      throw new InvalidOperationException($"Malformed at {i}: expected {{ or null");
-    }
-    
-    internal static int FindObjectEnd(string json, int start = 0) {
-      return FindScopeEnd(json, start, '{', '}');
-    }
-    
-    private static int FindScopeEnd(string json, int start, char cstart = '{', char cend = '}') {
-      var depth = 0;
-      
-      if (json[start] != cstart) {
-        return -1;
-      }
-
-      for (var i = start; i < json.Length; i++) {
-        if (json[i] == '"') {
-          // can't be escaped
-          Assert.Check('\\' != json[i - 1]);
-          // now skip until the first unescaped quote
-          while (i < json.Length) {
-            if (json[++i] == '"')
-              // are we escaped?
+        /// <summary>
+        /// Converts the object to JSON with type annotations.
+        /// </summary>
+        /// <param name="obj">Object to be serialized.</param>
+        /// <param name="instanceIDHandler">Handler for UnityEngine.Object references. If the handler returns an empty string,
+        /// the reference is removed from the final result.</param>
+        public static string ToJsonWithTypeAnnotation(object obj, InstanceIDHandlerDelegate instanceIDHandler = null)
+        {
+            var sb = new StringBuilder(1000);
+            using (var writer = new StringWriter(sb))
             {
-              if (json[i - 1] != '\\') {
-                break;
-              }
+                ToJsonWithTypeAnnotation(obj, writer, instanceIDHandler: instanceIDHandler);
             }
-          }
-        } else if (json[i] == cstart) {
-          depth++;
-        } else if (json[i] == cend) {
-          depth--;
-          if (depth == 0) {
-            return i;
-          }
+            return sb.ToString();
         }
-      }
 
-      return -1;
-    }
-    
-    [Serializable]
-    private class TypeNameWrapper {
+        /// <summary>
+        /// Converts the object/IList to JSON with type annotations.
+        /// </summary>
+        /// <param name="obj">Object to be serialized.</param>
+        /// <param name="writer">The output TextWriter.</param>
+        /// <param name="integerEnquoteMinDigits"><see cref="EnquoteIntegers"/></param>
+        /// <param name="typeSerializer">Handler for obtaining serialized type names. If <see langword="null"/>, the short assembly
+        /// qualified name (namespace + name + assembly name) will be used.</param>
+        /// <param name="instanceIDHandler">Handler for UnityEngine.Object references. If the handler returns an empty string,
+        /// the reference is removed from the final result.</param>
+        public static void ToJsonWithTypeAnnotation(object obj, TextWriter writer, int? integerEnquoteMinDigits = null, TypeSerializerDelegate typeSerializer = null, InstanceIDHandlerDelegate instanceIDHandler = null)
+        {
+            if (obj == null)
+            {
+                writer.Write("null");
+                return;
+            }
+
+            if (obj is IList list)
+            {
+                writer.Write("[");
+                for (var i = 0; i < list.Count; ++i)
+                {
+                    if (i > 0)
+                    {
+                        writer.Write(",");
+                    }
+
+                    ToJsonInternal(list[i], writer, integerEnquoteMinDigits, typeSerializer, instanceIDHandler);
+                }
+
+                writer.Write("]");
+            }
+            else
+            {
+                ToJsonInternal(obj, writer, integerEnquoteMinDigits, typeSerializer, instanceIDHandler);
+            }
+        }
+
+
+        /// <summary>
+        /// Converts JSON with type annotation to an instance of <typeparamref name="T"/>. If the JSON contains type annotations, they need to match
+        /// the expected result type. If there are no type annotations, use <paramref name="typeResolver"/> to return the expected type.
+        /// </summary>
+        /// <param name="json">JSON to be parsed</param>
+        /// <param name="typeResolver">Converts type name to a type instance.</param>
+        public static T FromJsonWithTypeAnnotation<T>(string json, TypeResolverDelegate typeResolver = null)
+        {
+            if (typeof(T).IsArray)
+            {
+                var listType = typeof(List<>).MakeGenericType(typeof(T).GetElementType());
+                var list = (IList)Activator.CreateInstance(listType);
+                FromJsonWithTypeAnnotationInternal(json, typeResolver, list);
+
+                var array = Array.CreateInstance(typeof(T).GetElementType(), list.Count);
+                list.CopyTo(array, 0);
+                return (T)(object)array;
+            }
+
+            if (typeof(T).GetInterface(typeof(IList).FullName) != null)
+            {
+                var list = (IList)Activator.CreateInstance(typeof(T));
+                FromJsonWithTypeAnnotationInternal(json, typeResolver, list);
+                return (T)list;
+            }
+
+            return (T)FromJsonWithTypeAnnotationInternal(json, typeResolver);
+        }
+
+        /// <summary>
+        /// Converts JSON with type annotation. If there are no type annotations, use <paramref name="typeResolver"/> to return the expected type.
+        /// </summary>
+        /// <param name="json">JSON to be parsed</param>
+        /// <param name="typeResolver">Converts type name to a type instance.</param>
+        public static object FromJsonWithTypeAnnotation(string json, TypeResolverDelegate typeResolver = null)
+        {
+            Assert.Check(json != null);
+
+            var i = SkipWhiteOrThrow(0);
+            if (json[i] == '[')
+            {
+                var list = new List<object>();
+
+                // list
+                ++i;
+                for (var expectComma = false; ; expectComma = true)
+                {
+                    i = SkipWhiteOrThrow(i);
+
+                    if (json[i] == ']')
+                    {
+                        break;
+                    }
+
+                    if (expectComma)
+                    {
+                        if (json[i] != ',')
+                        {
+                            throw new InvalidOperationException($"Malformed at {i}: expected ,");
+                        }
+                        i = SkipWhiteOrThrow(i + 1);
+                    }
+
+                    var item = FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
+                    list.Add(item);
+                }
+
+                return list.ToArray();
+            }
+
+            return FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
+
+            int SkipWhiteOrThrow(int i)
+            {
+                while (i < json.Length && char.IsWhiteSpace(json[i]))
+                {
+                    i++;
+                }
+
+                if (i == json.Length)
+                {
+                    throw new InvalidOperationException($"Malformed at {i}: expected more");
+                }
+
+                return i;
+            }
+        }
+
+
+        private static object FromJsonWithTypeAnnotationInternal(string json, TypeResolverDelegate typeResolver = null, IList targetList = null)
+        {
+            Assert.Check(json != null);
+
+            var i = SkipWhiteOrThrow(0);
+            if (json[i] == '[')
+            {
+                var list = targetList ?? new List<object>();
+
+                // list
+                ++i;
+                for (var expectComma = false; ; expectComma = true)
+                {
+                    i = SkipWhiteOrThrow(i);
+
+                    if (json[i] == ']')
+                    {
+                        break;
+                    }
+
+                    if (expectComma)
+                    {
+                        if (json[i] != ',')
+                        {
+                            throw new InvalidOperationException($"Malformed at {i}: expected ,");
+                        }
+
+                        i = SkipWhiteOrThrow(i + 1);
+                    }
+
+                    var item = FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
+                    list.Add(item);
+                }
+
+                return targetList ?? ((List<object>)list).ToArray();
+            }
+
+            if (targetList != null)
+            {
+                throw new InvalidOperationException($"Expected list, got {json[i]}");
+            }
+
+            return FromJsonWithTypeAnnotationToObject(ref i, json, typeResolver);
+
+            int SkipWhiteOrThrow(int i)
+            {
+                while (i < json.Length && char.IsWhiteSpace(json[i]))
+                {
+                    i++;
+                }
+
+                if (i == json.Length)
+                {
+                    throw new InvalidOperationException($"Malformed at {i}: expected more");
+                }
+
+                return i;
+            }
+        }
+
+        private static void ToJsonInternal(object obj, TextWriter writer,
+          int? integerEnquoteMinDigits = null,
+          TypeSerializerDelegate typeResolver = null,
+          InstanceIDHandlerDelegate instanceIDHandler = null)
+        {
+            Assert.Check(obj != null);
+            Assert.Check(writer != null);
+
+            var json = JsonUtility.ToJson(obj);
+            if (integerEnquoteMinDigits.HasValue)
+            {
+                json = EnquoteIntegers(json, integerEnquoteMinDigits.Value);
+            }
+
+            var type = obj.GetType();
+
+            writer.Write("{\"");
+            writer.Write(TypePropertyName);
+            writer.Write("\":\"");
+
+            writer.Write(typeResolver?.Invoke(type) ?? SerializableType.GetShortAssemblyQualifiedName(type));
+
+            writer.Write('\"');
+
+            if (json == "{}")
+            {
+                writer.Write("}");
+            }
+            else
+            {
+                Assert.Check('{' == json[0]);
+                Assert.Check('}' == json[^1]);
+                writer.Write(',');
+
+                if (instanceIDHandler != null)
+                {
+                    int i = 1;
+
+                    for (; ; )
+                    {
+                        const string prefix = "{\"instanceID\":";
+
+                        var nextInstanceId = json.IndexOf(prefix, i, StringComparison.Ordinal);
+                        if (nextInstanceId < 0)
+                        {
+                            break;
+                        }
+
+                        // parse the number that follows; may be negative
+                        var start = nextInstanceId + prefix.Length;
+                        var end = json.IndexOf('}', start);
+                        var instanceId = int.Parse(json.AsSpan(start, end - start));
+
+                        // append that part
+                        writer.Write(json.AsSpan(i, nextInstanceId - i));
+                        writer.Write(instanceIDHandler(obj, instanceId));
+                        i = end + 1;
+                    }
+
+                    writer.Write(json.AsSpan(i, json.Length - i));
+                }
+                else
+                {
+                    writer.Write(json.AsSpan(1, json.Length - 1));
+                }
+            }
+        }
+
+        private static object FromJsonWithTypeAnnotationToObject(ref int i, string json, TypeResolverDelegate typeResolver)
+        {
+            if (json[i] == '{')
+            {
+                var endIndex = FindScopeEnd(json, i, '{', '}');
+                if (endIndex < 0)
+                {
+                    throw new InvalidOperationException($"Unable to find end of object's end (starting at {i})");
+                }
+
+                Assert.Check(endIndex > i);
+                Assert.Check(json[endIndex] == '}');
+
+                var part = json.Substring(i, endIndex - i + 1);
+                i = endIndex + 1;
+
+                // read the object, only care about the type; there's no way to map dollar-prefixed property to a C# field,
+                // so some string replacing is necessary
+                var typeInfo = JsonUtility.FromJson<TypeNameWrapper>(part.Replace(TypePropertyName, nameof(TypeNameWrapper.__TypeName), StringComparison.Ordinal));
+
+                Type type;
+                if (typeResolver != null)
+                {
+                    type = typeResolver(typeInfo.__TypeName);
+                    if (type == null)
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    Assert.Check(!string.IsNullOrEmpty(typeInfo?.__TypeName));
+                    type = Type.GetType(typeInfo.__TypeName, true);
+                }
+
+                if (type.IsSubclassOf(typeof(ScriptableObject)))
+                {
+                    var instance = ScriptableObject.CreateInstance(type);
+                    JsonUtility.FromJsonOverwrite(part, instance);
+                    return instance;
+                }
+                else
+                {
+                    var instance = JsonUtility.FromJson(part, type);
+                    return instance;
+                }
+            }
+
+            if (i + 4 < json.Length && json.AsSpan(i, 4).SequenceEqual("null"))
+            {
+                // is this null?
+                i += 4;
+                return null;
+            }
+
+            throw new InvalidOperationException($"Malformed at {i}: expected {{ or null");
+        }
+
+        internal static int FindObjectEnd(string json, int start = 0)
+        {
+            return FindScopeEnd(json, start, '{', '}');
+        }
+
+        private static int FindScopeEnd(string json, int start, char cstart = '{', char cend = '}')
+        {
+            var depth = 0;
+
+            if (json[start] != cstart)
+            {
+                return -1;
+            }
+
+            for (var i = start; i < json.Length; i++)
+            {
+                if (json[i] == '"')
+                {
+                    // can't be escaped
+                    Assert.Check('\\' != json[i - 1]);
+                    // now skip until the first unescaped quote
+                    while (i < json.Length)
+                    {
+                        if (json[++i] == '"')
+                        // are we escaped?
+                        {
+                            if (json[i - 1] != '\\')
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (json[i] == cstart)
+                {
+                    depth++;
+                }
+                else if (json[i] == cend)
+                {
+                    depth--;
+                    if (depth == 0)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        [Serializable]
+        private class TypeNameWrapper
+        {
 #pragma warning disable CS0649 // Set by serialization
-      // ReSharper disable once InconsistentNaming
-      public string __TypeName;
+            // ReSharper disable once InconsistentNaming
+            public string __TypeName;
 #pragma warning restore CS0649
+        }
     }
-  }
 }
 
 #endregion
@@ -1493,94 +1704,105 @@ namespace Fusion {
 
 #region FusionLogInitializer.cs
 
-namespace Fusion {
-  using System;
-  using UnityEngine;
-  
+namespace Fusion
+{
+    using System;
+    using UnityEngine;
+
 #if UNITY_EDITOR
-  using UnityEditor;
-  using UnityEditor.Build;
+    using UnityEditor;
+    using UnityEditor.Build;
 #endif
-  
-  /// <summary>
-  /// Initializes the logging system for Fusion. Use <see cref="InitializeUser"/> to completely override the log level and trace channels or
-  /// to provide a custom logger. Use <see cref="InitializeUnityLoggerUser"/> to override default Unity logger settings.
-  /// </summary>
-  public static partial class FusionLogInitializer {
+
+    /// <summary>
+    /// Initializes the logging system for Fusion. Use <see cref="InitializeUser"/> to completely override the log level and trace channels or
+    /// to provide a custom logger. Use <see cref="InitializeUnityLoggerUser"/> to override default Unity logger settings.
+    /// </summary>
+    public static partial class FusionLogInitializer
+    {
 #if UNITY_EDITOR
-    static LogLevel GetEditorLogLevel() {
-      var currentBuildTarget = EditorUserBuildSettings.activeBuildTarget;
-      var currentBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(currentBuildTarget);
-      var currentNamedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(currentBuildTargetGroup);
-      var defines = PlayerSettings.GetScriptingDefineSymbols(currentNamedBuildTarget).Split(";");
-      
-      const string LogLevelNone  = "FUSION_LOGLEVEL_NONE";
-      const string LogLevelError = "FUSION_LOGLEVEL_ERROR";
-      const string LogLevelWarn  = "FUSION_LOGLEVEL_WARN";
-      const string LogLevelInfo  = "FUSION_LOGLEVEL_INFO";
-      const string LogLevelDebug = "FUSION_LOGLEVEL_DEBUG";
-      const string LogLevelTrace = "FUSION_LOGLEVEL_TRACE";
-      
-      (string, LogLevel)[] logLevelDefines = {
+        static LogLevel GetEditorLogLevel()
+        {
+            var currentBuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            var currentBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(currentBuildTarget);
+            var currentNamedBuildTarget = NamedBuildTarget.FromBuildTargetGroup(currentBuildTargetGroup);
+            var defines = PlayerSettings.GetScriptingDefineSymbols(currentNamedBuildTarget).Split(";");
+
+            const string LogLevelNone = "FUSION_LOGLEVEL_NONE";
+            const string LogLevelError = "FUSION_LOGLEVEL_ERROR";
+            const string LogLevelWarn = "FUSION_LOGLEVEL_WARN";
+            const string LogLevelInfo = "FUSION_LOGLEVEL_INFO";
+            const string LogLevelDebug = "FUSION_LOGLEVEL_DEBUG";
+            const string LogLevelTrace = "FUSION_LOGLEVEL_TRACE";
+
+            (string, LogLevel)[] logLevelDefines = {
         (LogLevelNone, LogLevel.None),
         (LogLevelError, LogLevel.Error),
         (LogLevelWarn, LogLevel.Warn),
         (LogLevelInfo, LogLevel.Info),
         (LogLevelDebug, LogLevel.Debug),
       };
-      
-      string defaultLogLevelDefine = LogLevelInfo;
-      
-      if (Array.IndexOf(defines, LogLevelTrace) >= 0) {
-        FusionEditorLog.Warn($"{LogLevelTrace} is not supported in Fusion. Replacing with {LogLevelDebug}.");
-        ArrayUtility.Remove(ref defines, LogLevelTrace);
-        defaultLogLevelDefine = LogLevelDebug;
-      }
-      
-      LogLevel? foundLogLevel = null;
-      foreach (var (define, logLevel) in logLevelDefines) {
-        if (Array.IndexOf(defines, define) < 0) {
-          continue;
-        }
 
-        foundLogLevel = logLevel;
-        break;
-      }
-      
-      if (foundLogLevel == null) {
-        if (Application.isPlaying) {
-          FusionEditorLog.Log($"No log level define set for Fusion. Setting default: {defaultLogLevelDefine}");
+            string defaultLogLevelDefine = LogLevelInfo;
+
+            if (Array.IndexOf(defines, LogLevelTrace) >= 0)
+            {
+                FusionEditorLog.Warn($"{LogLevelTrace} is not supported in Fusion. Replacing with {LogLevelDebug}.");
+                ArrayUtility.Remove(ref defines, LogLevelTrace);
+                defaultLogLevelDefine = LogLevelDebug;
+            }
+
+            LogLevel? foundLogLevel = null;
+            foreach (var (define, logLevel) in logLevelDefines)
+            {
+                if (Array.IndexOf(defines, define) < 0)
+                {
+                    continue;
+                }
+
+                foundLogLevel = logLevel;
+                break;
+            }
+
+            if (foundLogLevel == null)
+            {
+                if (Application.isPlaying)
+                {
+                    FusionEditorLog.Log($"No log level define set for Fusion. Setting default: {defaultLogLevelDefine}");
+                }
+
+                ArrayUtility.Add(ref defines, defaultLogLevelDefine);
+                PlayerSettings.SetScriptingDefineSymbols(currentNamedBuildTarget, string.Join(";", defines));
+
+                return LogLevel.Info;
+            }
+            else
+            {
+                return foundLogLevel.Value;
+            }
         }
-        
-        ArrayUtility.Add(ref defines, defaultLogLevelDefine);
-        PlayerSettings.SetScriptingDefineSymbols(currentNamedBuildTarget, string.Join(";", defines));
-        
-        return LogLevel.Info;
-      } else {
-        return foundLogLevel.Value;
-      }
-    }
 #endif
-    
-    /// <summary>
-    /// Initializes the logging system for Fusion. This method is called automatically when the assembly is loaded.
-    /// </summary>
+
+        /// <summary>
+        /// Initializes the logging system for Fusion. This method is called automatically when the assembly is loaded.
+        /// </summary>
 #if UNITY_EDITOR
-    [UnityEditor.InitializeOnLoadMethod]
+        [UnityEditor.InitializeOnLoadMethod]
 #endif
-    [RuntimeInitializeOnLoadMethod]
-    public static void Initialize() {
-      var isDark = false;
+        [RuntimeInitializeOnLoadMethod]
+        public static void Initialize()
+        {
+            var isDark = false;
 #if UNITY_EDITOR
-      isDark = UnityEditor.EditorGUIUtility.isProSkin;
-      FusionEditorLog.Initialize(isDark);
+            isDark = UnityEditor.EditorGUIUtility.isProSkin;
+            FusionEditorLog.Initialize(isDark);
 #endif
-      
-      LogLevel logLevel =
+
+            LogLevel logLevel =
 #if FUSION_LOGLEVEL_DEBUG || FUSION_LOGLEVEL_TRACE
         LogLevel.Debug;
 #elif FUSION_LOGLEVEL_INFO
-        LogLevel.Info;
+              LogLevel.Info;
 #elif FUSION_LOGLEVEL_WARN
         LogLevel.Warn;
 #elif FUSION_LOGLEVEL_ERROR
@@ -1593,22 +1815,23 @@ namespace Fusion {
         LogLevel.None;
       FusionEditorLog.LogWarning($"No log level define set for Fusion, treating as FUSION_LOGLEVEL_NONE (disabled completely).");
 #endif
-      
-      TraceChannels traceChannels = default;
-      traceChannels = traceChannels.AddChannelsFromDefines();
-      InitializeUser(ref logLevel, ref traceChannels);
 
-      if (Log.IsInitialized) {
-        return;
-      }
+            TraceChannels traceChannels = default;
+            traceChannels = traceChannels.AddChannelsFromDefines();
+            InitializeUser(ref logLevel, ref traceChannels);
 
-      var logger = CreateLogger(isDarkMode: isDark);
-      InitializeUnityLoggerUser(ref logger);
-      Log.Initialize(logLevel, logger.CreateLogStream, traceChannels);
+            if (Log.IsInitialized)
+            {
+                return;
+            }
+
+            var logger = CreateLogger(isDarkMode: isDark);
+            InitializeUnityLoggerUser(ref logger);
+            Log.Initialize(logLevel, logger.CreateLogStream, traceChannels);
+        }
+
+        static partial void InitializeUser(ref LogLevel logLevel, ref TraceChannels traceChannels);
     }
-    
-    static partial void InitializeUser(ref LogLevel logLevel, ref TraceChannels traceChannels);
-  }
 }
 
 #endregion
@@ -1616,10 +1839,11 @@ namespace Fusion {
 
 #region FusionMppm.cs
 
-namespace Fusion {
-  using System;
-  using System.Diagnostics;
-  using JetBrains.Annotations;
+namespace Fusion
+{
+    using System;
+    using System.Diagnostics;
+    using JetBrains.Annotations;
 #if FUSION_ENABLE_MPPM
   using System.Collections.Generic;
   using System.IO;
@@ -1633,81 +1857,86 @@ namespace Fusion {
   using UnityEngine;
   using Debug = UnityEngine.Debug;
 #endif
-  
-  // ReSharper disable once IdentifierTypo
-  /// <summary>
-  /// The current status of MPPM. If the package is not enabled, this will always be <see cref="FusionMppmStatus.Disabled"/>.
-  /// </summary>
-  public enum FusionMppmStatus {
+
+    // ReSharper disable once IdentifierTypo
     /// <summary>
-    /// MPPM is not installed.
+    /// The current status of MPPM. If the package is not enabled, this will always be <see cref="FusionMppmStatus.Disabled"/>.
     /// </summary>
-    Disabled,
+    public enum FusionMppmStatus
+    {
+        /// <summary>
+        /// MPPM is not installed.
+        /// </summary>
+        Disabled,
+        /// <summary>
+        /// This instance is the main instance. Can use <see cref="FusionMppm.Send{T}"/> to send commands.
+        /// </summary>
+        MainInstance,
+        /// <summary>
+        /// This instance is a virtual instance. Will receive commands from the main instance.
+        /// </summary>
+        VirtualInstance
+    }
+
     /// <summary>
-    /// This instance is the main instance. Can use <see cref="FusionMppm.Send{T}"/> to send commands.
+    /// Support for Multiplayer Play Mode (MPPM). It uses named pipes
+    /// to communicate between the main Unity instance and virtual instances.
     /// </summary>
-    MainInstance,
-    /// <summary>
-    /// This instance is a virtual instance. Will receive commands from the main instance.
-    /// </summary>
-    VirtualInstance
-  }
-  
-  /// <summary>
-  /// Support for Multiplayer Play Mode (MPPM). It uses named pipes
-  /// to communicate between the main Unity instance and virtual instances.
-  /// </summary>
 #if FUSION_ENABLE_MPPM && UNITY_EDITOR
   [InitializeOnLoad]
 #endif
-  // ReSharper disable once IdentifierTypo
-  public partial class FusionMppm {
-    
-    /// <summary>
-    /// The current status of MPPM.
-    /// </summary>
-    public static readonly FusionMppmStatus Status = FusionMppmStatus.Disabled;
-    
-    /// <summary>
-    /// If <see cref="Status"/> is <see cref="FusionMppmStatus.MainInstance"/>, this static field can be used to send commands.
-    /// </summary>
-    [CanBeNull]
-    public static readonly FusionMppm MainEditor = null;
+    // ReSharper disable once IdentifierTypo
+    public partial class FusionMppm
+    {
 
-    /// <summary>
-    /// Sends a command to all virtual instances. Use as:
-    /// <code>FusionMppm.MainEditor?.Send</code>
-    /// </summary>
-    /// <param name="data"></param>
-    /// <typeparam name="T"></typeparam>
-    [Conditional("UNITY_EDITOR")]
-    public void Send<T>(T data) where T : FusionMppmCommand {
+        /// <summary>
+        /// The current status of MPPM.
+        /// </summary>
+        public static readonly FusionMppmStatus Status = FusionMppmStatus.Disabled;
+
+        /// <summary>
+        /// If <see cref="Status"/> is <see cref="FusionMppmStatus.MainInstance"/>, this static field can be used to send commands.
+        /// </summary>
+        [CanBeNull]
+        public static readonly FusionMppm MainEditor = null;
+
+        /// <summary>
+        /// Sends a command to all virtual instances. Use as:
+        /// <code>FusionMppm.MainEditor?.Send</code>
+        /// </summary>
+        /// <param name="data"></param>
+        /// <typeparam name="T"></typeparam>
+        [Conditional("UNITY_EDITOR")]
+        public void Send<T>(T data) where T : FusionMppmCommand
+        {
 #if FUSION_ENABLE_MPPM && UNITY_EDITOR
       Assert.Check(Status == FusionMppmStatus.MainInstance, "Only the main instance can send commands");
       BroadcastInternal(data);
 #endif
-    }
+        }
 
-    
-    /// <summary>
-    /// Broadcasts a command to all virtual instances.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="data"></param>
+
+        /// <summary>
+        /// Broadcasts a command to all virtual instances.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="data"></param>
 #if FUSION_ENABLE_MPPM
     [Conditional("UNITY_EDITOR")]
 #else
-    [Conditional("FUSION_ENABLE_MPPM")]
+        [Conditional("FUSION_ENABLE_MPPM")]
 #endif
-    [Obsolete("Use FusionMppm.Broadcaster?.Send instead")]
-    public static void Broadcast<T>(T data) where T : FusionMppmCommand {
-      MainEditor?.Send(data);
-    }
+        [Obsolete("Use FusionMppm.Broadcaster?.Send instead")]
+        public static void Broadcast<T>(T data) where T : FusionMppmCommand
+        {
+            MainEditor?.Send(data);
+        }
 
-    private FusionMppm() {
-      
-    }
-    
+        private FusionMppm()
+        {
+
+        }
+
 #if FUSION_ENABLE_MPPM && UNITY_EDITOR
     private static readonly string s_mainInstancePath = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
     
@@ -1873,27 +2102,28 @@ namespace Fusion {
       public string Guid;
     }
 #endif
-  }
-  
-  /// <summary>
-  /// The base class for all Fusion MPPM commands.
-  /// </summary>
-  [Serializable]
-  // ReSharper disable once IdentifierTypo
-  public abstract class FusionMppmCommand {
+    }
+
     /// <summary>
-    /// Execute the command on a virtual instance.
+    /// The base class for all Fusion MPPM commands.
     /// </summary>
-    public abstract void Execute();
-    /// <summary>
-    /// Does the main instance need to wait for an ack?
-    /// </summary>
-    public virtual bool NeedsAck => false;
-    /// <summary>
-    /// If the command is persistent (i.e. needs to be executed on each domain reload), this key is used to store it.
-    /// </summary>
-    public virtual string PersistentKey => null;
-  }
+    [Serializable]
+    // ReSharper disable once IdentifierTypo
+    public abstract class FusionMppmCommand
+    {
+        /// <summary>
+        /// Execute the command on a virtual instance.
+        /// </summary>
+        public abstract void Execute();
+        /// <summary>
+        /// Does the main instance need to wait for an ack?
+        /// </summary>
+        public virtual bool NeedsAck => false;
+        /// <summary>
+        /// If the command is persistent (i.e. needs to be executed on each domain reload), this key is used to store it.
+        /// </summary>
+        public virtual string PersistentKey => null;
+    }
 }
 
 #endregion
@@ -1902,39 +2132,42 @@ namespace Fusion {
 #region FusionMppmRegisterCustomDependencyCommand.cs
 
 #if UNITY_EDITOR
-namespace Fusion {
-  using System;
-  using UnityEngine;
+namespace Fusion
+{
+    using System;
+    using UnityEngine;
 
-  /// <summary>
-  /// A command implementing a workaround for MPPM not syncing custom dependencies.
-  /// </summary>
-  [Serializable]
-  public class FusionMppmRegisterCustomDependencyCommand : FusionMppmCommand {
     /// <summary>
-    /// Name of the custom dependency.
+    /// A command implementing a workaround for MPPM not syncing custom dependencies.
     /// </summary>
-    public string DependencyName;
-    /// <summary>
-    /// Hash of the custom dependency.
-    /// </summary>
-    public string Hash;
-      
-    /// <inheritdoc cref="FusionMppmCommand.NeedsAck"/>
-    public override bool NeedsAck => true;
+    [Serializable]
+    public class FusionMppmRegisterCustomDependencyCommand : FusionMppmCommand
+    {
+        /// <summary>
+        /// Name of the custom dependency.
+        /// </summary>
+        public string DependencyName;
+        /// <summary>
+        /// Hash of the custom dependency.
+        /// </summary>
+        public string Hash;
 
-    /// <inheritdoc cref="FusionMppmCommand.PersistentKey"/>
-    public override string PersistentKey => $"Dependency_{DependencyName}";
-      
-    /// <summary>
-    /// Registers a custom dependency with the given name and hash.
-    /// </summary>
-    public override void Execute() {
-      FusionEditorLog.TraceMppm($"Registering custom dependency {DependencyName} with hash {Hash}");
-      var hash = Hash128.Parse(Hash);
-      UnityEditor.AssetDatabase.RegisterCustomDependency(DependencyName, hash);
+        /// <inheritdoc cref="FusionMppmCommand.NeedsAck"/>
+        public override bool NeedsAck => true;
+
+        /// <inheritdoc cref="FusionMppmCommand.PersistentKey"/>
+        public override string PersistentKey => $"Dependency_{DependencyName}";
+
+        /// <summary>
+        /// Registers a custom dependency with the given name and hash.
+        /// </summary>
+        public override void Execute()
+        {
+            FusionEditorLog.TraceMppm($"Registering custom dependency {DependencyName} with hash {Hash}");
+            var hash = Hash128.Parse(Hash);
+            UnityEditor.AssetDatabase.RegisterCustomDependency(DependencyName, hash);
+        }
     }
-  }
 }
 #endif
 
@@ -1943,19 +2176,21 @@ namespace Fusion {
 
 #region FusionUnityExtensions.cs
 
-namespace Fusion {
+namespace Fusion
+{
 #if UNITY_2022_1_OR_NEWER && !UNITY_2022_2_OR_NEWER
   using UnityEngine;
 #endif
 
-  /// <summary>
-  /// Provides backwards compatibility for Unity API.
-  /// </summary>
-  public static class FusionUnityExtensions {
-    
-    #region New Find API
+    /// <summary>
+    /// Provides backwards compatibility for Unity API.
+    /// </summary>
+    public static class FusionUnityExtensions
+    {
 
-#if UNITY_2022_1_OR_NEWER && !UNITY_2022_2_OR_NEWER 
+        #region New Find API
+
+#if UNITY_2022_1_OR_NEWER && !UNITY_2022_2_OR_NEWER
     public enum FindObjectsInactive {
       Exclude,
       Include,
@@ -2020,8 +2255,8 @@ namespace Fusion {
 
 #endif
 
-    #endregion
-  }
+        #endregion
+    }
 }
 
 #endregion
@@ -2033,419 +2268,504 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/NetworkObjectBaker.cs
 
-﻿//#undef UNITY_EDITOR
-namespace Fusion {
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using System.Text;
-  using System.Threading.Tasks;
-  using UnityEngine;
+//#undef UNITY_EDITOR
+namespace Fusion
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using UnityEngine;
 
 #if UNITY_EDITOR
-  using UnityEditor;
 #endif
 
-  public class NetworkObjectBaker {
+    public class NetworkObjectBaker
+    {
 
-    private List<NetworkObject> _allNetworkObjects             = new List<NetworkObject>();
-    private List<TransformPath> _networkObjectsPaths           = new List<TransformPath>();
-    private List<SimulationBehaviour> _allSimulationBehaviours = new List<SimulationBehaviour>();
-    private TransformPathCache _pathCache                      = new TransformPathCache();
-    private List<NetworkBehaviour> _arrayBufferNB    = new List<NetworkBehaviour>();
-    private List<NetworkObject> _arrayBufferNO       = new List<NetworkObject>();
-    
-    public struct Result {
-      public bool HadChanges { get; }
-      public int ObjectCount { get; }
-      public int BehaviourCount { get; }
+        private List<NetworkObject> _allNetworkObjects = new List<NetworkObject>();
+        private List<TransformPath> _networkObjectsPaths = new List<TransformPath>();
+        private List<SimulationBehaviour> _allSimulationBehaviours = new List<SimulationBehaviour>();
+        private TransformPathCache _pathCache = new TransformPathCache();
+        private List<NetworkBehaviour> _arrayBufferNB = new List<NetworkBehaviour>();
+        private List<NetworkObject> _arrayBufferNO = new List<NetworkObject>();
 
-      public Result(bool dirty, int objectCount, int behaviourCount) {
-        HadChanges = dirty;
-        ObjectCount = objectCount;
-        BehaviourCount = behaviourCount;
-      }
-    }
+        public struct Result
+        {
+            public bool HadChanges { get; }
+            public int ObjectCount { get; }
+            public int BehaviourCount { get; }
 
-    protected virtual void SetDirty(MonoBehaviour obj) {
-      // do nothing
-    }
-
-    protected virtual bool TryGetExecutionOrder(MonoBehaviour obj, out int order) {
-      order = default;
-      return false;
-    }
-    
-    protected virtual uint GetSortKey(NetworkObject obj) {
-      return 0;
-    }
-
-    /// <summary>
-    /// Postprocesses the behaviour. Returns true if the object was marked dirty.
-    /// </summary>
-    /// <param name="behaviour"></param>
-    /// <returns></returns>
-    protected virtual bool PostprocessBehaviour(SimulationBehaviour behaviour) {
-      // do nothing
-      return false;
-    }
-    
-    [System.Diagnostics.Conditional("FUSION_EDITOR_TRACE")]
-    protected static void Trace(string msg) {
-      Debug.Log($"[Fusion/NetworkObjectBaker] {msg}");
-    }
-
-    protected static void Warn(string msg, UnityEngine.Object context = null) {
-      Debug.LogWarning($"[Fusion/NetworkObjectBaker] {msg}", context);
-    }
-
-    public Result Bake(GameObject root) {
-
-      if (root == null) {
-        throw new ArgumentNullException(nameof(root));
-      }
-      
-      root.GetComponentsInChildren(true, _allNetworkObjects);
-      
-      // remove null ones (missing scripts may cause that)
-      _allNetworkObjects.RemoveAll(x => x == null);
-      
-      if (_allNetworkObjects.Count == 0) {
-        return new Result(false, 0, 0);
-      }
-
-      try {
-        foreach (var obj in _allNetworkObjects) {
-          _networkObjectsPaths.Add(_pathCache.Create(obj.transform));
+            public Result(bool dirty, int objectCount, int behaviourCount)
+            {
+                HadChanges = dirty;
+                ObjectCount = objectCount;
+                BehaviourCount = behaviourCount;
+            }
         }
 
-        bool dirty = false;
-        
-        _allNetworkObjects.Reverse();
-        _networkObjectsPaths.Reverse();
+        protected virtual void SetDirty(MonoBehaviour obj)
+        {
+            // do nothing
+        }
 
-        root.GetComponentsInChildren(true, _allSimulationBehaviours);
-        _allSimulationBehaviours.RemoveAll(x => x == null);
-        
-        int countNO = _allNetworkObjects.Count;
-        int countSB = _allSimulationBehaviours.Count;
+        protected virtual bool TryGetExecutionOrder(MonoBehaviour obj, out int order)
+        {
+            order = default;
+            return false;
+        }
 
-        // start from the leaves
-        for (int i = 0; i < _allNetworkObjects.Count; ++i) {
-          var obj = _allNetworkObjects[i];
+        protected virtual uint GetSortKey(NetworkObject obj)
+        {
+            return 0;
+        }
 
-          var objDirty = false;
-          var objActive = obj.gameObject.activeInHierarchy;
-          int? objExecutionOrder = null;
-          if (!objActive) {
-            if (TryGetExecutionOrder(obj, out var order)) {
-              objExecutionOrder = order;
-            } else {
-              Warn($"Unable to get execution order for {obj}. " +
-                $"Because the object is initially inactive, Fusion is unable to guarantee " +
-                $"the script's Awake will be invoked before Spawned. Please implement {nameof(TryGetExecutionOrder)}.");
+        /// <summary>
+        /// Postprocesses the behaviour. Returns true if the object was marked dirty.
+        /// </summary>
+        /// <param name="behaviour"></param>
+        /// <returns></returns>
+        protected virtual bool PostprocessBehaviour(SimulationBehaviour behaviour)
+        {
+            // do nothing
+            return false;
+        }
+
+        [System.Diagnostics.Conditional("FUSION_EDITOR_TRACE")]
+        protected static void Trace(string msg)
+        {
+            Debug.Log($"[Fusion/NetworkObjectBaker] {msg}");
+        }
+
+        protected static void Warn(string msg, UnityEngine.Object context = null)
+        {
+            Debug.LogWarning($"[Fusion/NetworkObjectBaker] {msg}", context);
+        }
+
+        public Result Bake(GameObject root)
+        {
+
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
             }
-          }
 
-          // find nested behaviours
-          _arrayBufferNB.Clear();
-          
-          var path = _networkObjectsPaths[i];
-          
-          string entryPath = path.ToString();
-          for (int scriptIndex = _allSimulationBehaviours.Count - 1; scriptIndex >= 0; --scriptIndex) {
-            var script = _allSimulationBehaviours[scriptIndex];
-            var scriptPath = _pathCache.Create(script.transform);
+            root.GetComponentsInChildren(true, _allNetworkObjects);
 
-            if (_pathCache.IsEqualOrAncestorOf(path, scriptPath)) {
-              if (script is NetworkBehaviour nb) {
-                _arrayBufferNB.Add(nb);
-              }
-              
-              objDirty |= PostprocessBehaviour(script);
-              
-              _allSimulationBehaviours.RemoveAt(scriptIndex);
+            // remove null ones (missing scripts may cause that)
+            _allNetworkObjects.RemoveAll(x => x == null);
 
-              if (objExecutionOrder != null) {
-                // check if execution order is ok
-                if (TryGetExecutionOrder(script, out var scriptOrder)) {
-                  if (objExecutionOrder <= scriptOrder) {
-                    Warn($"{obj} execution order is less or equal than of the script {script}. " +
-                      $"Because the object is initially inactive, Spawned callback will be invoked before the script's Awake on activation.", script);
-                  }
-                } else {
-                  Warn($"Unable to get execution order for {script}. " +
-                    $"Because the object is initially inactive, Fusion is unable to guarantee " +
-                    $"the script's Awake will be invoked before Spawned. Please implement {nameof(TryGetExecutionOrder)}.");
+            if (_allNetworkObjects.Count == 0)
+            {
+                return new Result(false, 0, 0);
+            }
+
+            try
+            {
+                foreach (var obj in _allNetworkObjects)
+                {
+                    _networkObjectsPaths.Add(_pathCache.Create(obj.transform));
                 }
-              }
 
-            } else if (_pathCache.Compare(path, scriptPath) < 0) {
-              // can't discard it yet
-            } else {
-              Debug.Assert(_pathCache.Compare(path, scriptPath) > 0);
-              break;
+                bool dirty = false;
+
+                _allNetworkObjects.Reverse();
+                _networkObjectsPaths.Reverse();
+
+                root.GetComponentsInChildren(true, _allSimulationBehaviours);
+                _allSimulationBehaviours.RemoveAll(x => x == null);
+
+                int countNO = _allNetworkObjects.Count;
+                int countSB = _allSimulationBehaviours.Count;
+
+                // start from the leaves
+                for (int i = 0; i < _allNetworkObjects.Count; ++i)
+                {
+                    var obj = _allNetworkObjects[i];
+
+                    var objDirty = false;
+                    var objActive = obj.gameObject.activeInHierarchy;
+                    int? objExecutionOrder = null;
+                    if (!objActive)
+                    {
+                        if (TryGetExecutionOrder(obj, out var order))
+                        {
+                            objExecutionOrder = order;
+                        }
+                        else
+                        {
+                            Warn($"Unable to get execution order for {obj}. " +
+                              $"Because the object is initially inactive, Fusion is unable to guarantee " +
+                              $"the script's Awake will be invoked before Spawned. Please implement {nameof(TryGetExecutionOrder)}.");
+                        }
+                    }
+
+                    // find nested behaviours
+                    _arrayBufferNB.Clear();
+
+                    var path = _networkObjectsPaths[i];
+
+                    string entryPath = path.ToString();
+                    for (int scriptIndex = _allSimulationBehaviours.Count - 1; scriptIndex >= 0; --scriptIndex)
+                    {
+                        var script = _allSimulationBehaviours[scriptIndex];
+                        var scriptPath = _pathCache.Create(script.transform);
+
+                        if (_pathCache.IsEqualOrAncestorOf(path, scriptPath))
+                        {
+                            if (script is NetworkBehaviour nb)
+                            {
+                                _arrayBufferNB.Add(nb);
+                            }
+
+                            objDirty |= PostprocessBehaviour(script);
+
+                            _allSimulationBehaviours.RemoveAt(scriptIndex);
+
+                            if (objExecutionOrder != null)
+                            {
+                                // check if execution order is ok
+                                if (TryGetExecutionOrder(script, out var scriptOrder))
+                                {
+                                    if (objExecutionOrder <= scriptOrder)
+                                    {
+                                        Warn($"{obj} execution order is less or equal than of the script {script}. " +
+                                          $"Because the object is initially inactive, Spawned callback will be invoked before the script's Awake on activation.", script);
+                                    }
+                                }
+                                else
+                                {
+                                    Warn($"Unable to get execution order for {script}. " +
+                                      $"Because the object is initially inactive, Fusion is unable to guarantee " +
+                                      $"the script's Awake will be invoked before Spawned. Please implement {nameof(TryGetExecutionOrder)}.");
+                                }
+                            }
+
+                        }
+                        else if (_pathCache.Compare(path, scriptPath) < 0)
+                        {
+                            // can't discard it yet
+                        }
+                        else
+                        {
+                            Debug.Assert(_pathCache.Compare(path, scriptPath) > 0);
+                            break;
+                        }
+                    }
+
+                    _arrayBufferNB.Reverse();
+                    objDirty |= Set(obj, ref obj.NetworkedBehaviours, _arrayBufferNB);
+
+                    // handle flags
+
+                    var flags = obj.Flags;
+
+                    if (!flags.IsVersionCurrent())
+                    {
+                        flags = flags.SetCurrentVersion();
+                    }
+
+                    objDirty |= Set(obj, ref obj.Flags, flags);
+
+                    // what's left is nested network objects resolution
+                    {
+                        _arrayBufferNO.Clear();
+
+                        // collect descendants; descendants should be continous without gaps here
+                        int j = i - 1;
+                        for (; j >= 0 && _pathCache.IsAncestorOf(path, _networkObjectsPaths[j]); --j)
+                        {
+                            _arrayBufferNO.Add(_allNetworkObjects[j]);
+                        }
+
+                        int descendantsBegin = j + 1;
+                        Debug.Assert(_arrayBufferNO.Count == i - descendantsBegin);
+
+                        objDirty |= Set(obj, ref obj.NestedObjects, _arrayBufferNO);
+                    }
+
+                    objDirty |= Set(obj, ref obj.SortKey, GetSortKey(obj));
+
+                    if (objDirty)
+                    {
+                        SetDirty(obj);
+                        dirty = true;
+                    }
+                }
+
+                return new Result(dirty, countNO, countSB);
             }
-          }
+            finally
+            {
+                _pathCache.Clear();
+                _allNetworkObjects.Clear();
+                _allSimulationBehaviours.Clear();
 
-          _arrayBufferNB.Reverse();
-          objDirty |= Set(obj, ref obj.NetworkedBehaviours, _arrayBufferNB);
+                _networkObjectsPaths.Clear();
 
-          // handle flags
+                _arrayBufferNB.Clear();
+                _arrayBufferNO.Clear();
+            }
+        }
 
-          var flags = obj.Flags;
+        private bool Set<T>(MonoBehaviour host, ref T field, T value)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, value))
+            {
+                Trace($"Object dirty: {host} ({field} vs {value})");
+                field = value;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-          if (!flags.IsVersionCurrent()) {
-            flags = flags.SetCurrentVersion();
-          }
+        private bool Set<T>(MonoBehaviour host, ref T[] field, List<T> value)
+        {
+            var comparer = EqualityComparer<T>.Default;
+            if (field == null || field.Length != value.Count || !field.SequenceEqual(value, comparer))
+            {
+                Trace($"Object dirty: {host} ({field} vs {value})");
+                field = value.ToArray();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-          objDirty |= Set(obj, ref obj.Flags, flags);
+        public unsafe readonly struct TransformPath
+        {
+            public const int MaxDepth = 10;
 
-          // what's left is nested network objects resolution
-          {
-            _arrayBufferNO.Clear();
-
-            // collect descendants; descendants should be continous without gaps here
-            int j = i - 1;
-            for (; j >= 0 && _pathCache.IsAncestorOf(path, _networkObjectsPaths[j]); --j) {
-              _arrayBufferNO.Add(_allNetworkObjects[j]);
+            public struct _Indices
+            {
+                public fixed ushort Value[MaxDepth];
             }
 
-            int descendantsBegin = j + 1;
-            Debug.Assert(_arrayBufferNO.Count == i - descendantsBegin);
+            public readonly _Indices Indices;
+            public readonly ushort Depth;
+            public readonly ushort Next;
 
-            objDirty |= Set(obj, ref obj.NestedObjects, _arrayBufferNO);
-          }
+            internal TransformPath(ushort depth, ushort next, List<ushort> indices, int offset, int count)
+            {
+                Depth = depth;
+                Next = next;
 
-          objDirty |= Set(obj, ref obj.SortKey, GetSortKey(obj));
-          
-          if (objDirty) {
-            SetDirty(obj);
-            dirty = true;
-          }
-        }
-
-        return new Result(dirty, countNO, countSB);
-      } finally {
-        _pathCache.Clear();
-        _allNetworkObjects.Clear();
-        _allSimulationBehaviours.Clear();
-
-        _networkObjectsPaths.Clear();
-
-        _arrayBufferNB.Clear();
-        _arrayBufferNO.Clear();
-      }
-    }
-
-    private bool Set<T>(MonoBehaviour host, ref T field, T value) {
-      if (!EqualityComparer<T>.Default.Equals(field, value)) {
-        Trace($"Object dirty: {host} ({field} vs {value})");
-        field = value;
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    private bool Set<T>(MonoBehaviour host, ref T[] field, List<T> value) {
-      var comparer = EqualityComparer<T>.Default;
-      if (field == null || field.Length != value.Count || !field.SequenceEqual(value, comparer)) {
-        Trace($"Object dirty: {host} ({field} vs {value})");
-        field = value.ToArray();
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    public unsafe readonly struct TransformPath {
-      public const int MaxDepth = 10;
-
-      public struct _Indices {
-        public fixed ushort Value[MaxDepth];
-      }
-
-      public readonly _Indices Indices;
-      public readonly ushort Depth;
-      public readonly ushort Next;
-
-      internal TransformPath(ushort depth, ushort next, List<ushort> indices, int offset, int count) {
-        Depth = depth;
-        Next = next;
-
-        for (int i = 0; i < count; ++i) {
-          Indices.Value[i] = indices[i + offset];
-        }
-      }
-
-      public override string ToString() {
-        var builder = new StringBuilder();
-        for (int i = 0; i < Depth && i < MaxDepth; ++i) {
-          if (i > 0) {
-            builder.Append("/");
-          }
-          builder.Append(Indices.Value[i]);
-        }
-
-        if (Depth > MaxDepth) {
-          Debug.Assert(Next > 0);
-          builder.Append($"/...[{Depth - MaxDepth}]");
-        }
-
-        return builder.ToString();
-      }
-    }
-
-    public sealed unsafe class TransformPathCache : IComparer<TransformPath>, IEqualityComparer<TransformPath> {
-
-      private Dictionary<Transform, TransformPath> _cache = new Dictionary<Transform, TransformPath>();
-      private List<ushort> _siblingIndexStack             = new List<ushort>();
-      private List<TransformPath> _nexts                  = new List<TransformPath>();
-
-
-      public TransformPath Create(Transform transform) {
-        if (_cache.TryGetValue(transform, out var existing)) {
-          return existing;
-        }
-
-        _siblingIndexStack.Clear();
-        for (var tr = transform; tr != null; tr = tr.parent) {
-          _siblingIndexStack.Add(checked((ushort)tr.GetSiblingIndex()));
-        }
-        _siblingIndexStack.Reverse();
-
-
-        var depth = checked((ushort)_siblingIndexStack.Count);
-
-        ushort nextPlusOne = 0;
-
-        if (depth > TransformPath.MaxDepth) {
-
-          int i;
-          if (depth % TransformPath.MaxDepth != 0) {
-            // tail is going to be partially full
-            i = depth - (depth % TransformPath.MaxDepth);
-          } else {
-            // tail is going to be full
-            i = depth - TransformPath.MaxDepth;
-          }
-
-          for (; i > 0; i -= TransformPath.MaxDepth) {
-            checked {
-              TransformPath path = new TransformPath((ushort)(depth - i), nextPlusOne,
-                _siblingIndexStack, i, Mathf.Min(TransformPath.MaxDepth, depth - i));
-              _nexts.Add(path);
-              nextPlusOne = (ushort)_nexts.Count;
+                for (int i = 0; i < count; ++i)
+                {
+                    Indices.Value[i] = indices[i + offset];
+                }
             }
-          }
+
+            public override string ToString()
+            {
+                var builder = new StringBuilder();
+                for (int i = 0; i < Depth && i < MaxDepth; ++i)
+                {
+                    if (i > 0)
+                    {
+                        builder.Append("/");
+                    }
+                    builder.Append(Indices.Value[i]);
+                }
+
+                if (Depth > MaxDepth)
+                {
+                    Debug.Assert(Next > 0);
+                    builder.Append($"/...[{Depth - MaxDepth}]");
+                }
+
+                return builder.ToString();
+            }
         }
 
-        var result = new TransformPath(depth, nextPlusOne,
-          _siblingIndexStack, 0, Mathf.Min(TransformPath.MaxDepth, depth));
+        public sealed unsafe class TransformPathCache : IComparer<TransformPath>, IEqualityComparer<TransformPath>
+        {
 
-        _cache.Add(transform, result);
-        return result;
-      }
+            private Dictionary<Transform, TransformPath> _cache = new Dictionary<Transform, TransformPath>();
+            private List<ushort> _siblingIndexStack = new List<ushort>();
+            private List<TransformPath> _nexts = new List<TransformPath>();
 
-      public void Clear() {
-        _nexts.Clear();
-        _cache.Clear();
-        _siblingIndexStack.Clear();
-      }
 
-      public bool Equals(TransformPath x, TransformPath y) {
-        if (x.Depth != y.Depth) {
-          return false;
+            public TransformPath Create(Transform transform)
+            {
+                if (_cache.TryGetValue(transform, out var existing))
+                {
+                    return existing;
+                }
+
+                _siblingIndexStack.Clear();
+                for (var tr = transform; tr != null; tr = tr.parent)
+                {
+                    _siblingIndexStack.Add(checked((ushort)tr.GetSiblingIndex()));
+                }
+                _siblingIndexStack.Reverse();
+
+
+                var depth = checked((ushort)_siblingIndexStack.Count);
+
+                ushort nextPlusOne = 0;
+
+                if (depth > TransformPath.MaxDepth)
+                {
+
+                    int i;
+                    if (depth % TransformPath.MaxDepth != 0)
+                    {
+                        // tail is going to be partially full
+                        i = depth - (depth % TransformPath.MaxDepth);
+                    }
+                    else
+                    {
+                        // tail is going to be full
+                        i = depth - TransformPath.MaxDepth;
+                    }
+
+                    for (; i > 0; i -= TransformPath.MaxDepth)
+                    {
+                        checked
+                        {
+                            TransformPath path = new TransformPath((ushort)(depth - i), nextPlusOne,
+                              _siblingIndexStack, i, Mathf.Min(TransformPath.MaxDepth, depth - i));
+                            _nexts.Add(path);
+                            nextPlusOne = (ushort)_nexts.Count;
+                        }
+                    }
+                }
+
+                var result = new TransformPath(depth, nextPlusOne,
+                  _siblingIndexStack, 0, Mathf.Min(TransformPath.MaxDepth, depth));
+
+                _cache.Add(transform, result);
+                return result;
+            }
+
+            public void Clear()
+            {
+                _nexts.Clear();
+                _cache.Clear();
+                _siblingIndexStack.Clear();
+            }
+
+            public bool Equals(TransformPath x, TransformPath y)
+            {
+                if (x.Depth != y.Depth)
+                {
+                    return false;
+                }
+
+                return CompareToDepthUnchecked(x, y, x.Depth) == 0;
+            }
+
+            public int GetHashCode(TransformPath obj)
+            {
+                int hash = obj.Depth;
+                return GetHashCode(obj, hash);
+            }
+
+            public int Compare(TransformPath x, TransformPath y)
+            {
+                var diff = CompareToDepthUnchecked(x, y, Mathf.Min(x.Depth, y.Depth));
+                if (diff != 0)
+                {
+                    return diff;
+                }
+
+                return x.Depth - y.Depth;
+            }
+
+            private int CompareToDepthUnchecked(in TransformPath x, in TransformPath y, int depth)
+            {
+                for (int i = 0; i < depth && i < TransformPath.MaxDepth; ++i)
+                {
+                    int diff = x.Indices.Value[i] - y.Indices.Value[i];
+                    if (diff != 0)
+                    {
+                        return diff;
+                    }
+                }
+
+                if (depth > TransformPath.MaxDepth)
+                {
+                    Debug.Assert(x.Next > 0);
+                    Debug.Assert(y.Next > 0);
+                    return CompareToDepthUnchecked(_nexts[x.Next - 1], _nexts[y.Next - 1], depth - TransformPath.MaxDepth);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+
+            private int GetHashCode(in TransformPath path, int hash)
+            {
+                for (int i = 0; i < path.Depth && i < TransformPath.MaxDepth; ++i)
+                {
+                    hash = hash * 31 + path.Indices.Value[i];
+                }
+
+                if (path.Depth > TransformPath.MaxDepth)
+                {
+                    Debug.Assert(path.Next > 0);
+                    hash = GetHashCode(_nexts[path.Next - 1], hash);
+                }
+
+                return hash;
+            }
+
+            public bool IsAncestorOf(in TransformPath x, in TransformPath y)
+            {
+                if (x.Depth >= y.Depth)
+                {
+                    return false;
+                }
+
+                return CompareToDepthUnchecked(x, y, x.Depth) == 0;
+            }
+
+            public bool IsEqualOrAncestorOf(in TransformPath x, in TransformPath y)
+            {
+                if (x.Depth > y.Depth)
+                {
+                    return false;
+                }
+
+                return CompareToDepthUnchecked(x, y, x.Depth) == 0;
+            }
+
+            public string Dump(in TransformPath x)
+            {
+                var builder = new StringBuilder();
+
+                Dump(x, builder);
+
+                return builder.ToString();
+            }
+
+            private void Dump(in TransformPath x, StringBuilder builder)
+            {
+                for (int i = 0; i < x.Depth && i < TransformPath.MaxDepth; ++i)
+                {
+                    if (i > 0)
+                    {
+                        builder.Append("/");
+                    }
+                    builder.Append(x.Indices.Value[i]);
+                }
+
+                if (x.Depth > TransformPath.MaxDepth)
+                {
+                    Debug.Assert(x.Next > 0);
+                    builder.Append("/");
+                    Dump(_nexts[x.Next - 1], builder);
+                }
+            }
         }
-
-        return CompareToDepthUnchecked(x, y, x.Depth) == 0;
-      }
-
-      public int GetHashCode(TransformPath obj) {
-        int hash = obj.Depth;
-        return GetHashCode(obj, hash);
-      }
-
-      public int Compare(TransformPath x, TransformPath y) {
-        var diff = CompareToDepthUnchecked(x, y, Mathf.Min(x.Depth, y.Depth));
-        if (diff != 0) {
-          return diff;
-        }
-
-        return x.Depth - y.Depth;
-      }
-
-      private int CompareToDepthUnchecked(in TransformPath x, in TransformPath y, int depth) {
-        for (int i = 0; i < depth && i < TransformPath.MaxDepth; ++i) {
-          int diff = x.Indices.Value[i] - y.Indices.Value[i];
-          if (diff != 0) {
-            return diff;
-          }
-        }
-
-        if (depth > TransformPath.MaxDepth) {
-          Debug.Assert(x.Next > 0);
-          Debug.Assert(y.Next > 0);
-          return CompareToDepthUnchecked(_nexts[x.Next - 1], _nexts[y.Next - 1], depth - TransformPath.MaxDepth);
-        } else {
-          return 0;
-        }
-      }
-
-      private int GetHashCode(in TransformPath path, int hash) {
-        for (int i = 0; i < path.Depth && i < TransformPath.MaxDepth; ++i) {
-          hash = hash * 31 + path.Indices.Value[i];
-        }
-
-        if (path.Depth > TransformPath.MaxDepth) {
-          Debug.Assert(path.Next > 0);
-          hash = GetHashCode(_nexts[path.Next - 1], hash);
-        }
-
-        return hash;
-      }
-
-      public bool IsAncestorOf(in TransformPath x, in TransformPath y) {
-        if (x.Depth >= y.Depth) {
-          return false;
-        }
-
-        return CompareToDepthUnchecked(x, y, x.Depth) == 0;
-      }
-
-      public bool IsEqualOrAncestorOf(in TransformPath x, in TransformPath y) {
-        if (x.Depth > y.Depth) {
-          return false;
-        }
-
-        return CompareToDepthUnchecked(x, y, x.Depth) == 0;
-      }
-
-      public string Dump(in TransformPath x) {
-        var builder = new StringBuilder();
-
-        Dump(x, builder);
-
-        return builder.ToString();
-      }
-
-      private void Dump(in TransformPath x, StringBuilder builder) {
-        for (int i = 0; i < x.Depth && i < TransformPath.MaxDepth; ++i) {
-          if (i > 0) {
-            builder.Append("/");
-          }
-          builder.Append(x.Indices.Value[i]);
-        }
-
-        if (x.Depth > TransformPath.MaxDepth) {
-          Debug.Assert(x.Next > 0);
-          builder.Append("/");
-          Dump(_nexts[x.Next - 1], builder);
-        }
-      }
     }
-  }
 }
 
 
@@ -2454,28 +2774,31 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/NetworkPrefabSourceUnity.cs
 
-﻿namespace Fusion {
-  using System;
-  using Object = UnityEngine.Object;
+namespace Fusion
+{
+    using System;
 
-  [Serializable]
-  public class NetworkPrefabSourceStatic : NetworkAssetSourceStatic<NetworkObject>, INetworkPrefabSource {
-    public NetworkObjectGuid               AssetGuid;
-    NetworkObjectGuid INetworkPrefabSource.AssetGuid => AssetGuid;
-  }
-  
-  [Serializable]
-  public class NetworkPrefabSourceStaticLazy : NetworkAssetSourceStaticLazy<NetworkObject>, INetworkPrefabSource {
-    public NetworkObjectGuid               AssetGuid;
-    NetworkObjectGuid INetworkPrefabSource.AssetGuid => AssetGuid;
-  }
+    [Serializable]
+    public class NetworkPrefabSourceStatic : NetworkAssetSourceStatic<NetworkObject>, INetworkPrefabSource
+    {
+        public NetworkObjectGuid AssetGuid;
+        NetworkObjectGuid INetworkPrefabSource.AssetGuid => AssetGuid;
+    }
 
-  [Serializable]
-  public class NetworkPrefabSourceResource : NetworkAssetSourceResource<NetworkObject>, INetworkPrefabSource {
-    public NetworkObjectGuid               AssetGuid;
-    NetworkObjectGuid INetworkPrefabSource.AssetGuid => AssetGuid;
-  }
-  
+    [Serializable]
+    public class NetworkPrefabSourceStaticLazy : NetworkAssetSourceStaticLazy<NetworkObject>, INetworkPrefabSource
+    {
+        public NetworkObjectGuid AssetGuid;
+        NetworkObjectGuid INetworkPrefabSource.AssetGuid => AssetGuid;
+    }
+
+    [Serializable]
+    public class NetworkPrefabSourceResource : NetworkAssetSourceResource<NetworkObject>, INetworkPrefabSource
+    {
+        public NetworkObjectGuid AssetGuid;
+        NetworkObjectGuid INetworkPrefabSource.AssetGuid => AssetGuid;
+    }
+
 #if FUSION_ENABLE_ADDRESSABLES && !FUSION_DISABLE_ADDRESSABLES
   [Serializable]
   public class NetworkPrefabSourceAddressable : NetworkAssetSourceAddressable<NetworkObject>, INetworkPrefabSource {
@@ -2490,166 +2813,171 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/Statistics/FusionStatisticsHelper.cs
 
-namespace Fusion.Statistics {
-  using System;
-  using UnityEngine;
+namespace Fusion.Statistics
+{
+    using UnityEngine;
 
-  internal static class FusionStatisticsHelper {
-    public const float DEFAULT_GRAPH_HEIGHT = 150F;
-    public const float DEFAULT_HEADER_HEIGHT = 50F;
-    
-    internal static void GetStatGraphDefaultSettings(RenderSimStats stat, out string valueTextFormat, out float valueTextMultiplier, out bool ignoreZeroOnAverage, out bool ignoreZeroOnBuffer, out int accumulateTimeMs) {
+    internal static class FusionStatisticsHelper
+    {
+        public const float DEFAULT_GRAPH_HEIGHT = 150F;
+        public const float DEFAULT_HEADER_HEIGHT = 50F;
 
-      valueTextFormat = "{0:0}";
-      valueTextMultiplier = 1f;
-      ignoreZeroOnAverage = false; 
-      ignoreZeroOnBuffer = false;
-      accumulateTimeMs = 0; // Default is every update, so zero.
-      
-      switch (stat) {
-            case RenderSimStats.InPackets:
-            case RenderSimStats.OutPackets:
-            case RenderSimStats.InObjectUpdates:
-            case RenderSimStats.OutObjectUpdates:
-              valueTextFormat = "{0:0}";
-              accumulateTimeMs = 1000;
-              break;
-            
-            case RenderSimStats.RTT:
-              valueTextFormat = "{0:0} ms";
-              valueTextMultiplier = 1000;
-              ignoreZeroOnAverage = true; ignoreZeroOnBuffer = true;
-              break;
-            
-            case RenderSimStats.InBandwidth:
-            case RenderSimStats.OutBandwidth:
-            case RenderSimStats.InputInBandwidth:
-            case RenderSimStats.InputOutBandwidth:
-              valueTextFormat = "{0:0} B";
-              accumulateTimeMs = 1000;
-              break;
-            
-            case RenderSimStats.AverageInPacketSize:
-            case RenderSimStats.AverageOutPacketSize:
-              valueTextFormat = "{0:0} B";
-              ignoreZeroOnBuffer = true;
-              ignoreZeroOnAverage = true;
-              break;
-            
-            case RenderSimStats.Resimulations:
-              valueTextFormat = "{0:0}";
-              break;
-            case RenderSimStats.ForwardTicks:
-              valueTextFormat = "{0:0}";
-              break;
-            
-            case RenderSimStats.TimeResets:
-            case RenderSimStats.SimulationSpeed:
-            case RenderSimStats.InterpolationSpeed:
-              valueTextFormat = "{0:0}";
-              break;
-            
-            // All time stats are normalized to use seconds, so 1000 multiplier to be ms.
-            case RenderSimStats.InputReceiveDelta:
-            case RenderSimStats.StateReceiveDelta:
-            case RenderSimStats.SimulationTimeOffset:
-            case RenderSimStats.InterpolationOffset:
-              valueTextMultiplier = 1000;
-              valueTextFormat = "{0:0} ms";
-              break;
-            
-            case RenderSimStats.GeneralAllocatedMemoryInUse:
-            case RenderSimStats.ObjectsAllocatedMemoryInUse:
-            case RenderSimStats.ObjectsAllocatedMemoryFree:
-            case RenderSimStats.GeneralAllocatedMemoryFree:
-              valueTextFormat = "{0:0} B";
-              break;
-            
-            case RenderSimStats.WordsWrittenCount:
-            case RenderSimStats.WordsReadCount:
-              valueTextFormat = "{0:0}";
-              ignoreZeroOnBuffer = true;
-              accumulateTimeMs = 1000;
-              break;
-            case RenderSimStats.WordsWrittenSize:
-            case RenderSimStats.WordsReadSize:
-              valueTextFormat = "{0:0} B";
-              ignoreZeroOnBuffer = true;
-              accumulateTimeMs = 1000;
-              break;
-            
-            default:
-              valueTextFormat = "{0:0}";
-              break;
-          }
+        internal static void GetStatGraphDefaultSettings(RenderSimStats stat, out string valueTextFormat, out float valueTextMultiplier, out bool ignoreZeroOnAverage, out bool ignoreZeroOnBuffer, out int accumulateTimeMs)
+        {
+
+            valueTextFormat = "{0:0}";
+            valueTextMultiplier = 1f;
+            ignoreZeroOnAverage = false;
+            ignoreZeroOnBuffer = false;
+            accumulateTimeMs = 0; // Default is every update, so zero.
+
+            switch (stat)
+            {
+                case RenderSimStats.InPackets:
+                case RenderSimStats.OutPackets:
+                case RenderSimStats.InObjectUpdates:
+                case RenderSimStats.OutObjectUpdates:
+                    valueTextFormat = "{0:0}";
+                    accumulateTimeMs = 1000;
+                    break;
+
+                case RenderSimStats.RTT:
+                    valueTextFormat = "{0:0} ms";
+                    valueTextMultiplier = 1000;
+                    ignoreZeroOnAverage = true; ignoreZeroOnBuffer = true;
+                    break;
+
+                case RenderSimStats.InBandwidth:
+                case RenderSimStats.OutBandwidth:
+                case RenderSimStats.InputInBandwidth:
+                case RenderSimStats.InputOutBandwidth:
+                    valueTextFormat = "{0:0} B";
+                    accumulateTimeMs = 1000;
+                    break;
+
+                case RenderSimStats.AverageInPacketSize:
+                case RenderSimStats.AverageOutPacketSize:
+                    valueTextFormat = "{0:0} B";
+                    ignoreZeroOnBuffer = true;
+                    ignoreZeroOnAverage = true;
+                    break;
+
+                case RenderSimStats.Resimulations:
+                    valueTextFormat = "{0:0}";
+                    break;
+                case RenderSimStats.ForwardTicks:
+                    valueTextFormat = "{0:0}";
+                    break;
+
+                case RenderSimStats.TimeResets:
+                case RenderSimStats.SimulationSpeed:
+                case RenderSimStats.InterpolationSpeed:
+                    valueTextFormat = "{0:0}";
+                    break;
+
+                // All time stats are normalized to use seconds, so 1000 multiplier to be ms.
+                case RenderSimStats.InputReceiveDelta:
+                case RenderSimStats.StateReceiveDelta:
+                case RenderSimStats.SimulationTimeOffset:
+                case RenderSimStats.InterpolationOffset:
+                    valueTextMultiplier = 1000;
+                    valueTextFormat = "{0:0} ms";
+                    break;
+
+                case RenderSimStats.GeneralAllocatedMemoryInUse:
+                case RenderSimStats.ObjectsAllocatedMemoryInUse:
+                case RenderSimStats.ObjectsAllocatedMemoryFree:
+                case RenderSimStats.GeneralAllocatedMemoryFree:
+                    valueTextFormat = "{0:0} B";
+                    break;
+
+                case RenderSimStats.WordsWrittenCount:
+                case RenderSimStats.WordsReadCount:
+                    valueTextFormat = "{0:0}";
+                    ignoreZeroOnBuffer = true;
+                    accumulateTimeMs = 1000;
+                    break;
+                case RenderSimStats.WordsWrittenSize:
+                case RenderSimStats.WordsReadSize:
+                    valueTextFormat = "{0:0} B";
+                    ignoreZeroOnBuffer = true;
+                    accumulateTimeMs = 1000;
+                    break;
+
+                default:
+                    valueTextFormat = "{0:0}";
+                    break;
+            }
+        }
+
+        internal static float GetStatDataFromSnapshot(RenderSimStats stat, FusionStatisticsSnapshot simulationStatsSnapshot)
+        {
+            switch (stat)
+            {
+                // Sim stats
+                case RenderSimStats.InPackets:
+                    return simulationStatsSnapshot.InPackets;
+                case RenderSimStats.OutPackets:
+                    return simulationStatsSnapshot.OutPackets;
+                case RenderSimStats.RTT:
+                    return simulationStatsSnapshot.RoundTripTime;
+                case RenderSimStats.InBandwidth:
+                    return simulationStatsSnapshot.InBandwidth;
+                case RenderSimStats.OutBandwidth:
+                    return simulationStatsSnapshot.OutBandwidth;
+                case RenderSimStats.Resimulations:
+                    return simulationStatsSnapshot.Resimulations;
+                case RenderSimStats.ForwardTicks:
+                    return simulationStatsSnapshot.ForwardTicks;
+                case RenderSimStats.InputInBandwidth:
+                    return simulationStatsSnapshot.InputInBandwidth;
+                case RenderSimStats.InputOutBandwidth:
+                    return simulationStatsSnapshot.InputOutBandwidth;
+                case RenderSimStats.AverageInPacketSize:
+                    return simulationStatsSnapshot.InBandwidth / Mathf.Max(simulationStatsSnapshot.InPackets, 1);
+                case RenderSimStats.AverageOutPacketSize:
+                    return simulationStatsSnapshot.OutBandwidth / Mathf.Max(simulationStatsSnapshot.OutPackets, 1);
+                case RenderSimStats.InObjectUpdates:
+                    return simulationStatsSnapshot.InObjectUpdates;
+                case RenderSimStats.OutObjectUpdates:
+                    return simulationStatsSnapshot.OutObjectUpdates;
+                case RenderSimStats.ObjectsAllocatedMemoryInUse:
+                    return simulationStatsSnapshot.ObjectsAllocMemoryUsedInBytes;
+                case RenderSimStats.GeneralAllocatedMemoryInUse:
+                    return simulationStatsSnapshot.GeneralAllocMemoryUsedInBytes;
+                case RenderSimStats.ObjectsAllocatedMemoryFree:
+                    return simulationStatsSnapshot.ObjectsAllocMemoryFreeInBytes;
+                case RenderSimStats.GeneralAllocatedMemoryFree:
+                    return simulationStatsSnapshot.GeneralAllocMemoryFreeInBytes;
+                case RenderSimStats.WordsWrittenCount:
+                    return simulationStatsSnapshot.WordsWrittenCount;
+                case RenderSimStats.WordsWrittenSize:
+                    return simulationStatsSnapshot.WordsWrittenSize;
+                case RenderSimStats.WordsReadCount:
+                    return simulationStatsSnapshot.WordsReadCount;
+                case RenderSimStats.WordsReadSize:
+                    return simulationStatsSnapshot.WordsReadSize;
+
+                // Time stats
+                case RenderSimStats.InputReceiveDelta:
+                    return simulationStatsSnapshot.InputReceiveDelta;
+                case RenderSimStats.TimeResets:
+                    return simulationStatsSnapshot.TimeResets;
+                case RenderSimStats.StateReceiveDelta:
+                    return simulationStatsSnapshot.StateReceiveDelta;
+                case RenderSimStats.SimulationTimeOffset:
+                    return simulationStatsSnapshot.SimulationTimeOffset;
+                case RenderSimStats.SimulationSpeed:
+                    return simulationStatsSnapshot.SimulationSpeed;
+                case RenderSimStats.InterpolationOffset:
+                    return simulationStatsSnapshot.InterpolationOffset;
+                case RenderSimStats.InterpolationSpeed:
+                    return simulationStatsSnapshot.InterpolationSpeed;
+            }
+
+            return default;
+        }
     }
-
-    internal static float GetStatDataFromSnapshot(RenderSimStats stat, FusionStatisticsSnapshot simulationStatsSnapshot) {
-      switch (stat) {
-            // Sim stats
-            case RenderSimStats.InPackets:
-              return simulationStatsSnapshot.InPackets;
-            case RenderSimStats.OutPackets:
-              return simulationStatsSnapshot.OutPackets;
-            case RenderSimStats.RTT:
-              return simulationStatsSnapshot.RoundTripTime;
-            case RenderSimStats.InBandwidth:
-              return simulationStatsSnapshot.InBandwidth;
-            case RenderSimStats.OutBandwidth:
-              return simulationStatsSnapshot.OutBandwidth;
-            case RenderSimStats.Resimulations:
-              return simulationStatsSnapshot.Resimulations;
-            case RenderSimStats.ForwardTicks:
-              return simulationStatsSnapshot.ForwardTicks;
-            case RenderSimStats.InputInBandwidth:
-              return simulationStatsSnapshot.InputInBandwidth;
-            case RenderSimStats.InputOutBandwidth:
-              return simulationStatsSnapshot.InputOutBandwidth;
-            case RenderSimStats.AverageInPacketSize:
-              return simulationStatsSnapshot.InBandwidth / Mathf.Max(simulationStatsSnapshot.InPackets, 1);
-            case RenderSimStats.AverageOutPacketSize:
-              return simulationStatsSnapshot.OutBandwidth / Mathf.Max(simulationStatsSnapshot.OutPackets, 1);
-            case RenderSimStats.InObjectUpdates:
-              return simulationStatsSnapshot.InObjectUpdates;
-            case RenderSimStats.OutObjectUpdates:
-              return simulationStatsSnapshot.OutObjectUpdates;
-            case RenderSimStats.ObjectsAllocatedMemoryInUse:
-              return simulationStatsSnapshot.ObjectsAllocMemoryUsedInBytes;
-            case RenderSimStats.GeneralAllocatedMemoryInUse:
-              return simulationStatsSnapshot.GeneralAllocMemoryUsedInBytes;
-            case RenderSimStats.ObjectsAllocatedMemoryFree:
-              return simulationStatsSnapshot.ObjectsAllocMemoryFreeInBytes;
-            case RenderSimStats.GeneralAllocatedMemoryFree:
-              return simulationStatsSnapshot.GeneralAllocMemoryFreeInBytes;
-            case RenderSimStats.WordsWrittenCount:
-              return simulationStatsSnapshot.WordsWrittenCount;
-            case RenderSimStats.WordsWrittenSize:
-              return simulationStatsSnapshot.WordsWrittenSize;
-            case RenderSimStats.WordsReadCount:
-              return simulationStatsSnapshot.WordsReadCount;
-            case RenderSimStats.WordsReadSize:
-              return simulationStatsSnapshot.WordsReadSize;
-            
-            // Time stats
-            case RenderSimStats.InputReceiveDelta:
-              return simulationStatsSnapshot.InputReceiveDelta;
-            case RenderSimStats.TimeResets:
-              return simulationStatsSnapshot.TimeResets;
-            case RenderSimStats.StateReceiveDelta:
-              return simulationStatsSnapshot.StateReceiveDelta;
-            case RenderSimStats.SimulationTimeOffset:
-              return simulationStatsSnapshot.SimulationTimeOffset;
-            case RenderSimStats.SimulationSpeed:
-              return simulationStatsSnapshot.SimulationSpeed;
-            case RenderSimStats.InterpolationOffset:
-              return simulationStatsSnapshot.InterpolationOffset;
-            case RenderSimStats.InterpolationSpeed:
-              return simulationStatsSnapshot.InterpolationSpeed;
-          }
-          
-          return default;
-    }
-  }
 }
 
 #endregion
@@ -2657,366 +2985,415 @@ namespace Fusion.Statistics {
 
 #region Assets/Photon/Fusion/Runtime/Statistics/FusionStatsGraphBase.cs
 
-namespace Fusion.Statistics {
-  using UnityEngine;
-  using UnityEngine.UI;
-  using System;
-  using System.Globalization;
+namespace Fusion.Statistics
+{
+    using System;
+    using System.Globalization;
+    using UnityEngine;
+    using UnityEngine.UI;
 
-  public abstract partial class FusionStatsGraphBase : MonoBehaviour {
-    
-    private static readonly int Samples = Shader.PropertyToID(SHADER_PROPERTY_SAMPLES);
-    private static readonly IFormatProvider _formatProvider = CultureInfo.GetCultureInfo("en-US");
+    public abstract partial class FusionStatsGraphBase : MonoBehaviour
+    {
 
-    private const string SHADER_PROPERTY_VALUES = "_Values";
-    private const string SHADER_PROPERTY_SAMPLES = "_Samples";
-    private const string SHADER_PROPERTY_THRESHOLD_1 = "_Threshold1";
-    private const string SHADER_PROPERTY_THRESHOLD_2 = "_Threshold2";
-    private const string SHADER_PROPERTY_THRESHOLD_3 = "_Threshold3";
-    private const string SHADER_PROPERTY_AVERAGE = "_Average";
+        private static readonly int Samples = Shader.PropertyToID(SHADER_PROPERTY_SAMPLES);
+        private static readonly IFormatProvider _formatProvider = CultureInfo.GetCultureInfo("en-US");
 
-    private int _valuesShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_VALUES);
-    private int _threshold1ShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_THRESHOLD_1);
-    private int _threshold2ShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_THRESHOLD_2);
-    private int _threshold3ShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_THRESHOLD_3);
-    private int _averageShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_AVERAGE);
+        private const string SHADER_PROPERTY_VALUES = "_Values";
+        private const string SHADER_PROPERTY_SAMPLES = "_Samples";
+        private const string SHADER_PROPERTY_THRESHOLD_1 = "_Threshold1";
+        private const string SHADER_PROPERTY_THRESHOLD_2 = "_Threshold2";
+        private const string SHADER_PROPERTY_THRESHOLD_3 = "_Threshold3";
+        private const string SHADER_PROPERTY_AVERAGE = "_Average";
 
-    // serialize private
-    [SerializeField] private RectTransform _render;
-    [SerializeField] private RectTransform _header;
-    [SerializeField] private Image _targetImage;
-    [SerializeField] private Button _toggleButton;
-    [SerializeField] private Text _averageValueText;
-    [SerializeField] private Text _peakValueText;
-    [SerializeField] private Text _currentValueText;
-    [Space] [SerializeField] private Text _threshold1Text;
-    [SerializeField] private Text _threshold2Text;
-    [SerializeField] private Text _threshold3Text;
-    
-    //protected
-    [Space] [SerializeField] protected float _valueTextMultiplier = 1f;
-    [SerializeField] [Range(60, 540)] protected int _maxSamples = 300;
-    [SerializeField] protected float _threshold1;
-    [SerializeField] protected float _threshold2;
-    [SerializeField] protected float _threshold3;
-    [SerializeField] protected bool _ignoreZeroedValuesOnAverageCalculation;
-    [SerializeField] protected bool _ignoreZeroedValuesOnBuffer;
-    [SerializeField] protected float _valuesTextUpdateDelay = .1f;
+        private int _valuesShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_VALUES);
+        private int _threshold1ShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_THRESHOLD_1);
+        private int _threshold2ShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_THRESHOLD_2);
+        private int _threshold3ShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_THRESHOLD_3);
+        private int _averageShaderPropertyID = Shader.PropertyToID(SHADER_PROPERTY_AVERAGE);
 
-    private FusionStatBuffer _bufferValues;
-    private float[] _bufferNormalizedValues;
+        // serialize private
+        [SerializeField] private RectTransform _render;
+        [SerializeField] private RectTransform _header;
+        [SerializeField] private Image _targetImage;
+        [SerializeField] private Button _toggleButton;
+        [SerializeField] private Text _averageValueText;
+        [SerializeField] private Text _peakValueText;
+        [SerializeField] private Text _currentValueText;
+        [Space][SerializeField] private Text _threshold1Text;
+        [SerializeField] private Text _threshold2Text;
+        [SerializeField] private Text _threshold3Text;
 
-    private float _headerHeight = 25;
-    private float _renderHeight = 125;
-    private VerticalLayoutGroup _parentLayoutGroup;
+        //protected
+        [Space][SerializeField] protected float _valueTextMultiplier = 1f;
+        [SerializeField][Range(60, 540)] protected int _maxSamples = 300;
+        [SerializeField] protected float _threshold1;
+        [SerializeField] protected float _threshold2;
+        [SerializeField] protected float _threshold3;
+        [SerializeField] protected bool _ignoreZeroedValuesOnAverageCalculation;
+        [SerializeField] protected bool _ignoreZeroedValuesOnBuffer;
+        [SerializeField] protected float _valuesTextUpdateDelay = .1f;
 
-    private float _invertedRenderMaxValue;
-    private float _lastUpdateTime;
-    private Material _material;
+        private FusionStatBuffer _bufferValues;
+        private float[] _bufferNormalizedValues;
 
-    private bool Initialized => _bufferNormalizedValues != null;
+        private float _headerHeight = 25;
+        private float _renderHeight = 125;
+        private VerticalLayoutGroup _parentLayoutGroup;
 
-    protected virtual void Initialize(int accumulateTimeMs) {
-      _material = new Material(_targetImage.material);
-      _targetImage.material = _material;
-      _bufferValues = new FusionStatBuffer(_maxSamples, _ignoreZeroedValuesOnAverageCalculation, accumulateTimeMs);
-      _bufferNormalizedValues = new float[_maxSamples];
-      _parentLayoutGroup = GetComponentInParent<VerticalLayoutGroup>();
+        private float _invertedRenderMaxValue;
+        private float _lastUpdateTime;
+        private Material _material;
 
-      _lookupTable = null;
-      _lookupMultiplier = 1.0f;
+        private bool Initialized => _bufferNormalizedValues != null;
 
-      switch (_valueTextFormat) {
-        case "{0:0}": {
-          _lookupTable = LOOKUP_TABLE_0;
-          _lookupMultiplier = 1.0f;
-          break;
-        }
-        case "{0:0} ms": {
-          _lookupTable = LOOKUP_TABLE_0ms;
-          _lookupMultiplier = 1.0f;
-          break;
-        }
-        case "{0:0} B": {
-          _lookupTable = LOOKUP_TABLE_0_BYTES;
-          _lookupMultiplier = 1.0f;
-          break;
-        }
-        case "{0:0.00} ms": {
-          _lookupTable = LOOKUP_TABLE_0_00ms;
-          _lookupMultiplier = 100.0f;
-          break;
-        }
-      }
+        protected virtual void Initialize(int accumulateTimeMs)
+        {
+            _material = new Material(_targetImage.material);
+            _targetImage.material = _material;
+            _bufferValues = new FusionStatBuffer(_maxSamples, _ignoreZeroedValuesOnAverageCalculation, accumulateTimeMs);
+            _bufferNormalizedValues = new float[_maxSamples];
+            _parentLayoutGroup = GetComponentInParent<VerticalLayoutGroup>();
 
-      Restore();
-    }
+            _lookupTable = null;
+            _lookupMultiplier = 1.0f;
 
-    protected virtual void OnEnable() {
-      var statsRender = GetComponentInParent<FusionStatistics>(true);
-      if (statsRender) {
-        statsRender.RegisterGraph(this);
-        Restore();
-      }
-    }
+            switch (_valueTextFormat)
+            {
+                case "{0:0}":
+                    {
+                        _lookupTable = LOOKUP_TABLE_0;
+                        _lookupMultiplier = 1.0f;
+                        break;
+                    }
+                case "{0:0} ms":
+                    {
+                        _lookupTable = LOOKUP_TABLE_0ms;
+                        _lookupMultiplier = 1.0f;
+                        break;
+                    }
+                case "{0:0} B":
+                    {
+                        _lookupTable = LOOKUP_TABLE_0_BYTES;
+                        _lookupMultiplier = 1.0f;
+                        break;
+                    }
+                case "{0:0.00} ms":
+                    {
+                        _lookupTable = LOOKUP_TABLE_0_00ms;
+                        _lookupMultiplier = 100.0f;
+                        break;
+                    }
+            }
 
-    protected virtual void OnDisable() {
-      var statsRender = GetComponentInParent<FusionStatistics>(true);
-      if (statsRender) {
-        statsRender.UnregisterGraph(this);
-        Restore();
-      }
-    }
-
-    protected virtual void AddValueToBuffer(float value, ref DateTime now) {
-      if (_ignoreZeroedValuesOnBuffer && value == 0) return;
-      
-      _bufferValues.Add(value, ref now);
-
-      _invertedRenderMaxValue = 1 / _bufferValues.MaxValue;
-
-      _invertedRenderMaxValue *= .9f; // 10 % more to fell better on render
-
-      for (int i = 0, k = _bufferValues.Index; i < _maxSamples; i++, k = (k+1)%_bufferValues.Length) {
-        _bufferNormalizedValues[i] = _bufferValues[k] * _invertedRenderMaxValue;
-      }
-      
-      SetGraphValues(_bufferNormalizedValues);
-      OnSetValues();
-    }
-
-    protected virtual void Refit() {
-      var finalHeight = 0f;
-      var rect = (RectTransform)transform;
-
-      if (_render.gameObject.activeSelf)
-        finalHeight += _renderHeight;
-      if (_header.gameObject.activeSelf)
-        finalHeight += _headerHeight;
-
-      rect.sizeDelta = new Vector2(rect.sizeDelta.x, finalHeight);
-      _parentLayoutGroup.enabled = false;
-      _parentLayoutGroup.enabled = true;
-    }
-
-    protected virtual void Restore() {
-      if (Initialized == false) return;
-      
-      _material.SetInteger(Samples, _maxSamples);
-      // The normalized one needs to be cleaned.
-      Array.Clear(_bufferNormalizedValues, 0, _maxSamples);
-      Refit();
-    }
-
-    public virtual void ToggleRenderDisplay() {
-      var active = _render.gameObject.activeSelf;
-      _render.gameObject.SetActive(!active);
-
-      if (active) {
-        OnDisable();
-        _toggleButton.transform.rotation = Quaternion.Euler(0, 0, 90);
-      } else {
-        _toggleButton.transform.rotation = Quaternion.identity;
-        OnEnable();
-      }
-
-      Refit();
-    }
-
-    protected virtual void OnSetValues() {
-      if (Time.time >= _lastUpdateTime + _valuesTextUpdateDelay) {
-        _lastUpdateTime = Time.time;
-
-        _averageValueText.text = GetValueText(_bufferValues.AverageValue * _valueTextMultiplier);
-        _peakValueText.text = GetValueText(_bufferValues.MaxValue * _valueTextMultiplier);
-      }
-      
-      _currentValueText.text = GetValueText(_bufferValues.LatestValue * _valueTextMultiplier);
-
-      float normalizedThreshold1 = _threshold1 * _invertedRenderMaxValue;
-      float normalizedThreshold2 = _threshold2 * _invertedRenderMaxValue;
-      float normalizedThreshold3 = _threshold3 * _invertedRenderMaxValue;
-
-      _material.SetFloat(_threshold1ShaderPropertyID, normalizedThreshold1);
-      _material.SetFloat(_threshold2ShaderPropertyID, normalizedThreshold2);
-      _material.SetFloat(_threshold3ShaderPropertyID, normalizedThreshold3);
-
-      _threshold1Text.text = GetValueText(_threshold1 * _valueTextMultiplier);
-      _threshold2Text.text = GetValueText(_threshold2 * _valueTextMultiplier);
-      _threshold3Text.text = GetValueText(_threshold3 * _valueTextMultiplier);
-
-      UpdateThresholdPosition(_threshold1Text, normalizedThreshold1);
-      UpdateThresholdPosition(_threshold2Text, normalizedThreshold2);
-      UpdateThresholdPosition(_threshold3Text, normalizedThreshold3);
-    }
-    
-    protected void SetThresholds(float threshold1, float threshold2, float threshold3) {
-      _threshold1 = threshold1 / _valueTextMultiplier;
-      _threshold2 = threshold2 / _valueTextMultiplier;
-      _threshold3 = threshold3 / _valueTextMultiplier;
-    }
-
-    protected void SetIgnoreZeroValues(bool ignoreZeroOnAverage, bool ignoreZeroOnBuffer) {
-      _ignoreZeroedValuesOnAverageCalculation = ignoreZeroOnAverage;
-      _ignoreZeroedValuesOnBuffer = ignoreZeroOnBuffer;
-      _bufferValues.SetIgnoreZeroOnAverage(ignoreZeroOnAverage);
-    }
-
-    protected void SetValueTextFormat(string value) {
-      _valueTextFormat = value;
-    }
-
-    protected void SetValueTextMultiplier(float value) {
-      _valueTextMultiplier = value;
-    }
-
-    protected void SetAccumulateTime(int accumulateTimeMs) {
-      _bufferValues.SetAccumulateTime(accumulateTimeMs);
-    }
-
-    private void UpdateThresholdPosition(Text text, float thresholdNormalized) {
-      Vector3 position = text.rectTransform.anchoredPosition3D;
-      var renderHalfHeight = _targetImage.rectTransform.rect.height * .5f;
-
-      position.y = RemapValue(thresholdNormalized, 0, 1, -renderHalfHeight, renderHalfHeight);
-      text.rectTransform.anchoredPosition3D = position;
-      text.gameObject.SetActive(thresholdNormalized < 1 && thresholdNormalized > 0);
-    }
-
-    protected virtual void SetGraphValues(float[] values) {
-      if (values == null || values.Length == 0)
-        return;
-
-      _material.SetFloat(_averageShaderPropertyID, _bufferValues.AverageValue);
-      _material.SetFloatArray(_valuesShaderPropertyID, values);
-    }
-
-    private float RemapValue(float value, float iMin, float iMax, float oMin, float oMax) {
-      if (float.IsNaN(value)) return oMin;
-
-      var t = Mathf.InverseLerp(iMin, iMax, value);
-      return Mathf.Lerp(oMin, oMax, t);
-    }
-
-    public abstract void UpdateGraph(NetworkRunner runner, FusionStatisticsManager statisticsManager, ref DateTime now);
-
-    internal struct FusionStatBuffer {
-      private readonly float[] _buffer;
-      private int _index;
-      private int _count;
-      private int _zeroCount;
-      private bool _ignoreZeroOnAverage;
-      private TimeSpan _accumulateTimeSpan;
-
-      private float _sum;
-      private float _max;
-      private float _accumulated;
-      private DateTime _lastBufferInsertTime;
-
-      public int Index => _index;
-      public int Length => _buffer.Length;
-      public float MaxValue => _max;
-
-
-      public FusionStatBuffer(int size, bool ignoreZeroOnAverage, int accumulateTimeMs) {
-        _buffer = new float[size];
-        _index = 0;
-        _count = 0;
-        _zeroCount = 0;
-        _ignoreZeroOnAverage = ignoreZeroOnAverage;
-        _accumulateTimeSpan = TimeSpan.FromMilliseconds(accumulateTimeMs);
-        _sum = 0;
-        _max = float.MinValue;
-        _accumulated = 0;
-        _lastBufferInsertTime = DateTime.MinValue;
-      }
-      
-      public void SetAccumulateTime(int accumulateTimeMs) {
-        _accumulateTimeSpan = TimeSpan.FromMilliseconds(accumulateTimeMs);
-      }
-
-      public void SetIgnoreZeroOnAverage(bool value) {
-        _ignoreZeroOnAverage = value;
-      }
-
-      public float this[int index] => _buffer[index];
-
-      public void Add(float value, ref DateTime now) {
-
-        _accumulated += value;
-        
-        if (now - _lastBufferInsertTime >= _accumulateTimeSpan) {
-          AddOnBuffer(_accumulated);
-          _accumulated = 0;
-          _lastBufferInsertTime = now;
-        } 
-      }
-
-      private void AddOnBuffer(float value) {
-         
-        var recalculateMax = false;
-        
-        if (_count == _buffer.Length) {
-          var removingValue = _buffer[_index];
-          _sum -= removingValue;
-          
-          if (removingValue == 0)
-            _zeroCount = Mathf.Max(0, _zeroCount-1);
-
-          if (removingValue >= _max) {
-            recalculateMax = true;
-          }
-        } else {
-          _count++;
+            Restore();
         }
 
-        if (value == 0)
-          _zeroCount = Mathf.Min(_count-1, _zeroCount+1);
-
-        _buffer[_index] = value;
-        
-        _sum += value;
-        
-        if (value > _max) {
-          _max = value;
+        protected virtual void OnEnable()
+        {
+            var statsRender = GetComponentInParent<FusionStatistics>(true);
+            if (statsRender)
+            {
+                statsRender.RegisterGraph(this);
+                Restore();
+            }
         }
 
-        _index = (_index + 1) % _buffer.Length;
-
-        if (recalculateMax) {
-          _max = CalculateMax();
+        protected virtual void OnDisable()
+        {
+            var statsRender = GetComponentInParent<FusionStatistics>(true);
+            if (statsRender)
+            {
+                statsRender.UnregisterGraph(this);
+                Restore();
+            }
         }
-      }
 
-      public float LatestValue {
-        get {
-          if (_count == 0)
-            return 0;
-          return _buffer[(_index - 1 + _buffer.Length) % _buffer.Length];
-        }
-      }
+        protected virtual void AddValueToBuffer(float value, ref DateTime now)
+        {
+            if (_ignoreZeroedValuesOnBuffer && value == 0) return;
 
-      public float AverageValue {
-        get {
-          if (_count == 0)
-            return 0f;
-            
-          return _sum / (_ignoreZeroOnAverage ? _count - _zeroCount : _count);
-        }
-      }
+            _bufferValues.Add(value, ref now);
 
-      private float CalculateMax()
-      {
-        float max = float.MinValue;
-        for (int i = 0; i < _count; i++) {
-          if (_buffer[i] > max) {
-            max = _buffer[i];
-          }
+            _invertedRenderMaxValue = 1 / _bufferValues.MaxValue;
+
+            _invertedRenderMaxValue *= .9f; // 10 % more to fell better on render
+
+            for (int i = 0, k = _bufferValues.Index; i < _maxSamples; i++, k = (k + 1) % _bufferValues.Length)
+            {
+                _bufferNormalizedValues[i] = _bufferValues[k] * _invertedRenderMaxValue;
+            }
+
+            SetGraphValues(_bufferNormalizedValues);
+            OnSetValues();
         }
-        return max;
-      }
+
+        protected virtual void Refit()
+        {
+            var finalHeight = 0f;
+            var rect = (RectTransform)transform;
+
+            if (_render.gameObject.activeSelf)
+                finalHeight += _renderHeight;
+            if (_header.gameObject.activeSelf)
+                finalHeight += _headerHeight;
+
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x, finalHeight);
+            _parentLayoutGroup.enabled = false;
+            _parentLayoutGroup.enabled = true;
+        }
+
+        protected virtual void Restore()
+        {
+            if (Initialized == false) return;
+
+            _material.SetInteger(Samples, _maxSamples);
+            // The normalized one needs to be cleaned.
+            Array.Clear(_bufferNormalizedValues, 0, _maxSamples);
+            Refit();
+        }
+
+        public virtual void ToggleRenderDisplay()
+        {
+            var active = _render.gameObject.activeSelf;
+            _render.gameObject.SetActive(!active);
+
+            if (active)
+            {
+                OnDisable();
+                _toggleButton.transform.rotation = Quaternion.Euler(0, 0, 90);
+            }
+            else
+            {
+                _toggleButton.transform.rotation = Quaternion.identity;
+                OnEnable();
+            }
+
+            Refit();
+        }
+
+        protected virtual void OnSetValues()
+        {
+            if (Time.time >= _lastUpdateTime + _valuesTextUpdateDelay)
+            {
+                _lastUpdateTime = Time.time;
+
+                _averageValueText.text = GetValueText(_bufferValues.AverageValue * _valueTextMultiplier);
+                _peakValueText.text = GetValueText(_bufferValues.MaxValue * _valueTextMultiplier);
+            }
+
+            _currentValueText.text = GetValueText(_bufferValues.LatestValue * _valueTextMultiplier);
+
+            float normalizedThreshold1 = _threshold1 * _invertedRenderMaxValue;
+            float normalizedThreshold2 = _threshold2 * _invertedRenderMaxValue;
+            float normalizedThreshold3 = _threshold3 * _invertedRenderMaxValue;
+
+            _material.SetFloat(_threshold1ShaderPropertyID, normalizedThreshold1);
+            _material.SetFloat(_threshold2ShaderPropertyID, normalizedThreshold2);
+            _material.SetFloat(_threshold3ShaderPropertyID, normalizedThreshold3);
+
+            _threshold1Text.text = GetValueText(_threshold1 * _valueTextMultiplier);
+            _threshold2Text.text = GetValueText(_threshold2 * _valueTextMultiplier);
+            _threshold3Text.text = GetValueText(_threshold3 * _valueTextMultiplier);
+
+            UpdateThresholdPosition(_threshold1Text, normalizedThreshold1);
+            UpdateThresholdPosition(_threshold2Text, normalizedThreshold2);
+            UpdateThresholdPosition(_threshold3Text, normalizedThreshold3);
+        }
+
+        protected void SetThresholds(float threshold1, float threshold2, float threshold3)
+        {
+            _threshold1 = threshold1 / _valueTextMultiplier;
+            _threshold2 = threshold2 / _valueTextMultiplier;
+            _threshold3 = threshold3 / _valueTextMultiplier;
+        }
+
+        protected void SetIgnoreZeroValues(bool ignoreZeroOnAverage, bool ignoreZeroOnBuffer)
+        {
+            _ignoreZeroedValuesOnAverageCalculation = ignoreZeroOnAverage;
+            _ignoreZeroedValuesOnBuffer = ignoreZeroOnBuffer;
+            _bufferValues.SetIgnoreZeroOnAverage(ignoreZeroOnAverage);
+        }
+
+        protected void SetValueTextFormat(string value)
+        {
+            _valueTextFormat = value;
+        }
+
+        protected void SetValueTextMultiplier(float value)
+        {
+            _valueTextMultiplier = value;
+        }
+
+        protected void SetAccumulateTime(int accumulateTimeMs)
+        {
+            _bufferValues.SetAccumulateTime(accumulateTimeMs);
+        }
+
+        private void UpdateThresholdPosition(Text text, float thresholdNormalized)
+        {
+            Vector3 position = text.rectTransform.anchoredPosition3D;
+            var renderHalfHeight = _targetImage.rectTransform.rect.height * .5f;
+
+            position.y = RemapValue(thresholdNormalized, 0, 1, -renderHalfHeight, renderHalfHeight);
+            text.rectTransform.anchoredPosition3D = position;
+            text.gameObject.SetActive(thresholdNormalized < 1 && thresholdNormalized > 0);
+        }
+
+        protected virtual void SetGraphValues(float[] values)
+        {
+            if (values == null || values.Length == 0)
+                return;
+
+            _material.SetFloat(_averageShaderPropertyID, _bufferValues.AverageValue);
+            _material.SetFloatArray(_valuesShaderPropertyID, values);
+        }
+
+        private float RemapValue(float value, float iMin, float iMax, float oMin, float oMax)
+        {
+            if (float.IsNaN(value)) return oMin;
+
+            var t = Mathf.InverseLerp(iMin, iMax, value);
+            return Mathf.Lerp(oMin, oMax, t);
+        }
+
+        public abstract void UpdateGraph(NetworkRunner runner, FusionStatisticsManager statisticsManager, ref DateTime now);
+
+        internal struct FusionStatBuffer
+        {
+            private readonly float[] _buffer;
+            private int _index;
+            private int _count;
+            private int _zeroCount;
+            private bool _ignoreZeroOnAverage;
+            private TimeSpan _accumulateTimeSpan;
+
+            private float _sum;
+            private float _max;
+            private float _accumulated;
+            private DateTime _lastBufferInsertTime;
+
+            public int Index => _index;
+            public int Length => _buffer.Length;
+            public float MaxValue => _max;
+
+
+            public FusionStatBuffer(int size, bool ignoreZeroOnAverage, int accumulateTimeMs)
+            {
+                _buffer = new float[size];
+                _index = 0;
+                _count = 0;
+                _zeroCount = 0;
+                _ignoreZeroOnAverage = ignoreZeroOnAverage;
+                _accumulateTimeSpan = TimeSpan.FromMilliseconds(accumulateTimeMs);
+                _sum = 0;
+                _max = float.MinValue;
+                _accumulated = 0;
+                _lastBufferInsertTime = DateTime.MinValue;
+            }
+
+            public void SetAccumulateTime(int accumulateTimeMs)
+            {
+                _accumulateTimeSpan = TimeSpan.FromMilliseconds(accumulateTimeMs);
+            }
+
+            public void SetIgnoreZeroOnAverage(bool value)
+            {
+                _ignoreZeroOnAverage = value;
+            }
+
+            public float this[int index] => _buffer[index];
+
+            public void Add(float value, ref DateTime now)
+            {
+
+                _accumulated += value;
+
+                if (now - _lastBufferInsertTime >= _accumulateTimeSpan)
+                {
+                    AddOnBuffer(_accumulated);
+                    _accumulated = 0;
+                    _lastBufferInsertTime = now;
+                }
+            }
+
+            private void AddOnBuffer(float value)
+            {
+
+                var recalculateMax = false;
+
+                if (_count == _buffer.Length)
+                {
+                    var removingValue = _buffer[_index];
+                    _sum -= removingValue;
+
+                    if (removingValue == 0)
+                        _zeroCount = Mathf.Max(0, _zeroCount - 1);
+
+                    if (removingValue >= _max)
+                    {
+                        recalculateMax = true;
+                    }
+                }
+                else
+                {
+                    _count++;
+                }
+
+                if (value == 0)
+                    _zeroCount = Mathf.Min(_count - 1, _zeroCount + 1);
+
+                _buffer[_index] = value;
+
+                _sum += value;
+
+                if (value > _max)
+                {
+                    _max = value;
+                }
+
+                _index = (_index + 1) % _buffer.Length;
+
+                if (recalculateMax)
+                {
+                    _max = CalculateMax();
+                }
+            }
+
+            public float LatestValue
+            {
+                get
+                {
+                    if (_count == 0)
+                        return 0;
+                    return _buffer[(_index - 1 + _buffer.Length) % _buffer.Length];
+                }
+            }
+
+            public float AverageValue
+            {
+                get
+                {
+                    if (_count == 0)
+                        return 0f;
+
+                    return _sum / (_ignoreZeroOnAverage ? _count - _zeroCount : _count);
+                }
+            }
+
+            private float CalculateMax()
+            {
+                float max = float.MinValue;
+                for (int i = 0; i < _count; i++)
+                {
+                    if (_buffer[i] > max)
+                    {
+                        max = _buffer[i];
+                    }
+                }
+                return max;
+            }
+        }
     }
-  }
 }
 
 #endregion
@@ -3024,38 +3401,40 @@ namespace Fusion.Statistics {
 
 #region Assets/Photon/Fusion/Runtime/Statistics/FusionStatsLookup.cs
 
-namespace Fusion.Statistics {
-using UnityEngine;
+namespace Fusion.Statistics
+{
+    using UnityEngine;
 
-  public partial class FusionStatsGraphBase {
-    
-    [SerializeField]
-    private string _valueTextFormat     = "{0}";
-    private string[][] _lookupTable;
-    private float      _lookupMultiplier;
-    
-    private string GetValueText(float value)
+    public partial class FusionStatsGraphBase
     {
-      if (_lookupTable != null)
-      {
-        int rows    = _lookupTable.Length;
-        int columns = _lookupTable[0].Length;
 
-        int intValue = Mathf.RoundToInt(value * _lookupMultiplier);
-        if (intValue >= 0 && intValue < rows * columns)
+        [SerializeField]
+        private string _valueTextFormat = "{0}";
+        private string[][] _lookupTable;
+        private float _lookupMultiplier;
+
+        private string GetValueText(float value)
         {
-          int row    = intValue % rows;
-          int column = intValue / rows;
+            if (_lookupTable != null)
+            {
+                int rows = _lookupTable.Length;
+                int columns = _lookupTable[0].Length;
 
-          return _lookupTable[row][column];
+                int intValue = Mathf.RoundToInt(value * _lookupMultiplier);
+                if (intValue >= 0 && intValue < rows * columns)
+                {
+                    int row = intValue % rows;
+                    int column = intValue / rows;
+
+                    return _lookupTable[row][column];
+                }
+            }
+
+            return string.Format(_formatProvider, _valueTextFormat, value);
         }
-      }
 
-      return string.Format(_formatProvider, _valueTextFormat, value);
-    }
-
-    private static readonly string[][] LOOKUP_TABLE_0 =
-    {
+        private static readonly string[][] LOOKUP_TABLE_0 =
+        {
       new string[] {  "0","100","200","300","400","500","600","700","800","900", },
       new string[] {  "1","101","201","301","401","501","601","701","801","901", },
       new string[] {  "2","102","202","302","402","502","602","702","802","902", },
@@ -3158,8 +3537,8 @@ using UnityEngine;
       new string[] { "99","199","299","399","499","599","699","799","899","999", },
     };
 
-    private static readonly string[][] LOOKUP_TABLE_0ms =
-    {
+        private static readonly string[][] LOOKUP_TABLE_0ms =
+        {
       new string[] {  "0ms","100ms","200ms","300ms","400ms","500ms","600ms","700ms","800ms","900ms", },
       new string[] {  "1ms","101ms","201ms","301ms","401ms","501ms","601ms","701ms","801ms","901ms", },
       new string[] {  "2ms","102ms","202ms","302ms","402ms","502ms","602ms","702ms","802ms","902ms", },
@@ -3261,9 +3640,9 @@ using UnityEngine;
       new string[] { "98ms","198ms","298ms","398ms","498ms","598ms","698ms","798ms","898ms","998ms", },
       new string[] { "99ms","199ms","299ms","399ms","499ms","599ms","699ms","799ms","899ms","999ms", },
     };
-    
-    private static readonly string[][] LOOKUP_TABLE_0_BYTES =
-    {
+
+        private static readonly string[][] LOOKUP_TABLE_0_BYTES =
+        {
       new string[] {  "0 B","100 B","200 B","300 B","400 B","500 B","600 B","700 B","800 B","900 B", },
       new string[] {  "1 B","101 B","201 B","301 B","401 B","501 B","601 B","701 B","801 B","901 B", },
       new string[] {  "2 B","102 B","202 B","302 B","402 B","502 B","602 B","702 B","802 B","902 B", },
@@ -3366,8 +3745,8 @@ using UnityEngine;
       new string[] { "99 B","199 B","299 B","399 B","499 B","599 B","699 B","799 B","899 B","999 B", },
     };
 
-    private static readonly string[][] LOOKUP_TABLE_0_00ms =
-    {
+        private static readonly string[][] LOOKUP_TABLE_0_00ms =
+        {
       new string[] { "0.00ms","1.00ms","2.00ms","3.00ms","4.00ms","5.00ms","6.00ms","7.00ms","8.00ms","9.00ms",    "10.00ms","11.00ms","12.00ms","13.00ms","14.00ms","15.00ms","16.00ms","17.00ms","18.00ms","19.00ms",    "20.00ms","21.00ms","22.00ms","23.00ms","24.00ms","25.00ms","26.00ms","27.00ms","28.00ms","29.00ms",    "30.00ms","31.00ms","32.00ms","33.00ms","34.00ms","35.00ms","36.00ms","37.00ms","38.00ms","39.00ms",    "40.00ms","41.00ms","42.00ms","43.00ms","44.00ms","45.00ms","46.00ms","47.00ms","48.00ms","49.00ms",    "50.00ms","51.00ms","52.00ms","53.00ms","54.00ms","55.00ms","56.00ms","57.00ms","58.00ms","59.00ms",    "60.00ms","61.00ms","62.00ms","63.00ms","64.00ms","65.00ms","66.00ms","67.00ms","68.00ms","69.00ms",    "70.00ms","71.00ms","72.00ms","73.00ms","74.00ms","75.00ms","76.00ms","77.00ms","78.00ms","79.00ms",    "80.00ms","81.00ms","82.00ms","83.00ms","84.00ms","85.00ms","86.00ms","87.00ms","88.00ms","89.00ms",    "90.00ms","91.00ms","92.00ms","93.00ms","94.00ms","95.00ms","96.00ms","97.00ms","98.00ms","99.00ms", },
       new string[] { "0.01ms","1.01ms","2.01ms","3.01ms","4.01ms","5.01ms","6.01ms","7.01ms","8.01ms","9.01ms",    "10.01ms","11.01ms","12.01ms","13.01ms","14.01ms","15.01ms","16.01ms","17.01ms","18.01ms","19.01ms",    "20.01ms","21.01ms","22.01ms","23.01ms","24.01ms","25.01ms","26.01ms","27.01ms","28.01ms","29.01ms",    "30.01ms","31.01ms","32.01ms","33.01ms","34.01ms","35.01ms","36.01ms","37.01ms","38.01ms","39.01ms",    "40.01ms","41.01ms","42.01ms","43.01ms","44.01ms","45.01ms","46.01ms","47.01ms","48.01ms","49.01ms",    "50.01ms","51.01ms","52.01ms","53.01ms","54.01ms","55.01ms","56.01ms","57.01ms","58.01ms","59.01ms",    "60.01ms","61.01ms","62.01ms","63.01ms","64.01ms","65.01ms","66.01ms","67.01ms","68.01ms","69.01ms",    "70.01ms","71.01ms","72.01ms","73.01ms","74.01ms","75.01ms","76.01ms","77.01ms","78.01ms","79.01ms",    "80.01ms","81.01ms","82.01ms","83.01ms","84.01ms","85.01ms","86.01ms","87.01ms","88.01ms","89.01ms",    "90.01ms","91.01ms","92.01ms","93.01ms","94.01ms","95.01ms","96.01ms","97.01ms","98.01ms","99.01ms", },
       new string[] { "0.02ms","1.02ms","2.02ms","3.02ms","4.02ms","5.02ms","6.02ms","7.02ms","8.02ms","9.02ms",    "10.02ms","11.02ms","12.02ms","13.02ms","14.02ms","15.02ms","16.02ms","17.02ms","18.02ms","19.02ms",    "20.02ms","21.02ms","22.02ms","23.02ms","24.02ms","25.02ms","26.02ms","27.02ms","28.02ms","29.02ms",    "30.02ms","31.02ms","32.02ms","33.02ms","34.02ms","35.02ms","36.02ms","37.02ms","38.02ms","39.02ms",    "40.02ms","41.02ms","42.02ms","43.02ms","44.02ms","45.02ms","46.02ms","47.02ms","48.02ms","49.02ms",    "50.02ms","51.02ms","52.02ms","53.02ms","54.02ms","55.02ms","56.02ms","57.02ms","58.02ms","59.02ms",    "60.02ms","61.02ms","62.02ms","63.02ms","64.02ms","65.02ms","66.02ms","67.02ms","68.02ms","69.02ms",    "70.02ms","71.02ms","72.02ms","73.02ms","74.02ms","75.02ms","76.02ms","77.02ms","78.02ms","79.02ms",    "80.02ms","81.02ms","82.02ms","83.02ms","84.02ms","85.02ms","86.02ms","87.02ms","88.02ms","89.02ms",    "90.02ms","91.02ms","92.02ms","93.02ms","94.02ms","95.02ms","96.02ms","97.02ms","98.02ms","99.02ms", },
@@ -3469,7 +3848,7 @@ using UnityEngine;
       new string[] { "0.98ms","1.98ms","2.98ms","3.98ms","4.98ms","5.98ms","6.98ms","7.98ms","8.98ms","9.98ms",    "10.98ms","11.98ms","12.98ms","13.98ms","14.98ms","15.98ms","16.98ms","17.98ms","18.98ms","19.98ms",    "20.98ms","21.98ms","22.98ms","23.98ms","24.98ms","25.98ms","26.98ms","27.98ms","28.98ms","29.98ms",    "30.98ms","31.98ms","32.98ms","33.98ms","34.98ms","35.98ms","36.98ms","37.98ms","38.98ms","39.98ms",    "40.98ms","41.98ms","42.98ms","43.98ms","44.98ms","45.98ms","46.98ms","47.98ms","48.98ms","49.98ms",    "50.98ms","51.98ms","52.98ms","53.98ms","54.98ms","55.98ms","56.98ms","57.98ms","58.98ms","59.98ms",    "60.98ms","61.98ms","62.98ms","63.98ms","64.98ms","65.98ms","66.98ms","67.98ms","68.98ms","69.98ms",    "70.98ms","71.98ms","72.98ms","73.98ms","74.98ms","75.98ms","76.98ms","77.98ms","78.98ms","79.98ms",    "80.98ms","81.98ms","82.98ms","83.98ms","84.98ms","85.98ms","86.98ms","87.98ms","88.98ms","89.98ms",    "90.98ms","91.98ms","92.98ms","93.98ms","94.98ms","95.98ms","96.98ms","97.98ms","98.98ms","99.98ms", },
       new string[] { "0.99ms","1.99ms","2.99ms","3.99ms","4.99ms","5.99ms","6.99ms","7.99ms","8.99ms","9.99ms",    "10.99ms","11.99ms","12.99ms","13.99ms","14.99ms","15.99ms","16.99ms","17.99ms","18.99ms","19.99ms",    "20.99ms","21.99ms","22.99ms","23.99ms","24.99ms","25.99ms","26.99ms","27.99ms","28.99ms","29.99ms",    "30.99ms","31.99ms","32.99ms","33.99ms","34.99ms","35.99ms","36.99ms","37.99ms","38.99ms","39.99ms",    "40.99ms","41.99ms","42.99ms","43.99ms","44.99ms","45.99ms","46.99ms","47.99ms","48.99ms","49.99ms",    "50.99ms","51.99ms","52.99ms","53.99ms","54.99ms","55.99ms","56.99ms","57.99ms","58.99ms","59.99ms",    "60.99ms","61.99ms","62.99ms","63.99ms","64.99ms","65.99ms","66.99ms","67.99ms","68.99ms","69.99ms",    "70.99ms","71.99ms","72.99ms","73.99ms","74.99ms","75.99ms","76.99ms","77.99ms","78.99ms","79.99ms",    "80.99ms","81.99ms","82.99ms","83.99ms","84.99ms","85.99ms","86.99ms","87.99ms","88.99ms","89.99ms",    "90.99ms","91.99ms","92.99ms","93.99ms","94.99ms","95.99ms","96.99ms","97.99ms","98.99ms","99.99ms", },
     };
-  }
+    }
 }
 
 #endregion
@@ -3477,89 +3856,97 @@ using UnityEngine;
 
 #region Assets/Photon/Fusion/Runtime/Utilities/FusionScalableIMGUI.cs
 
-namespace Fusion {
-  using System.Reflection;
-  using UnityEngine;
-
-  /// <summary>
-  /// In-Game IMGUI style used for the <see cref="FusionBootstrapDebugGUI"/> interface.
-  /// </summary>
-  public static class FusionScalableIMGUI {
-    private static GUISkin _scalableSkin;
-
-    private static void InitializedGUIStyles(GUISkin baseSkin) {
-      _scalableSkin = baseSkin == null ? GUI.skin : baseSkin;
-
-      // If no skin was provided, make the built in GuiSkin more tolerable.
-      if (baseSkin == null) {
-        _scalableSkin = GUI.skin;
-        _scalableSkin.button.alignment = TextAnchor.MiddleCenter;
-        _scalableSkin.label.alignment = TextAnchor.MiddleCenter;
-        _scalableSkin.textField.alignment = TextAnchor.MiddleCenter;
-
-        _scalableSkin.button.normal.background = _scalableSkin.box.normal.background;
-        _scalableSkin.button.hover.background = _scalableSkin.window.normal.background;
-
-        _scalableSkin.button.normal.textColor = new Color(.8f, .8f, .8f);
-        _scalableSkin.button.hover.textColor = new Color(1f, 1f, 1f);
-        _scalableSkin.button.active.textColor = new Color(1f, 1f, 1f);
-        _scalableSkin.button.border = new RectOffset(6, 6, 6, 6);
-        _scalableSkin.window.border = new RectOffset(8, 8, 8, 10);
-      } else {
-        // Use the supplied skin as the base.
-        _scalableSkin = baseSkin;
-      }
-    }
+namespace Fusion
+{
+    using UnityEngine;
 
     /// <summary>
-    /// Get the custom scalable skin, already resized to the current screen. Provides the height, width, padding and margin used.
+    /// In-Game IMGUI style used for the <see cref="FusionBootstrapDebugGUI"/> interface.
     /// </summary>
-    /// <returns></returns>
-    public static GUISkin GetScaledSkin(GUISkin baseSkin, out float height, out float width, out int padding, out int margin, out float boxLeft) {
+    public static class FusionScalableIMGUI
+    {
+        private static GUISkin _scalableSkin;
 
-      if (_scalableSkin == null) {
-        InitializedGUIStyles(baseSkin);
-      }
+        private static void InitializedGUIStyles(GUISkin baseSkin)
+        {
+            _scalableSkin = baseSkin == null ? GUI.skin : baseSkin;
 
-      var dimensions = ScaleGuiSkinToScreenHeight();
-      height = dimensions.Item1;
-      width = dimensions.Item2;
-      padding = dimensions.Item3;
-      margin = dimensions.Item4;
-      boxLeft = dimensions.Item5;
-      return _scalableSkin;
+            // If no skin was provided, make the built in GuiSkin more tolerable.
+            if (baseSkin == null)
+            {
+                _scalableSkin = GUI.skin;
+                _scalableSkin.button.alignment = TextAnchor.MiddleCenter;
+                _scalableSkin.label.alignment = TextAnchor.MiddleCenter;
+                _scalableSkin.textField.alignment = TextAnchor.MiddleCenter;
+
+                _scalableSkin.button.normal.background = _scalableSkin.box.normal.background;
+                _scalableSkin.button.hover.background = _scalableSkin.window.normal.background;
+
+                _scalableSkin.button.normal.textColor = new Color(.8f, .8f, .8f);
+                _scalableSkin.button.hover.textColor = new Color(1f, 1f, 1f);
+                _scalableSkin.button.active.textColor = new Color(1f, 1f, 1f);
+                _scalableSkin.button.border = new RectOffset(6, 6, 6, 6);
+                _scalableSkin.window.border = new RectOffset(8, 8, 8, 10);
+            }
+            else
+            {
+                // Use the supplied skin as the base.
+                _scalableSkin = baseSkin;
+            }
+        }
+
+        /// <summary>
+        /// Get the custom scalable skin, already resized to the current screen. Provides the height, width, padding and margin used.
+        /// </summary>
+        /// <returns></returns>
+        public static GUISkin GetScaledSkin(GUISkin baseSkin, out float height, out float width, out int padding, out int margin, out float boxLeft)
+        {
+
+            if (_scalableSkin == null)
+            {
+                InitializedGUIStyles(baseSkin);
+            }
+
+            var dimensions = ScaleGuiSkinToScreenHeight();
+            height = dimensions.Item1;
+            width = dimensions.Item2;
+            padding = dimensions.Item3;
+            margin = dimensions.Item4;
+            boxLeft = dimensions.Item5;
+            return _scalableSkin;
+        }
+
+        /// <summary>
+        /// Modifies a skin to make it scale with screen height.
+        /// </summary>
+        /// <param name="skin"></param>
+        /// <returns>Returns (height, width, padding, top-margin, left-box-margin) values applied to the GuiSkin</returns>
+        public static (float, float, int, int, float) ScaleGuiSkinToScreenHeight()
+        {
+
+            bool isVerticalAspect = Screen.height > Screen.width;
+            bool isSuperThin = Screen.height / Screen.width > (17f / 9f);
+
+            float height = Screen.height * .08f;
+            float width = System.Math.Min(Screen.width * .9f, Screen.height * .6f);
+            int padding = (int)(height / 4);
+            int margin = (int)(height / 8);
+            float boxLeft = (Screen.width - width) * .5f;
+
+            int fontsize = (int)(isSuperThin ? (width - (padding * 2)) * .07f : height * .4f);
+            var margins = new RectOffset(0, 0, margin, margin);
+
+            _scalableSkin.button.fontSize = fontsize;
+            _scalableSkin.button.margin = margins;
+            _scalableSkin.label.fontSize = fontsize;
+            _scalableSkin.label.padding = new RectOffset(padding, padding, padding, padding);
+            _scalableSkin.textField.fontSize = fontsize;
+            _scalableSkin.window.padding = new RectOffset(padding, padding, padding, padding);
+            _scalableSkin.window.margin = new RectOffset(margin, margin, margin, margin);
+
+            return (height, width, padding, margin, boxLeft);
+        }
     }
-
-    /// <summary>
-    /// Modifies a skin to make it scale with screen height.
-    /// </summary>
-    /// <param name="skin"></param>
-    /// <returns>Returns (height, width, padding, top-margin, left-box-margin) values applied to the GuiSkin</returns>
-    public static (float, float, int, int, float) ScaleGuiSkinToScreenHeight() {
-
-      bool isVerticalAspect = Screen.height > Screen.width;
-      bool isSuperThin = Screen.height / Screen.width > (17f / 9f);
-
-      float height = Screen.height * .08f;
-      float width = System.Math.Min(Screen.width * .9f, Screen.height * .6f);
-      int padding = (int)(height / 4);
-      int margin = (int)(height / 8);
-      float boxLeft = (Screen.width - width) * .5f;
-
-      int fontsize = (int)(isSuperThin ? (width - (padding * 2)) * .07f : height * .4f);
-      var margins = new RectOffset(0, 0, margin, margin);
-
-      _scalableSkin.button.fontSize = fontsize;
-      _scalableSkin.button.margin = margins;
-      _scalableSkin.label.fontSize = fontsize;
-      _scalableSkin.label.padding = new RectOffset(padding, padding, padding, padding);
-      _scalableSkin.textField.fontSize = fontsize;
-      _scalableSkin.window.padding = new RectOffset(padding, padding, padding, padding);
-      _scalableSkin.window.margin = new RectOffset(margin, margin, margin, margin);
-
-      return (height, width, padding, margin, boxLeft);
-    }
-  }
 }
 
 #endregion
@@ -3567,237 +3954,286 @@ namespace Fusion {
 
 #region Assets/Photon/Fusion/Runtime/Utilities/FusionUnitySceneManagerUtils.cs
 
-﻿namespace Fusion {
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using System.Text;
-  using System.Threading.Tasks;
-  using UnityEditor;
-  using UnityEngine;
-  using UnityEngine.SceneManagement;
+namespace Fusion
+{
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using UnityEditor;
+    using UnityEngine;
+    using UnityEngine.SceneManagement;
 
-  public static class FusionUnitySceneManagerUtils {
+    public static class FusionUnitySceneManagerUtils
+    {
 
-    public class SceneEqualityComparer : IEqualityComparer<Scene> {
-      public bool Equals(Scene x, Scene y) {
-        return x.handle == y.handle;
-      }
+        public class SceneEqualityComparer : IEqualityComparer<Scene>
+        {
+            public bool Equals(Scene x, Scene y)
+            {
+                return x.handle == y.handle;
+            }
 
-      public int GetHashCode(Scene obj) {
-        return obj.handle;
-      }
-    }
+            public int GetHashCode(Scene obj)
+            {
+                return obj.handle;
+            }
+        }
 
-    public static bool IsAddedToBuildSettings(this Scene scene) {
-      if (scene.buildIndex < 0) {
-        return false;
-      }
-      // yep that's a thing: https://docs.unity3d.com/ScriptReference/SceneManagement.Scene-buildIndex.html
-      if (scene.buildIndex >= SceneManager.sceneCountInBuildSettings) {
-        return false;
-      }
-      return true;
-    }
+        public static bool IsAddedToBuildSettings(this Scene scene)
+        {
+            if (scene.buildIndex < 0)
+            {
+                return false;
+            }
+            // yep that's a thing: https://docs.unity3d.com/ScriptReference/SceneManagement.Scene-buildIndex.html
+            if (scene.buildIndex >= SceneManager.sceneCountInBuildSettings)
+            {
+                return false;
+            }
+            return true;
+        }
 
 #if UNITY_EDITOR
-    public static bool AddToBuildSettings(Scene scene) {
-      if (IsAddedToBuildSettings(scene)) {
-        return false;
-      }
+        public static bool AddToBuildSettings(Scene scene)
+        {
+            if (IsAddedToBuildSettings(scene))
+            {
+                return false;
+            }
 
-      EditorBuildSettings.scenes =
-        new[] { new EditorBuildSettingsScene(scene.path, true) }
-        .Concat(EditorBuildSettings.scenes)
-        .ToArray();
+            EditorBuildSettings.scenes =
+              new[] { new EditorBuildSettingsScene(scene.path, true) }
+              .Concat(EditorBuildSettings.scenes)
+              .ToArray();
 
-      Debug.Log($"Added '{scene.path}' as first entry in Build Settings.");
-      return true;
-    }
+            Debug.Log($"Added '{scene.path}' as first entry in Build Settings.");
+            return true;
+        }
 #endif
 
-    public static LocalPhysicsMode GetLocalPhysicsMode(this Scene scene) {
-      LocalPhysicsMode mode = LocalPhysicsMode.None;
-      if (scene.GetPhysicsScene() != Physics.defaultPhysicsScene) {
-        mode |= LocalPhysicsMode.Physics3D;
-      }
-      if (scene.GetPhysicsScene2D() != Physics2D.defaultPhysicsScene) {
-        mode |= LocalPhysicsMode.Physics2D;
-      }
-      return mode;
-    }
-
-    /// <summary>
-    /// Finds all components of type <typeparam name="T"/> in the scene.
-    /// </summary>
-    /// <param name="scene"></param>
-    /// <param name="includeInactive"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static T[] GetComponents<T>(this Scene scene, bool includeInactive) where T : Component {
-      return GetComponents<T>(scene, includeInactive, out _);
-    }
-    
-    /// <summary>
-    /// Finds all components of type <typeparam name="T"/> in the scene.
-    /// </summary>
-    /// <param name="scene"></param>
-    /// <param name="includeInactive"></param>
-    /// <param name="rootObjects"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static T[] GetComponents<T>(this Scene scene, bool includeInactive, out GameObject[] rootObjects) where T : Component {
-      rootObjects = scene.GetRootGameObjects();
-      
-      var partialResult = new List<T>();
-      var result        = new List<T>();
-
-      foreach (var go in rootObjects) {
-        // depth-first, according to docs and verified by our tests
-        go.GetComponentsInChildren(includeInactive: includeInactive, partialResult);
-        // AddRange accepts IEnumerable, so there would be an alloc
-        foreach (var comp in partialResult) {
-          result.Add(comp);
-        }
-      }
-      return result.ToArray(); 
-    }
-    
-    private static readonly List<GameObject> _reusableGameObjectList = new List<GameObject>();
-    
-    /// <summary>
-    /// Finds all components of type <typeparam name="T"/> in the scene.
-    /// </summary>
-    /// <param name="scene"></param>
-    /// <param name="results"></param>
-    /// <param name="includeInactive"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static void GetComponents<T>(this Scene scene, List<T> results, bool includeInactive) where T : Component {
-      var rootObjects = _reusableGameObjectList;
-      scene.GetRootGameObjects(rootObjects);
-      results.Clear();
-      
-      var partialResult = new List<T>();
-
-      foreach (var go in rootObjects) {
-        // depth-first, according to docs and verified by our tests
-        go.GetComponentsInChildren(includeInactive: includeInactive, partialResult);
-        // AddRange accepts IEnumerable, so there would be an alloc
-        foreach (var comp in partialResult) {
-          results.Add(comp);
-        }
-      }
-    }
-    
-    /// <summary>
-    /// Finds the first instance of type <typeparam name="T"/> in the scene. Returns null if no instance found.
-    /// </summary>
-    /// <param name="scene"></param>
-    /// <param name="includeInactive"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static T FindComponent<T>(this Scene scene, bool includeInactive = false) where T : Component {
-      var rootObjects = _reusableGameObjectList;
-      scene.GetRootGameObjects(rootObjects);
-
-      foreach (var go in rootObjects) {
-        // depth-first, according to docs and verified by our tests
-        var found = go.GetComponentInChildren<T>(includeInactive);
-        if (found != null) {
-          return found;
-        }
-      }
-      return null;
-    }
-
-    public static bool CanBeUnloaded(this Scene scene) {
-      if (!scene.isLoaded) {
-        return false;
-      }
-      
-      for (int i = 0; i < SceneManager.sceneCount; ++i) {
-        var s = SceneManager.GetSceneAt(i);
-        if (s != scene && s.isLoaded) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public static string Dump(this Scene scene) {
-      StringBuilder result = new StringBuilder();
-
-      result.Append("[UnityScene:");
-      
-      if (scene.IsValid()) {
-        result.Append(scene.name);
-        result.Append(", isLoaded:").Append(scene.isLoaded);
-        result.Append(", buildIndex:").Append(scene.buildIndex);
-        result.Append(", isDirty:").Append(scene.isDirty);
-        result.Append(", path:").Append(scene.path);
-        result.Append(", rootCount:").Append(scene.rootCount);
-        result.Append(", isSubScene:").Append(scene.isSubScene);
-      } else {
-        result.Append("<Invalid>");
-      }
-
-      result.Append(", handle:").Append(scene.handle);
-      result.Append("]");
-      return result.ToString();
-    }
-
-    public static string Dump(this LoadSceneParameters loadSceneParameters) {
-      return $"[LoadSceneParameters: {loadSceneParameters.loadSceneMode}, localPhysicsMode:{loadSceneParameters.localPhysicsMode}]";
-    }
-    
-    public static int GetSceneBuildIndex(string nameOrPath) {
-      if (nameOrPath.IndexOf('/') >= 0) {
-        return SceneUtility.GetBuildIndexByScenePath(nameOrPath);
-      } else {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; ++i) {
-          var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-          GetFileNameWithoutExtensionPosition(scenePath, out var nameIndex, out var nameLength);
-          if (nameLength == nameOrPath.Length && string.Compare(scenePath, nameIndex, nameOrPath, 0, nameLength, true) == 0) {
-            return i;
-          }
+        public static LocalPhysicsMode GetLocalPhysicsMode(this Scene scene)
+        {
+            LocalPhysicsMode mode = LocalPhysicsMode.None;
+            if (scene.GetPhysicsScene() != Physics.defaultPhysicsScene)
+            {
+                mode |= LocalPhysicsMode.Physics3D;
+            }
+            if (scene.GetPhysicsScene2D() != Physics2D.defaultPhysicsScene)
+            {
+                mode |= LocalPhysicsMode.Physics2D;
+            }
+            return mode;
         }
 
-        return -1;
-      }
-    }
-    
-    public static int GetSceneIndex(IList<string> scenePathsOrNames, string nameOrPath) {
-      if (nameOrPath.IndexOf('/') >= 0) {
-        return scenePathsOrNames.IndexOf(nameOrPath);
-      } else {
-        for (int i = 0; i < scenePathsOrNames.Count; ++i) {
-          var scenePath = scenePathsOrNames[i];
-          GetFileNameWithoutExtensionPosition(scenePath, out var nameIndex, out var nameLength);
-          if (nameLength == nameOrPath.Length && string.Compare(scenePath, nameIndex, nameOrPath, 0, nameLength, true) == 0) {
-            return i;
-          }
+        /// <summary>
+        /// Finds all components of type <typeparam name="T"/> in the scene.
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="includeInactive"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T[] GetComponents<T>(this Scene scene, bool includeInactive) where T : Component
+        {
+            return GetComponents<T>(scene, includeInactive, out _);
         }
-        return -1;
-      }
-    }
 
-    public static void GetFileNameWithoutExtensionPosition(string nameOrPath, out int index, out int length) {
-      var lastSlash = nameOrPath.LastIndexOf('/');
-      if (lastSlash >= 0) {
-        index = lastSlash + 1;
-      } else {
-        index = 0;
-      }
+        /// <summary>
+        /// Finds all components of type <typeparam name="T"/> in the scene.
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="includeInactive"></param>
+        /// <param name="rootObjects"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T[] GetComponents<T>(this Scene scene, bool includeInactive, out GameObject[] rootObjects) where T : Component
+        {
+            rootObjects = scene.GetRootGameObjects();
 
-      var lastDot = nameOrPath.LastIndexOf('.');
-      if (lastDot > index) {
-        length = lastDot - index;
-      } else {
-        length = nameOrPath.Length - index;
-      }
+            var partialResult = new List<T>();
+            var result = new List<T>();
+
+            foreach (var go in rootObjects)
+            {
+                // depth-first, according to docs and verified by our tests
+                go.GetComponentsInChildren(includeInactive: includeInactive, partialResult);
+                // AddRange accepts IEnumerable, so there would be an alloc
+                foreach (var comp in partialResult)
+                {
+                    result.Add(comp);
+                }
+            }
+            return result.ToArray();
+        }
+
+        private static readonly List<GameObject> _reusableGameObjectList = new List<GameObject>();
+
+        /// <summary>
+        /// Finds all components of type <typeparam name="T"/> in the scene.
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="results"></param>
+        /// <param name="includeInactive"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static void GetComponents<T>(this Scene scene, List<T> results, bool includeInactive) where T : Component
+        {
+            var rootObjects = _reusableGameObjectList;
+            scene.GetRootGameObjects(rootObjects);
+            results.Clear();
+
+            var partialResult = new List<T>();
+
+            foreach (var go in rootObjects)
+            {
+                // depth-first, according to docs and verified by our tests
+                go.GetComponentsInChildren(includeInactive: includeInactive, partialResult);
+                // AddRange accepts IEnumerable, so there would be an alloc
+                foreach (var comp in partialResult)
+                {
+                    results.Add(comp);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finds the first instance of type <typeparam name="T"/> in the scene. Returns null if no instance found.
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="includeInactive"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T FindComponent<T>(this Scene scene, bool includeInactive = false) where T : Component
+        {
+            var rootObjects = _reusableGameObjectList;
+            scene.GetRootGameObjects(rootObjects);
+
+            foreach (var go in rootObjects)
+            {
+                // depth-first, according to docs and verified by our tests
+                var found = go.GetComponentInChildren<T>(includeInactive);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+            return null;
+        }
+
+        public static bool CanBeUnloaded(this Scene scene)
+        {
+            if (!scene.isLoaded)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < SceneManager.sceneCount; ++i)
+            {
+                var s = SceneManager.GetSceneAt(i);
+                if (s != scene && s.isLoaded)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static string Dump(this Scene scene)
+        {
+            StringBuilder result = new StringBuilder();
+
+            result.Append("[UnityScene:");
+
+            if (scene.IsValid())
+            {
+                result.Append(scene.name);
+                result.Append(", isLoaded:").Append(scene.isLoaded);
+                result.Append(", buildIndex:").Append(scene.buildIndex);
+                result.Append(", isDirty:").Append(scene.isDirty);
+                result.Append(", path:").Append(scene.path);
+                result.Append(", rootCount:").Append(scene.rootCount);
+                result.Append(", isSubScene:").Append(scene.isSubScene);
+            }
+            else
+            {
+                result.Append("<Invalid>");
+            }
+
+            result.Append(", handle:").Append(scene.handle);
+            result.Append("]");
+            return result.ToString();
+        }
+
+        public static string Dump(this LoadSceneParameters loadSceneParameters)
+        {
+            return $"[LoadSceneParameters: {loadSceneParameters.loadSceneMode}, localPhysicsMode:{loadSceneParameters.localPhysicsMode}]";
+        }
+
+        public static int GetSceneBuildIndex(string nameOrPath)
+        {
+            if (nameOrPath.IndexOf('/') >= 0)
+            {
+                return SceneUtility.GetBuildIndexByScenePath(nameOrPath);
+            }
+            else
+            {
+                for (int i = 0; i < SceneManager.sceneCountInBuildSettings; ++i)
+                {
+                    var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+                    GetFileNameWithoutExtensionPosition(scenePath, out var nameIndex, out var nameLength);
+                    if (nameLength == nameOrPath.Length && string.Compare(scenePath, nameIndex, nameOrPath, 0, nameLength, true) == 0)
+                    {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }
+        }
+
+        public static int GetSceneIndex(IList<string> scenePathsOrNames, string nameOrPath)
+        {
+            if (nameOrPath.IndexOf('/') >= 0)
+            {
+                return scenePathsOrNames.IndexOf(nameOrPath);
+            }
+            else
+            {
+                for (int i = 0; i < scenePathsOrNames.Count; ++i)
+                {
+                    var scenePath = scenePathsOrNames[i];
+                    GetFileNameWithoutExtensionPosition(scenePath, out var nameIndex, out var nameLength);
+                    if (nameLength == nameOrPath.Length && string.Compare(scenePath, nameIndex, nameOrPath, 0, nameLength, true) == 0)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+        }
+
+        public static void GetFileNameWithoutExtensionPosition(string nameOrPath, out int index, out int length)
+        {
+            var lastSlash = nameOrPath.LastIndexOf('/');
+            if (lastSlash >= 0)
+            {
+                index = lastSlash + 1;
+            }
+            else
+            {
+                index = 0;
+            }
+
+            var lastDot = nameOrPath.LastIndexOf('.');
+            if (lastDot > index)
+            {
+                length = lastDot - index;
+            }
+            else
+            {
+                length = nameOrPath.Length - index;
+            }
+        }
     }
-  }
 }
 
 
@@ -3808,30 +4244,32 @@ namespace Fusion {
 
 namespace Fusion
 {
-  using System.Collections.Generic;
-  using System.Linq;
-  using UnityEngine;
-  using Analyzer;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Analyzer;
+    using UnityEngine;
 
-    public static class NetworkRunnerVisibilityExtensions {
-   
-      // TODO: Still needed?
-      [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-      private static void ResetAllSimulationStatics() {
-        ResetStatics();
-      }
-      
-      /// <summary>
-      /// Types that fusion.runtime isn't aware of, which need to be found using names instead.
-      /// </summary>
-      [StaticField(StaticFieldResetMode.None)]
-      private static readonly string[] RecognizedBehaviourNames = 
-      {
+    public static class NetworkRunnerVisibilityExtensions
+    {
+
+        // TODO: Still needed?
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetAllSimulationStatics()
+        {
+            ResetStatics();
+        }
+
+        /// <summary>
+        /// Types that fusion.runtime isn't aware of, which need to be found using names instead.
+        /// </summary>
+        [StaticField(StaticFieldResetMode.None)]
+        private static readonly string[] RecognizedBehaviourNames =
+        {
         "EventSystem"
       };
-      
-      [StaticField(StaticFieldResetMode.None)]
-      private static readonly System.Type[] RecognizedBehaviourTypes = {
+
+        [StaticField(StaticFieldResetMode.None)]
+        private static readonly System.Type[] RecognizedBehaviourTypes = {
         typeof(IRunnerVisibilityRecognizedType),
         typeof(Renderer),
         typeof(AudioListener),
@@ -3840,336 +4278,395 @@ namespace Fusion
         typeof(Light)
       };
 
-      
-      private static readonly Dictionary<NetworkRunner, RunnerVisibility> DictionaryLookup;
 
-      // Constructor
-      static NetworkRunnerVisibilityExtensions() {
-        DictionaryLookup = new Dictionary<NetworkRunner, RunnerVisibility>();
-      }
+        private static readonly Dictionary<NetworkRunner, RunnerVisibility> DictionaryLookup;
 
-      private class RunnerVisibility {
-        public bool IsVisible { get; set; } = true;
-
-        public LinkedList<RunnerVisibilityLink> Nodes = new LinkedList<RunnerVisibilityLink>();
-      }
-
-      private static bool _commonLinksWithMissingInputAuthNeedRefresh;
-
-      public static void RetryRefreshCommonLinks() {
-        _commonLinksWithMissingInputAuthNeedRefresh = false;
-        RefreshCommonObjectVisibilities();
-      }
-
-      public static void EnableVisibilityExtension(this NetworkRunner runner) {
-        if (runner && DictionaryLookup.ContainsKey(runner) == false) {
-          DictionaryLookup.Add(runner, new RunnerVisibility());
-        }
-      }
-
-      public static void DisableVisibilityExtension(this NetworkRunner runner) {
-        if (runner && DictionaryLookup.ContainsKey(runner)) {
-          DictionaryLookup.Remove(runner);
-        }
-      }
-      
-      public static bool HasVisibilityEnabled(this NetworkRunner runner) {
-        return DictionaryLookup.ContainsKey(runner);
-      }
-      
-      public static bool GetVisible(this NetworkRunner runner) {
-        if (runner == null) {
-          return false;
-        }
-        
-        if (DictionaryLookup.TryGetValue(runner, out var runnerVisibility) == false) {
-          return true;
+        // Constructor
+        static NetworkRunnerVisibilityExtensions()
+        {
+            DictionaryLookup = new Dictionary<NetworkRunner, RunnerVisibility>();
         }
 
-        return runnerVisibility.IsVisible;
-      }
+        private class RunnerVisibility
+        {
+            public bool IsVisible { get; set; } = true;
 
-      public static void SetVisible(this NetworkRunner runner, bool isVisibile) {
-        runner.GetVisibilityInfo().IsVisible = isVisibile;
-        RefreshRunnerVisibility(runner);
-      }
-
-      private static LinkedList<RunnerVisibilityLink> GetVisibilityNodes(this NetworkRunner runner) {
-        if (runner == false) {
-          return null;
-        }
-        return runner.GetVisibilityInfo()?.Nodes;
-      }
-
-      private static RunnerVisibility GetVisibilityInfo(this NetworkRunner runner) {
-        if (DictionaryLookup.TryGetValue(runner, out var runnerVisibility) == false) {
-          return null;
+            public LinkedList<RunnerVisibilityLink> Nodes = new LinkedList<RunnerVisibilityLink>();
         }
 
-        return runnerVisibility;
-      }
-      
-      /// <summary>
-      /// Find all component types that contribute to a scene rendering, and associate them with a <see cref="RunnerVisibilityLink"/> component, 
-      /// and add them to the runner's list of visibility nodes.
-      /// </summary>
-      /// <param name="go"></param>
-      /// <param name="runner"></param>
-      public static void AddVisibilityNodes(this NetworkRunner runner, GameObject go) {
-        runner.EnableVisibilityExtension();
+        private static bool _commonLinksWithMissingInputAuthNeedRefresh;
 
-        // Check for flag component which indicates object has already been cataloged.
-        if (go.GetComponent<RunnerVisibilityLinksRoot>()) {return;}
-      
-        go.AddComponent<RunnerVisibilityLinksRoot>();
-
-        // Have user EnableOnSingleRunner add RunnerVisibilityControl before we process all nodes.
-        var existingEnableOnSingles = go.transform.GetComponentsInChildren<EnableOnSingleRunner>(true);
-        List<RunnerVisibilityLink> existingNodes = go.GetComponentsInChildren<RunnerVisibilityLink>(false).ToList();
-      
-        foreach (var enableOnSingleRunner in existingEnableOnSingles) {
-          enableOnSingleRunner.AddNodes(existingNodes);
+        public static void RetryRefreshCommonLinks()
+        {
+            _commonLinksWithMissingInputAuthNeedRefresh = false;
+            RefreshCommonObjectVisibilities();
         }
 
-        CollectBehavioursAndAddNodes(go, runner, existingNodes);
+        public static void EnableVisibilityExtension(this NetworkRunner runner)
+        {
+            if (runner && DictionaryLookup.ContainsKey(runner) == false)
+            {
+                DictionaryLookup.Add(runner, new RunnerVisibility());
+            }
+        }
 
-        RefreshRunnerVisibility(runner);
-      }
+        public static void DisableVisibilityExtension(this NetworkRunner runner)
+        {
+            if (runner && DictionaryLookup.ContainsKey(runner))
+            {
+                DictionaryLookup.Remove(runner);
+            }
+        }
 
-      private static void CollectBehavioursAndAddNodes(GameObject go, NetworkRunner runner, List<RunnerVisibilityLink> existingNodes) {
+        public static bool HasVisibilityEnabled(this NetworkRunner runner)
+        {
+            return DictionaryLookup.ContainsKey(runner);
+        }
 
-        // If any changes are made to the commons, we need a full refresh.
-        var commonsNeedRefresh = false;
-
-        var components = go.transform.GetComponentsInChildren<Component>(true);
-        foreach (var comp in components) {
-          var nodeAlreadyExists = false;
-
-          // Check for broken/missing components
-          if (comp == null) continue;
-          // See if devs added a node for this behaviour already
-          foreach (var existingNode in existingNodes)
-            if (existingNode.Component == comp) {
-              nodeAlreadyExists = true;
-              if (existingNode.IsOnSingleRunner) {
-                AddNodeToCommonLookup(existingNode);
-                RegisterNode(existingNode, runner, comp);
-                commonsNeedRefresh = true;
-              }
-              break;
+        public static bool GetVisible(this NetworkRunner runner)
+        {
+            if (runner == null)
+            {
+                return false;
             }
 
-          if (nodeAlreadyExists)
-            continue;
-
-          // No existing node was found, create one if this comp is a recognized render type
-
-          var type = comp.GetType();
-          // Only add if comp is one of the behaviours considered render related.
-          if (IsRecognizedByRunnerVisibility(type)) {
-            var node = comp.gameObject.AddComponent<RunnerVisibilityLink>();
-            RegisterNode(node, runner, comp);
-          }
-        }
-
-        if (commonsNeedRefresh) {
-          _commonLinksWithMissingInputAuthNeedRefresh = true;
-          RefreshCommonObjectVisibilities();
-        }
-      }
-
-      internal static bool IsRecognizedByRunnerVisibility(this System.Type type) {
-        // First try the faster type based lookup
-        foreach (var recognizedType in RecognizedBehaviourTypes) {
-          if (recognizedType.IsAssignableFrom(type))
-            return true;
-        }
-
-        // The try the slower string based (for namespace references not included in the Fusion core).
-        var typename = type.Name;
-        foreach (var recognizedNames in RecognizedBehaviourNames) {
-          if (typename.Contains(recognizedNames))
-            return true;
-        }
-
-        return false;
-      }
-      
-      private static void RegisterNode(RunnerVisibilityLink link, NetworkRunner runner, Component comp) {
-// #if DEBUG
-//         if (runner.GetVisibilityNodes().Contains(node))
-//           Log.Warn($"{nameof(RunnerVisibilityNode)} on '{node.name}' already has been registered.");
-// #endif
-
-        runner.GetVisibilityNodes().AddLast(link);
-        link.Initialize(comp, runner);
-      }
-
-      public static void UnregisterNode(this RunnerVisibilityLink link) {
-
-        if (link == null || link._runner == null) {
-          return;
-        }
-
-        var runner                  = link._runner;
-        var runnerIsNullOrDestroyed = !(runner);
-
-        if (!runnerIsNullOrDestroyed) {
-          var visNodes = link._runner.GetVisibilityNodes();
-          if (visNodes == null) {
-            // No VisibilityNodes collection, likely a shutdown condition.
-            return;
-          } 
-        }
-
-        if (runnerIsNullOrDestroyed == false && runner.GetVisibilityNodes().Contains(link)) {
-          runner.GetVisibilityNodes().Remove(link);
-        }
-
-        // // Remove from the Runner list.
-        // if (!ReferenceEquals(node, null) && node._node != null && node._node.List != null) {
-        //   node._node.List.Remove(node);
-        // }
-
-        if (link.Guid != null) {
-
-          if (CommonObjectLookup.TryGetValue(link.Guid, out var clones)) {
-            if (clones.Contains(link)) {
-              clones.Remove(link);
+            if (DictionaryLookup.TryGetValue(runner, out var runnerVisibility) == false)
+            {
+                return true;
             }
 
-            // if this is the last instance of this _guid... remove the entry from the lookup.
-            if (clones.Count == 0) {
-              CommonObjectLookup.Remove(link.Guid);
+            return runnerVisibility.IsVisible;
+        }
+
+        public static void SetVisible(this NetworkRunner runner, bool isVisibile)
+        {
+            runner.GetVisibilityInfo().IsVisible = isVisibile;
+            RefreshRunnerVisibility(runner);
+        }
+
+        private static LinkedList<RunnerVisibilityLink> GetVisibilityNodes(this NetworkRunner runner)
+        {
+            if (runner == false)
+            {
+                return null;
             }
-          }
-        }
-      }
-
-
-      private static void AddNodeToCommonLookup(RunnerVisibilityLink link) {
-        var guid = link.Guid;
-        if (string.IsNullOrEmpty(guid))
-          return;
-
-        if (!CommonObjectLookup.TryGetValue(guid, out var clones)) {
-          clones = new List<RunnerVisibilityLink>();
-          CommonObjectLookup.Add(guid, clones);
-        }
-        clones.Add(link);
-      }
-      
-      /// <summary>
-      /// Reapplies a runner's IsVisibile setting to all of its registered visibility nodes.
-      /// </summary>
-      /// <param name="runner"></param>
-      /// <param name="refreshCommonObjects"></param>
-      private static void RefreshRunnerVisibility(NetworkRunner runner, bool refreshCommonObjects = true) {
-
-        // Trying to refresh before the runner has setup.
-        if (runner.GetVisibilityNodes() == null) {
-          //Log.Warn($"{nameof(NetworkRunner)} visibility can't be changed. Not ready yet.");
-          return;
+            return runner.GetVisibilityInfo()?.Nodes;
         }
 
-        bool enable = runner.GetVisible();
-
-        foreach (var node in runner.GetVisibilityNodes()) {
-
-          // This should never be null, but just in case...
-          if (node == null) {
-            continue;
-          }
-          node.SetEnabled(enable);
-        }
-        if (refreshCommonObjects) {
-          RefreshCommonObjectVisibilities();
-        }
-      }
-      
-      
-      /// <summary>
-      /// Dictionary lookup for manually added visibility nodes (which indicates only one instance should be visible at a time), 
-      /// which returns a list of nodes for a given LocalIdentifierInFile.
-      /// </summary>
-      [StaticField]
-      private readonly static Dictionary<string, List<RunnerVisibilityLink>> CommonObjectLookup = new Dictionary<string, List<RunnerVisibilityLink>>();
-      
-      internal static void RefreshCommonObjectVisibilities() {
-        var runners = NetworkRunner.GetInstancesEnumerator();
-        NetworkRunner serverRunner = null;
-        NetworkRunner clientRunner = null;
-        NetworkRunner firstRunner = null;
-        bool foundInputAuth = false;
-
-        // First find the runner for each preference.
-        while (runners.MoveNext()) {
-          var runner = runners.Current;
-          // Exclude inactive runners TODO: may not be needed after this list is patched to contain only active
-          if (!runner.IsRunning || !runner.GetVisible() || runner.IsShutdown)
-            continue;
-
-          if (runner.IsServer) {
-            serverRunner = runner;
-          }
-          
-          if (!clientRunner && runner.GameMode != GameMode.Server) {
-            clientRunner = runner;
-          }
-
-          if (!firstRunner) {
-            firstRunner = runner;
-          }
-        }
-
-        // loop all common objects, making sure to activate only one peer instance.
-        foreach (var kvp in CommonObjectLookup) {
-          var clones = kvp.Value;
-          if (clones.Count > 0) {
-            NetworkRunner prefRunner;
-            var firstClone = clones[0];
-
-            switch (firstClone.PreferredRunner) {
-              case RunnerVisibilityLink.PreferredRunners.Server:
-                prefRunner = serverRunner;
-                break;
-              case RunnerVisibilityLink.PreferredRunners.Client:
-                prefRunner = clientRunner;
-                break;
-              case RunnerVisibilityLink.PreferredRunners.Auto:
-                prefRunner = firstRunner;
-                break;
-              default:
-                prefRunner = null;
-                break;
+        private static RunnerVisibility GetVisibilityInfo(this NetworkRunner runner)
+        {
+            if (DictionaryLookup.TryGetValue(runner, out var runnerVisibility) == false)
+            {
+                return null;
             }
 
-            foundInputAuth = false;
-            foreach (var clone in clones) {
-              if (clone.PreferredRunner == RunnerVisibilityLink.PreferredRunners.InputAuthority) {
-                var inputFound = clone.IsInputAuth();
-                clone.Enabled = inputFound && clone._runner.GetVisible();
-                foundInputAuth |= inputFound;
-              } else {
-                clone.Enabled = ReferenceEquals(clone._runner, prefRunner);
-              }
-            }
-
-            if (firstClone.PreferredRunner == RunnerVisibilityLink.PreferredRunners.InputAuthority) {
-              if (foundInputAuth == false && _commonLinksWithMissingInputAuthNeedRefresh) {
-                // Signal to refresh later when the object has input information.
-                _commonLinksWithMissingInputAuthNeedRefresh = false;
-                firstClone.InvokeRefreshCommonObjectVisibilities(1f);
-              }
-            }
-          }
+            return runnerVisibility;
         }
-      }
 
-      [StaticFieldResetMethod]
-      internal static void ResetStatics() {
-        CommonObjectLookup.Clear();
-      }
+        /// <summary>
+        /// Find all component types that contribute to a scene rendering, and associate them with a <see cref="RunnerVisibilityLink"/> component, 
+        /// and add them to the runner's list of visibility nodes.
+        /// </summary>
+        /// <param name="go"></param>
+        /// <param name="runner"></param>
+        public static void AddVisibilityNodes(this NetworkRunner runner, GameObject go)
+        {
+            runner.EnableVisibilityExtension();
+
+            // Check for flag component which indicates object has already been cataloged.
+            if (go.GetComponent<RunnerVisibilityLinksRoot>()) { return; }
+
+            go.AddComponent<RunnerVisibilityLinksRoot>();
+
+            // Have user EnableOnSingleRunner add RunnerVisibilityControl before we process all nodes.
+            var existingEnableOnSingles = go.transform.GetComponentsInChildren<EnableOnSingleRunner>(true);
+            List<RunnerVisibilityLink> existingNodes = go.GetComponentsInChildren<RunnerVisibilityLink>(false).ToList();
+
+            foreach (var enableOnSingleRunner in existingEnableOnSingles)
+            {
+                enableOnSingleRunner.AddNodes(existingNodes);
+            }
+
+            CollectBehavioursAndAddNodes(go, runner, existingNodes);
+
+            RefreshRunnerVisibility(runner);
+        }
+
+        private static void CollectBehavioursAndAddNodes(GameObject go, NetworkRunner runner, List<RunnerVisibilityLink> existingNodes)
+        {
+
+            // If any changes are made to the commons, we need a full refresh.
+            var commonsNeedRefresh = false;
+
+            var components = go.transform.GetComponentsInChildren<Component>(true);
+            foreach (var comp in components)
+            {
+                var nodeAlreadyExists = false;
+
+                // Check for broken/missing components
+                if (comp == null) continue;
+                // See if devs added a node for this behaviour already
+                foreach (var existingNode in existingNodes)
+                    if (existingNode.Component == comp)
+                    {
+                        nodeAlreadyExists = true;
+                        if (existingNode.IsOnSingleRunner)
+                        {
+                            AddNodeToCommonLookup(existingNode);
+                            RegisterNode(existingNode, runner, comp);
+                            commonsNeedRefresh = true;
+                        }
+                        break;
+                    }
+
+                if (nodeAlreadyExists)
+                    continue;
+
+                // No existing node was found, create one if this comp is a recognized render type
+
+                var type = comp.GetType();
+                // Only add if comp is one of the behaviours considered render related.
+                if (IsRecognizedByRunnerVisibility(type))
+                {
+                    var node = comp.gameObject.AddComponent<RunnerVisibilityLink>();
+                    RegisterNode(node, runner, comp);
+                }
+            }
+
+            if (commonsNeedRefresh)
+            {
+                _commonLinksWithMissingInputAuthNeedRefresh = true;
+                RefreshCommonObjectVisibilities();
+            }
+        }
+
+        internal static bool IsRecognizedByRunnerVisibility(this System.Type type)
+        {
+            // First try the faster type based lookup
+            foreach (var recognizedType in RecognizedBehaviourTypes)
+            {
+                if (recognizedType.IsAssignableFrom(type))
+                    return true;
+            }
+
+            // The try the slower string based (for namespace references not included in the Fusion core).
+            var typename = type.Name;
+            foreach (var recognizedNames in RecognizedBehaviourNames)
+            {
+                if (typename.Contains(recognizedNames))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static void RegisterNode(RunnerVisibilityLink link, NetworkRunner runner, Component comp)
+        {
+            // #if DEBUG
+            //         if (runner.GetVisibilityNodes().Contains(node))
+            //           Log.Warn($"{nameof(RunnerVisibilityNode)} on '{node.name}' already has been registered.");
+            // #endif
+
+            runner.GetVisibilityNodes().AddLast(link);
+            link.Initialize(comp, runner);
+        }
+
+        public static void UnregisterNode(this RunnerVisibilityLink link)
+        {
+
+            if (link == null || link._runner == null)
+            {
+                return;
+            }
+
+            var runner = link._runner;
+            var runnerIsNullOrDestroyed = !(runner);
+
+            if (!runnerIsNullOrDestroyed)
+            {
+                var visNodes = link._runner.GetVisibilityNodes();
+                if (visNodes == null)
+                {
+                    // No VisibilityNodes collection, likely a shutdown condition.
+                    return;
+                }
+            }
+
+            if (runnerIsNullOrDestroyed == false && runner.GetVisibilityNodes().Contains(link))
+            {
+                runner.GetVisibilityNodes().Remove(link);
+            }
+
+            // // Remove from the Runner list.
+            // if (!ReferenceEquals(node, null) && node._node != null && node._node.List != null) {
+            //   node._node.List.Remove(node);
+            // }
+
+            if (link.Guid != null)
+            {
+
+                if (CommonObjectLookup.TryGetValue(link.Guid, out var clones))
+                {
+                    if (clones.Contains(link))
+                    {
+                        clones.Remove(link);
+                    }
+
+                    // if this is the last instance of this _guid... remove the entry from the lookup.
+                    if (clones.Count == 0)
+                    {
+                        CommonObjectLookup.Remove(link.Guid);
+                    }
+                }
+            }
+        }
+
+
+        private static void AddNodeToCommonLookup(RunnerVisibilityLink link)
+        {
+            var guid = link.Guid;
+            if (string.IsNullOrEmpty(guid))
+                return;
+
+            if (!CommonObjectLookup.TryGetValue(guid, out var clones))
+            {
+                clones = new List<RunnerVisibilityLink>();
+                CommonObjectLookup.Add(guid, clones);
+            }
+            clones.Add(link);
+        }
+
+        /// <summary>
+        /// Reapplies a runner's IsVisibile setting to all of its registered visibility nodes.
+        /// </summary>
+        /// <param name="runner"></param>
+        /// <param name="refreshCommonObjects"></param>
+        private static void RefreshRunnerVisibility(NetworkRunner runner, bool refreshCommonObjects = true)
+        {
+
+            // Trying to refresh before the runner has setup.
+            if (runner.GetVisibilityNodes() == null)
+            {
+                //Log.Warn($"{nameof(NetworkRunner)} visibility can't be changed. Not ready yet.");
+                return;
+            }
+
+            bool enable = runner.GetVisible();
+
+            foreach (var node in runner.GetVisibilityNodes())
+            {
+
+                // This should never be null, but just in case...
+                if (node == null)
+                {
+                    continue;
+                }
+                node.SetEnabled(enable);
+            }
+            if (refreshCommonObjects)
+            {
+                RefreshCommonObjectVisibilities();
+            }
+        }
+
+
+        /// <summary>
+        /// Dictionary lookup for manually added visibility nodes (which indicates only one instance should be visible at a time), 
+        /// which returns a list of nodes for a given LocalIdentifierInFile.
+        /// </summary>
+        [StaticField]
+        private readonly static Dictionary<string, List<RunnerVisibilityLink>> CommonObjectLookup = new Dictionary<string, List<RunnerVisibilityLink>>();
+
+        internal static void RefreshCommonObjectVisibilities()
+        {
+            var runners = NetworkRunner.GetInstancesEnumerator();
+            NetworkRunner serverRunner = null;
+            NetworkRunner clientRunner = null;
+            NetworkRunner firstRunner = null;
+            bool foundInputAuth = false;
+
+            // First find the runner for each preference.
+            while (runners.MoveNext())
+            {
+                var runner = runners.Current;
+                // Exclude inactive runners TODO: may not be needed after this list is patched to contain only active
+                if (!runner.IsRunning || !runner.GetVisible() || runner.IsShutdown)
+                    continue;
+
+                if (runner.IsServer)
+                {
+                    serverRunner = runner;
+                }
+
+                if (!clientRunner && runner.GameMode != GameMode.Server)
+                {
+                    clientRunner = runner;
+                }
+
+                if (!firstRunner)
+                {
+                    firstRunner = runner;
+                }
+            }
+
+            // loop all common objects, making sure to activate only one peer instance.
+            foreach (var kvp in CommonObjectLookup)
+            {
+                var clones = kvp.Value;
+                if (clones.Count > 0)
+                {
+                    NetworkRunner prefRunner;
+                    var firstClone = clones[0];
+
+                    switch (firstClone.PreferredRunner)
+                    {
+                        case RunnerVisibilityLink.PreferredRunners.Server:
+                            prefRunner = serverRunner;
+                            break;
+                        case RunnerVisibilityLink.PreferredRunners.Client:
+                            prefRunner = clientRunner;
+                            break;
+                        case RunnerVisibilityLink.PreferredRunners.Auto:
+                            prefRunner = firstRunner;
+                            break;
+                        default:
+                            prefRunner = null;
+                            break;
+                    }
+
+                    foundInputAuth = false;
+                    foreach (var clone in clones)
+                    {
+                        if (clone.PreferredRunner == RunnerVisibilityLink.PreferredRunners.InputAuthority)
+                        {
+                            var inputFound = clone.IsInputAuth();
+                            clone.Enabled = inputFound && clone._runner.GetVisible();
+                            foundInputAuth |= inputFound;
+                        }
+                        else
+                        {
+                            clone.Enabled = ReferenceEquals(clone._runner, prefRunner);
+                        }
+                    }
+
+                    if (firstClone.PreferredRunner == RunnerVisibilityLink.PreferredRunners.InputAuthority)
+                    {
+                        if (foundInputAuth == false && _commonLinksWithMissingInputAuthNeedRefresh)
+                        {
+                            // Signal to refresh later when the object has input information.
+                            _commonLinksWithMissingInputAuthNeedRefresh = false;
+                            firstClone.InvokeRefreshCommonObjectVisibilities(1f);
+                        }
+                    }
+                }
+            }
+        }
+
+        [StaticFieldResetMethod]
+        internal static void ResetStatics()
+        {
+            CommonObjectLookup.Clear();
+        }
     }
 }
 

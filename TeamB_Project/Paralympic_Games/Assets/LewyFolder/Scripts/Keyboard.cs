@@ -1,7 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;   
-using TMPro;
 
 
 public class Keyboard : MonoBehaviour
@@ -30,7 +27,7 @@ public class Keyboard : MonoBehaviour
 
     public void DeleteChar()
     {
-        if(inputField.text.Length > 0)
+        if (inputField.text.Length > 0)
         {
             inputField.text = inputField.text.Substring(0, inputField.text.Length - 1);
 

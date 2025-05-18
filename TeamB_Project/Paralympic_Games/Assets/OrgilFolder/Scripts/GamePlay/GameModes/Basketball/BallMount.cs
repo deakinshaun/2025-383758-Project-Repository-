@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Oculus.Interaction;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ namespace OrgilFolder.Scripts.GamePlay.GameModes.Basketball
         [SerializeField] private GameObject preview;
         private Collider ballCollider;
         private InteractableUnityEventWrapper ballEventWrapper;
-        
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Ball"))

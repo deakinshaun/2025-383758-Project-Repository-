@@ -9,8 +9,8 @@
 // ----------------------------------------------------------------------------
 
 using System;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Photon.Voice
 {
@@ -353,7 +353,7 @@ namespace Photon.Voice
         // Release resources for dispose or reuse.
         public void Release()
         {
-            if(Interlocked.Decrement(ref refCnt) == 0)
+            if (Interlocked.Decrement(ref refCnt) == 0)
             {
                 Free();
             }

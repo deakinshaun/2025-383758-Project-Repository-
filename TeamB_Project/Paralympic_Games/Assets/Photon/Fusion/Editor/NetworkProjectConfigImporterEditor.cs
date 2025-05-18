@@ -1,141 +1,171 @@
-namespace Fusion.Editor {
+namespace Fusion.Editor
+{
 
-  using System;
-  using System.IO;
-  using System.Linq;
-  using UnityEditor;
-  using UnityEditor.AssetImporters;
-  using UnityEngine;
+    using System;
+    using System.IO;
+    using UnityEditor;
+    using UnityEditor.AssetImporters;
+    using UnityEngine;
 
-  [CustomEditor(typeof(NetworkProjectConfigImporter))]
-  internal class NetworkProjectConfigImporterEditor : ScriptedImporterEditor {
+    [CustomEditor(typeof(NetworkProjectConfigImporter))]
+    internal class NetworkProjectConfigImporterEditor : ScriptedImporterEditor
+    {
 
-    private Exception         _initializeException;
-    private LogSettingsDrawer _logSettingsDrawer;
+        private Exception _initializeException;
+        private LogSettingsDrawer _logSettingsDrawer;
 
-    private static bool _versionExpanded;
-    private static string _version;
-    private static string _allVersionInfo;
+        private static bool _versionExpanded;
+        private static string _version;
+        private static string _allVersionInfo;
 
-    public override bool showImportedObject => false;
+        public override bool showImportedObject => false;
 
-    protected override Type extraDataType => typeof(NetworkProjectConfigAsset);
+        protected override Type extraDataType => typeof(NetworkProjectConfigAsset);
 
-    public override void OnInspectorGUI() {
+        public override void OnInspectorGUI()
+        {
 
-      bool rebuildPrefabTable = false;
-      
-      try {
-        if (_initializeException != null) {
-          EditorGUILayout.HelpBox(_initializeException.ToString(), MessageType.Error, true);
-        } else {
+            bool rebuildPrefabTable = false;
 
-          FusionEditorGUI.InjectScriptHeaderDrawer(extraDataSerializedObject);
-          FusionEditorGUI.ScriptPropertyField(extraDataSerializedObject);
+            try
+            {
+                if (_initializeException != null)
+                {
+                    EditorGUILayout.HelpBox(_initializeException.ToString(), MessageType.Error, true);
+                }
+                else
+                {
 
-          VersionInfoGUI();
+                    FusionEditorGUI.InjectScriptHeaderDrawer(extraDataSerializedObject);
+                    FusionEditorGUI.ScriptPropertyField(extraDataSerializedObject);
 
-          using (new EditorGUI.DisabledScope(HasModified())) {
-            rebuildPrefabTable = GUILayout.Button("Rebuild Prefab Table");
-          }
+                    VersionInfoGUI();
 
-          extraDataSerializedObject.Update();
-          EditorGUILayout.PropertyField(extraDataSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.Config)));
-          extraDataSerializedObject.ApplyModifiedProperties();
+                    using (new EditorGUI.DisabledScope(HasModified()))
+                    {
+                        rebuildPrefabTable = GUILayout.Button("Rebuild Prefab Table");
+                    }
 
-          EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(NetworkProjectConfigImporter.PrefabOptions)));
-          
-          EditorGUILayout.Space();
-          EditorGUILayout.LabelField("Log", EditorStyles.boldLabel);
-          _logSettingsDrawer.DrawLayout(this, true);
-          
-          EditorGUILayout.Space();
-          EditorGUILayout.LabelField("Auto-Generated", EditorStyles.boldLabel);
+                    extraDataSerializedObject.Update();
+                    EditorGUILayout.PropertyField(extraDataSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.Config)));
+                    extraDataSerializedObject.ApplyModifiedProperties();
 
-          if (GUILayout.Button("Show Network Prefabs Inspector")) {
-            NetworkPrefabsInspector.ShowWindow();
-          }
-          
-          // WORKAROUND: during initial failed imports, this may be an instance of UnityEngine.DefaultAsset instead of the actual asset
-          if (assetSerializedObject?.targetObject.GetType() == typeof(NetworkProjectConfigAsset)) {
-            // this has the tendency to overwrite the global enabled flag, so let's make sure it's reset once the scope exists
-            using (new FusionEditorGUI.EnabledScope(GUI.enabled)) {
-              EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.Prefabs)));
-              EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.BehaviourMeta)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(NetworkProjectConfigImporter.PrefabOptions)));
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Log", EditorStyles.boldLabel);
+                    _logSettingsDrawer.DrawLayout(this, true);
+
+                    EditorGUILayout.Space();
+                    EditorGUILayout.LabelField("Auto-Generated", EditorStyles.boldLabel);
+
+                    if (GUILayout.Button("Show Network Prefabs Inspector"))
+                    {
+                        NetworkPrefabsInspector.ShowWindow();
+                    }
+
+                    // WORKAROUND: during initial failed imports, this may be an instance of UnityEngine.DefaultAsset instead of the actual asset
+                    if (assetSerializedObject?.targetObject.GetType() == typeof(NetworkProjectConfigAsset))
+                    {
+                        // this has the tendency to overwrite the global enabled flag, so let's make sure it's reset once the scope exists
+                        using (new FusionEditorGUI.EnabledScope(GUI.enabled))
+                        {
+                            EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.Prefabs)));
+                            EditorGUILayout.PropertyField(assetSerializedObject.FindPropertyOrThrow(nameof(NetworkProjectConfigAsset.BehaviourMeta)));
+                        }
+                    }
+                    else
+                    {
+                        EditorGUILayout.HelpBox("Asset failed to deserialize correctly. Please reimport.", MessageType.Warning);
+                    }
+                }
             }
-          } else {
-            EditorGUILayout.HelpBox("Asset failed to deserialize correctly. Please reimport.", MessageType.Warning);
-          }
+            finally
+            {
+                ApplyRevertGUI();
+            }
+
+            if (rebuildPrefabTable)
+            {
+                NetworkProjectConfigUtilities.RebuildPrefabTable();
+            }
         }
-      } finally {
-        ApplyRevertGUI();
-      }
-      
-      if (rebuildPrefabTable) {
-        NetworkProjectConfigUtilities.RebuildPrefabTable();
-      }
-    }
 
-    private static void VersionInfoGUI() {
-      if (string.IsNullOrEmpty(_allVersionInfo)) {
-        var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
-        foreach (var asm in assemblies) {
-          var assemblyFullName = asm.FullName;
-          if (assemblyFullName.StartsWith("Fusion.Runtime,")) {
-            _version = $"{NetworkRunner.BuildType}: {System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion}";
-          }
+        private static void VersionInfoGUI()
+        {
+            if (string.IsNullOrEmpty(_allVersionInfo))
+            {
+                var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+                foreach (var asm in assemblies)
+                {
+                    var assemblyFullName = asm.FullName;
+                    if (assemblyFullName.StartsWith("Fusion.Runtime,"))
+                    {
+                        _version = $"{NetworkRunner.BuildType}: {System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion}";
+                    }
 
-          if (assemblyFullName.StartsWith("Fusion.") || assemblyFullName.StartsWith("Fusion,")) {
-            var fileVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location).ToString();
-            _allVersionInfo += $"{assemblyFullName.Substring(0, assemblyFullName.IndexOf(",", StringComparison.Ordinal))}: {fileVersion} \n";
-          }
+                    if (assemblyFullName.StartsWith("Fusion.") || assemblyFullName.StartsWith("Fusion,"))
+                    {
+                        var fileVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location).ToString();
+                        _allVersionInfo += $"{assemblyFullName.Substring(0, assemblyFullName.IndexOf(",", StringComparison.Ordinal))}: {fileVersion} \n";
+                    }
+                }
+            }
+
+            var r = EditorGUILayout.GetControlRect();
+            _versionExpanded = EditorGUI.Foldout(r, _versionExpanded, "");
+            EditorGUI.LabelField(r, "Fusion Version", _version);
+
+            if (_versionExpanded)
+            {
+                EditorGUILayout.HelpBox(_allVersionInfo, MessageType.None);
+            }
         }
-      }
 
-      var r = EditorGUILayout.GetControlRect();
-      _versionExpanded = EditorGUI.Foldout(r, _versionExpanded, "");
-      EditorGUI.LabelField(r, "Fusion Version", _version);
+        protected override void Apply()
+        {
+            base.Apply();
 
-      if (_versionExpanded) {
-        EditorGUILayout.HelpBox(_allVersionInfo, MessageType.None);
-      }
-    }
+            if (targets != null)
+            {
+                for (int i = 0; i < extraDataTargets.Length; ++i)
+                {
+                    var importer = GetImporter(i);
+                    var wrapper = GetConfigWrapper(i);
 
-    protected override void Apply() {
-      base.Apply();
+                    EditorUtility.SetDirty(importer);
 
-      if (targets != null) {
-        for (int i = 0; i < extraDataTargets.Length; ++i) {
-          var importer = GetImporter(i);
-          var wrapper = GetConfigWrapper(i);
-          
-          EditorUtility.SetDirty(importer);
-
-          var json = EditorJsonUtility.ToJson(wrapper.Config, true);
-          File.WriteAllText(importer.assetPath, json);
+                    var json = EditorJsonUtility.ToJson(wrapper.Config, true);
+                    File.WriteAllText(importer.assetPath, json);
+                }
+            }
         }
-      }
+
+        protected override void InitializeExtraDataInstance(UnityEngine.Object extraData, int targetIndex)
+        {
+            try
+            {
+                var importer = GetImporter(targetIndex);
+                var extra = (NetworkProjectConfigAsset)extraData;
+
+                extra.Config = NetworkProjectConfigImporter.LoadConfigFromFile(importer.assetPath);
+
+                _initializeException = null;
+            }
+            catch (Exception ex)
+            {
+                _initializeException = ex;
+            }
+        }
+
+        private NetworkProjectConfigImporter GetImporter(int i)
+        {
+            return (NetworkProjectConfigImporter)targets[i];
+        }
+
+        private NetworkProjectConfigAsset GetConfigWrapper(int i)
+        {
+            return (NetworkProjectConfigAsset)extraDataTargets[i];
+        }
     }
-
-    protected override void InitializeExtraDataInstance(UnityEngine.Object extraData, int targetIndex) {
-      try {
-        var importer = GetImporter(targetIndex);
-        var extra = (NetworkProjectConfigAsset)extraData;
-
-        extra.Config = NetworkProjectConfigImporter.LoadConfigFromFile(importer.assetPath);
-
-        _initializeException = null;
-      } catch (Exception ex) {
-        _initializeException = ex;
-      }
-    }
-
-    private NetworkProjectConfigImporter GetImporter(int i) {
-      return (NetworkProjectConfigImporter)targets[i];
-    }
-
-    private NetworkProjectConfigAsset GetConfigWrapper(int i) {
-      return (NetworkProjectConfigAsset)extraDataTargets[i];
-    }
-  }
 }

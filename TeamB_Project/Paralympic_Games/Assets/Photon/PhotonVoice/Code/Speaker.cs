@@ -35,9 +35,9 @@ namespace Photon.Voice.Unity
         [SerializeField]
         protected bool restartOnDeviceChange = true;
 
-#endregion
+        #endregion
 
-#region Public Fields
+        #region Public Fields
 
 #if UNITY_PS4 || UNITY_PS5
         /// <summary>Set the PlayStation User ID to determine on which user's headphones to play audio.</summary>
@@ -63,9 +63,9 @@ namespace Photon.Voice.Unity
         public AudioOutputPlugin OutputPlugin;
 #endif
 
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         /// <summary>Is the speaker playing right now.</summary>
         public bool IsPlaying
@@ -131,9 +131,9 @@ namespace Photon.Voice.Unity
             }
         }
 
-#endregion
+        #endregion
 
-#region Private Methods
+        #region Private Methods
 
         protected override void Awake()
         {
@@ -172,7 +172,7 @@ namespace Photon.Voice.Unity
                 // fall through to the default return line at the end of this function
             }
 #elif UNITY_WEBGL && !UNITY_EDITOR // allows non-WebGL workflow in Editor
-    #if UNITY_2021_2_OR_NEWER // requires ES6
+#if UNITY_2021_2_OR_NEWER // requires ES6
             webOutAudioSource = this.GetComponent<AudioSource>();
             double initSpatialBlend = webOutAudioSource != null ? webOutAudioSource.spatialBlend : 0;
             double refDistance = webOutAudioSource != null ? webOutAudioSource.minDistance : 0;
@@ -192,10 +192,10 @@ namespace Photon.Voice.Unity
             }
 
             return webOut;
-    #else
+#else
             this.Logger.Log(LogLevel.Error, "Speaker requies Unity 2021.2 or newer for WebGL");
             return new AudioOutDummy<float>();
-    #endif
+#endif
 #endif
 #pragma warning disable CS0162 // Unreachable code detected (UNITY_WEBGL)
             return new UnityAudioOut(this.GetComponent<AudioSource>(), this.playDelayConfig, this.Logger, string.Empty, true);
@@ -333,9 +333,9 @@ namespace Photon.Voice.Unity
 #endif
         }
 
-#endregion
+        #endregion
 
-#region Public Methods
+        #region Public Methods
 
         // prevents multiple restarts per Update()
         // int instead of bool to use Interlocked.Exchange()
@@ -364,7 +364,7 @@ namespace Photon.Voice.Unity
             }
         }
 
-#endregion
+        #endregion
     }
 }
 

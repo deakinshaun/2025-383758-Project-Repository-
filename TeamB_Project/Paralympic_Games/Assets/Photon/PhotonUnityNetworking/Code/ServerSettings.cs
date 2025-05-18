@@ -13,7 +13,6 @@ namespace Photon.Pun
 {
     using System;
     using System.Collections.Generic;
-    using ExitGames.Client.Photon;
     using Photon.Realtime;
     using UnityEngine;
 
@@ -48,11 +47,11 @@ namespace Photon.Pun
         [Tooltip("RPC name list.\nUsed as shortcut when sending calls.")]
         public List<string> RpcList = new List<string>();   // set by scripts and or via Inspector
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         public bool DisableAutoOpenWizard;
         public bool ShowSettings;
         public bool DevRegionSetOnce;
-        #endif
+#endif
 
         /// <summary>Sets appid and region code in the AppSettings. Used in Editor.</summary>
         public void UseCloud(string cloudAppid, string code = "")

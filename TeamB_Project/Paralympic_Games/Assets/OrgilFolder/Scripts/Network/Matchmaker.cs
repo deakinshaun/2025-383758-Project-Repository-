@@ -1,12 +1,11 @@
 using System;
-using UnityEngine;
-using Fusion;
-using Fusion.Sockets;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Fusion;
+using Fusion.Sockets;
+using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
 public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -20,7 +19,7 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
 
     public NetworkRunner Runner { get; private set; }
     public event Action<List<SessionInfo>> onSessionListUpdated;
-    
+
     bool _private = false;
     string _roomCode = null;
 
@@ -33,13 +32,13 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (Instance == this) Instance = null;
     }
-    
-    public void TryHostSession(GameProperty property,System.Action successCallback = null)
+
+    public void TryHostSession(GameProperty property, System.Action successCallback = null)
     {
-        StartCoroutine(HostSessionRoutine(property,successCallback));
+        StartCoroutine(HostSessionRoutine(property, successCallback));
     }
 
-    IEnumerator HostSessionRoutine(GameProperty property,System.Action successCallback)
+    IEnumerator HostSessionRoutine(GameProperty property, System.Action successCallback)
     {
         if (!Runner)
         {
@@ -53,7 +52,7 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
             });
             Runner.AddCallbacks(this);
         }
-		
+
         string code = string.IsNullOrWhiteSpace(_roomCode) ? RoomCode.Create(6) : _roomCode;
 
         Task<StartGameResult> task = Runner.StartGame(new StartGameArgs()
@@ -93,7 +92,7 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
         Runner = Instantiate(runnerPrefab);
 
         Runner.ProvideInput = true;
-        
+
 
         Task<StartGameResult> task = Runner.StartGame(new StartGameArgs()
         {
@@ -136,7 +135,7 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
             yield return null;
         }
         StartGameResult result = task.Result;
-		
+
         if (result.Ok)
         {
             Debug.Log("Connected to lobby.");
@@ -164,7 +163,7 @@ public class Matchmaker : MonoBehaviour, INetworkRunnerCallbacks
         onCloseLobby_After?.Invoke();
         Runner = null;
     }
-    
+
     public void SetPrivate(bool value)
     {
         _private = value;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Photon.Voice
 {
@@ -86,7 +85,7 @@ namespace Photon.Voice
                         AudioUtil.Resample(buffer, offset, inLen, channels, outBuf, 0, outBuf.Length, outChannels);
                     }
                 }
-               readPosSamples = (readPosSamples + inSamples) % bufferSamples;
+                readPosSamples = (readPosSamples + inSamples) % bufferSamples;
             }
         }
     }

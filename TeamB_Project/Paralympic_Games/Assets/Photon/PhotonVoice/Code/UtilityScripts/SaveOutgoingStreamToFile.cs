@@ -1,7 +1,7 @@
 ﻿namespace Photon.Voice.Unity.UtilityScripts
 {
-    using UnityEngine;
     using System.IO;
+    using UnityEngine;
 
     [RequireComponent(typeof(Recorder))]
     [DisallowMultipleComponent]

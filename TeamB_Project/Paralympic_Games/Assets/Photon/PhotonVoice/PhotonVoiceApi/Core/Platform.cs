@@ -310,5 +310,5 @@ namespace Photon.Voice
         }
 #endif // UNITY_5_3_OR_NEWER
 #endif // PHOTON_VOICE_VIDEO_ENABLE
-        }
     }
+}

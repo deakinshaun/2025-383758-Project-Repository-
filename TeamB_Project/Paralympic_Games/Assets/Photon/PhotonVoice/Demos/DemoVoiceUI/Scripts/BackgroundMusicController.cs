@@ -27,7 +27,7 @@
 
         private void OnVolumeChanged(float newValue)
         {
-//            this.volumeText.text = string.Format("BG Volume: {0:0.###}", newValue);
+            //            this.volumeText.text = string.Format("BG Volume: {0:0.###}", newValue);
             this.audioSource.volume = newValue;
         }
     }

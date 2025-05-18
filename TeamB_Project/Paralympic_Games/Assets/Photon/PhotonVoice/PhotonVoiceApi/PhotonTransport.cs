@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Photon.Voice
 {
@@ -111,12 +109,12 @@ namespace Photon.Voice
                     flags = (FrameFlags)content[3];
                 }
                 byte frNumber = evNumber;
-                if (content.Length  > 4)
+                if (content.Length > 4)
                 {
                     frNumber = (byte)content[4];
                 }
                 var buffer = new FrameBuffer(receivedBytes, flags, frNumber);
-                this.voiceClient.onFrame( playerId, voiceId, evNumber, ref buffer, isLocalPlayer);
+                this.voiceClient.onFrame(playerId, voiceId, evNumber, ref buffer, isLocalPlayer);
                 buffer.Release();
             }
         }

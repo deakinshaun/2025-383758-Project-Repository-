@@ -1,7 +1,6 @@
 using LudicWorlds;
 using Unity.Sentis;
 using UnityEngine;
-using System.Collections;
 
 
 public class RunSpectroState : SentisWhisperState
@@ -20,12 +19,12 @@ public class RunSpectroState : SentisWhisperState
         stage = 0;
         RunSpectro(); //we will do the inference in 1 frame
     }
- 
+
     public override void Update()
     {
         stateMachine.SetState(nextStateId);
     }
-       
+
     private void RunSpectro()
     { //in one go...
         using var input = new Tensor<float>(new TensorShape(1, whisper.NumSamples), whisper.Data);

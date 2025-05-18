@@ -205,27 +205,27 @@ namespace ExitGames.Demos.DemoPunVoice
             switch (this.Sequence)
             {
                 case SpawnSequence.Connection:
-                {
-                    int id = PhotonNetwork.LocalPlayer.ActorNumber;
-                    return this.SpawnPoints[(id == -1) ? 0 : id % this.SpawnPoints.Count];
-                }
-
-                case SpawnSequence.RoundRobin:
-                {
-                    this.lastUsedSpawnPointIndex++;
-                    if (this.lastUsedSpawnPointIndex >= this.SpawnPoints.Count)
                     {
-                        this.lastUsedSpawnPointIndex = 0;
+                        int id = PhotonNetwork.LocalPlayer.ActorNumber;
+                        return this.SpawnPoints[(id == -1) ? 0 : id % this.SpawnPoints.Count];
                     }
 
-                    // Use Vector.Zero and Quaternion.Identity if we are dealing with no or a null spawnpoint.
-                    return this.SpawnPoints[this.lastUsedSpawnPointIndex];
-                }
+                case SpawnSequence.RoundRobin:
+                    {
+                        this.lastUsedSpawnPointIndex++;
+                        if (this.lastUsedSpawnPointIndex >= this.SpawnPoints.Count)
+                        {
+                            this.lastUsedSpawnPointIndex = 0;
+                        }
+
+                        // Use Vector.Zero and Quaternion.Identity if we are dealing with no or a null spawnpoint.
+                        return this.SpawnPoints[this.lastUsedSpawnPointIndex];
+                    }
 
                 case SpawnSequence.Random:
-                {
-                    return this.SpawnPoints[Random.Range(0, this.SpawnPoints.Count)];
-                }
+                    {
+                        return this.SpawnPoints[Random.Range(0, this.SpawnPoints.Count)];
+                    }
 
                 default:
                     return null;

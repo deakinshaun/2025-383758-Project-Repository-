@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -20,10 +19,10 @@ public class ParticleSystemCustomPositions : MonoBehaviour
             particles[i].position = positions[i].position;
             particles[i].startSize = 2f;
             particles[i].startLifetime = 1000f;
-            
+
         }
-        _particleSystem.SetParticles(particles,count);
-        
+        _particleSystem.SetParticles(particles, count);
+
     }
-    
+
 }

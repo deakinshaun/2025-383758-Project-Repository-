@@ -1,5 +1,4 @@
 ﻿using Fusion;
-using Photon.Pun.UtilityScripts;
 using UnityEngine;
 
 namespace OrgilFolder.Scripts.GamePlay
@@ -35,7 +34,7 @@ namespace OrgilFolder.Scripts.GamePlay
             GameManager.Instance.Rpc_LoadDone();
         }
 
-        public (Vector3,Quaternion) GetSpawnPositionAndRotation(int index, int team)
+        public (Vector3, Quaternion) GetSpawnPositionAndRotation(int index, int team)
         {
             Transform spawnTf = team switch
             {

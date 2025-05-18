@@ -29,7 +29,7 @@ namespace OrgilFolder.Scripts.GamePlay
 
             cc.Velocity = input.velocity;
             cc.Move(input.velocity);
-            
+
             NetworkRotation = input.rotation;
             cc.transform.rotation = NetworkRotation;
         }

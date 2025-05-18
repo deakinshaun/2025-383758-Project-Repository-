@@ -1,13 +1,12 @@
 using LudicWorlds;
 using Unity.Sentis;
-using UnityEngine;
 
 public class LoadDecoderState : SentisWhisperState
 {
 
     public LoadDecoderState(IStateMachine<WhisperStateID> stateMachine) : base(stateMachine, WhisperStateID.LoadDecoder, WhisperStateID.LoadEncoder)
     {
-        
+
     }
 
     public override void Enter()
@@ -19,19 +18,19 @@ public class LoadDecoderState : SentisWhisperState
 
     public override void Update()
     {
-        switch(stage)
+        switch (stage)
         {
             case 0:
                 LoadDecoder();
                 stage = 1;
                 break;
             default:
-                stateMachine.SetState( nextStateId );
+                stateMachine.SetState(nextStateId);
                 break;
-        }      
+        }
     }
 
-    private void LoadDecoder() 
+    private void LoadDecoder()
     {
         Model decoder = ModelLoader.Load(whisper.decoderAsset);
 
@@ -47,7 +46,7 @@ public class LoadDecoderState : SentisWhisperState
         FunctionalTensor[] outputs = Functional.Forward(decoder, inputs);
 
         // Calculate the argMax of the first output with the functional API.
-        FunctionalTensor argmaxOutput = Functional.ArgMax(outputs[0],2);
+        FunctionalTensor argmaxOutput = Functional.ArgMax(outputs[0], 2);
 
         // Build the model from the graph using the `Compile` method with the desired outputs.
         Model decoderWithArgMax = graph.Compile(argmaxOutput);

@@ -1,7 +1,7 @@
 ﻿namespace Photon.Voice.Unity
 {
-    using Voice;
     using UnityEngine;
+    using Voice;
 
     /// <summary>
     /// This component is useful to handle audio device and config changes.

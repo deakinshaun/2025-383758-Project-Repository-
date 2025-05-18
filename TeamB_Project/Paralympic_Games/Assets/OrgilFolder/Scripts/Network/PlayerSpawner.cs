@@ -9,7 +9,7 @@ public class PlayerSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         if (Runner.CanSpawn)
         {
             var pObject = Runner.Spawn(playerObject, inputAuthority: player);
-            Runner.SetPlayerObject(player,pObject);
+            Runner.SetPlayerObject(player, pObject);
         }
     }
 

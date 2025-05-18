@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace Photon.Voice
 {
@@ -126,7 +125,7 @@ namespace Photon.Voice
     {
         bool IsSupported { get; }
         void Refresh();
-        Action OnReady {set;}
+        Action OnReady { set; }
         string Error { get; }
     }
 

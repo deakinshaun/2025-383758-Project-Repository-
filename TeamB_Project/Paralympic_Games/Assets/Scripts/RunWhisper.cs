@@ -1,8 +1,8 @@
-using UnityEngine;
-using Unity.Sentis;
-using TMPro;
 using System.Collections.Generic;
 using LudicWorlds;
+using TMPro;
+using Unity.Sentis;
+using UnityEngine;
 
 // https://huggingface.co/unity/sentis-whisper-tiny/blob/main/RunWhisper.cs
 
@@ -92,14 +92,14 @@ public class RunWhisper : GameObjectStateMachine<WhisperStateID>
     }
 
 
-    public void Transcribe( AudioClip clip )
+    public void Transcribe(AudioClip clip)
     {
         Debug.Log("-> SentisWisper::Transcribe() ...");
 
         IsReady = false;
         audioClip = clip;
 
-        SetState( WhisperStateID.StartTranscription );
+        SetState(WhisperStateID.StartTranscription);
     }
 
 

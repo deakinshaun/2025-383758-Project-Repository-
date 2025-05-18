@@ -13,10 +13,10 @@
 namespace ExitGames.Demos.DemoPunVoice
 {
     using System.Collections.Generic;
+    using Photon.Pun;
+    using Photon.Realtime;
     using UnityEngine;
     using UnityEngine.UI;
-    using Photon.Realtime;
-    using Photon.Pun;
 
     public class ChangePOV : MonoBehaviour, IMatchmakingCallbacks
     {

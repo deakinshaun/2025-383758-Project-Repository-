@@ -16,9 +16,9 @@
 namespace ExitGames.Demos.DemoPunVoice
 {
 
+    using Photon.Voice.PUN;
     using UnityEngine;
     using UnityEngine.UI;
-    using Photon.Voice.PUN;
 
     [RequireComponent(typeof(Canvas))]
     public class Highlighter : MonoBehaviour

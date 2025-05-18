@@ -1,9 +1,9 @@
 ﻿namespace Photon.Voice.Unity.Demos.DemoVoiceUI
 {
-    using UnityEngine;
-    using UnityEngine.UI;
     using System.Collections.Generic;
     using POpusCodec.Enums;
+    using UnityEngine;
+    using UnityEngine.UI;
 
     public class CodecSettingsUI : MonoBehaviour
     {

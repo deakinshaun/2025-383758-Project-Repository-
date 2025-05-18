@@ -1,56 +1,55 @@
-using UnityEngine;
 using System.Collections.Generic;
-using System;
+using UnityEngine;
 
 namespace LudicWorlds
 {
-	public class GameObjectStateMachine<T> : MonoBehaviour, IStateMachine<T>
-	{
-		protected GameObjectState<T>	currentState;
-		protected GameObjectState<T>	prevState;
-		protected GameObjectState<T>	nextState;
-		protected Dictionary<T, GameObjectState<T>> states;
+    public class GameObjectStateMachine<T> : MonoBehaviour, IStateMachine<T>
+    {
+        protected GameObjectState<T> currentState;
+        protected GameObjectState<T> prevState;
+        protected GameObjectState<T> nextState;
+        protected Dictionary<T, GameObjectState<T>> states;
 
-		//-------------------------------------------------------------------
-		// Acessors
-		//-------------------------------------------------------------------
+        //-------------------------------------------------------------------
+        // Acessors
+        //-------------------------------------------------------------------
 
-		public IState<T> CurrentState 
-		{
-			get{ return currentState; }
-		}
-	
-        public IState<T> PreviousState
+        public IState<T> CurrentState
         {
-            get{ return prevState; }
+            get { return currentState; }
         }
 
-		//-------------------------------------------
-		// Monobehaviour
-		//-------------------------------------------
+        public IState<T> PreviousState
+        {
+            get { return prevState; }
+        }
 
-		protected virtual void Awake() 
-		{
-			//Debug.Log ("-> GameObjectStateMachine::Awake");
-			InitStateMachine();
-		}
+        //-------------------------------------------
+        // Monobehaviour
+        //-------------------------------------------
 
-		protected virtual void Start() 
-		{
-			//Debug.Log("-> GameObjectStateMachine::Start");
-			InitStates();
-		}
+        protected virtual void Awake()
+        {
+            //Debug.Log ("-> GameObjectStateMachine::Awake");
+            InitStateMachine();
+        }
 
-	 	protected virtual void Update() 
-		{      
-			currentState?.Update(); 
-		}
+        protected virtual void Start()
+        {
+            //Debug.Log("-> GameObjectStateMachine::Start");
+            InitStates();
+        }
 
-        protected virtual void FixedUpdate() {}
+        protected virtual void Update()
+        {
+            currentState?.Update();
+        }
+
+        protected virtual void FixedUpdate() { }
 
         protected virtual void LateUpdate()
         {
-			currentState?.LateUpdate();   
+            currentState?.LateUpdate();
         }
 
         //-------------------------------------------
@@ -58,54 +57,54 @@ namespace LudicWorlds
         //-------------------------------------------
 
         private void InitStateMachine()
-		{
+        {
             currentState = null;
-			states = new Dictionary<T, GameObjectState<T>>();	
-		}
-	
-		protected virtual void InitStates() {}
-
-	
-		public void AddState( IState<T> state )
-		{
-			this.states.Add( state.ID, state as GameObjectState<T>);
+            states = new Dictionary<T, GameObjectState<T>>();
         }
-		
 
-		public bool SetState( IState<T> state)
-		{
+        protected virtual void InitStates() { }
+
+
+        public void AddState(IState<T> state)
+        {
+            this.states.Add(state.ID, state as GameObjectState<T>);
+        }
+
+
+        public bool SetState(IState<T> state)
+        {
             if (state != null)
-			{
+            {
                 currentState?.Exit();
-				
-				prevState = currentState;
-				currentState = state as GameObjectState<T>;
-				currentState.Enter();
-                return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
 
-		public bool SetState(T stateID)
-		{
+                prevState = currentState;
+                currentState = state as GameObjectState<T>;
+                currentState.Enter();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        public bool SetState(T stateID)
+        {
             if (currentState != null)
             {
                 if (stateID.Equals(currentState.ID))
                     return true;
             }
 
-            if(!states.ContainsKey(stateID))
+            if (!states.ContainsKey(stateID))
             {
                 Debug.LogError("LL-> GameObjectStateMachine::ChangeState() - Can't find stateID: " + stateID);
                 return false;
             }
 
-            return SetState( states[stateID] );
-		}
+            return SetState(states[stateID]);
+        }
 
         public void ClearStates()
         {

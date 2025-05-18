@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public static class RoomCode
+﻿public static class RoomCode
 {
     static readonly System.Random rnd = new System.Random();
     public static string Create(int length = 4)

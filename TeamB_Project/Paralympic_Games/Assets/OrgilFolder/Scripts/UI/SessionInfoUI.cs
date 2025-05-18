@@ -12,7 +12,7 @@ namespace OrgilFolder.Scripts.UI
         [SerializeField] private TMP_Text gameMode;
         [SerializeField] private TMP_Text playerCount;
         [SerializeField] private Button joinButton;
-        public event Action OnJoinClicked = delegate {  };
+        public event Action OnJoinClicked = delegate { };
         private void Start()
         {
             joinButton.onClick.AddListener(OnJoinClicked.Invoke);

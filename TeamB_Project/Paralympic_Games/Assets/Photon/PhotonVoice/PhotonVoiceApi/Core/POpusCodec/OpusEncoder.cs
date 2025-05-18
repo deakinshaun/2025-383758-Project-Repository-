@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using POpusCodec.Enums;
-using Photon.Voice;
 using System.Runtime.InteropServices;
+using Photon.Voice;
+using POpusCodec.Enums;
 
 namespace POpusCodec
 {

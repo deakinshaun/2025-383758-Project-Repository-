@@ -52,8 +52,8 @@ public class SessionUIScreen : MonoBehaviour
 
     private void Initialization()
     {
-        
-        
+
+
         foreach (var player in PlayerRegistry.Players)
         {
             SpawnPlayerItem(PlayerRegistry.Instance.Runner, player.Ref, player.Team);

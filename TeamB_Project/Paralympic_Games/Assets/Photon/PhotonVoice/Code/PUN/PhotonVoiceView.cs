@@ -15,8 +15,8 @@
 namespace Photon.Voice.PUN
 {
     using Pun;
-    using UnityEngine;
     using Unity;
+    using UnityEngine;
 
     /// <summary>
     /// Component that should be attached to a networked PUN prefab that has <see cref="PhotonView"/>.

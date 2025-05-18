@@ -1,11 +1,11 @@
 ﻿namespace Photon.Voice.Unity.Editor
 {
-    using ExitGames.Client.Photon;
     using System.Collections.Generic;
-    using UnityEngine;
-    using UnityEditor;
-    using Unity;
+    using ExitGames.Client.Photon;
     using Realtime;
+    using Unity;
+    using UnityEditor;
+    using UnityEngine;
 
     [CustomEditor(typeof(UnityVoiceClient), true)]
     public class UnityVoiceClientEditor : VoiceConnectionEditor
